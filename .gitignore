@@ -1,0 +1,13 @@
+.settings
+target/
+bin/
+.antlr*
+.metadata/
+*/plugin.xml_gen
+node_modules
+bower_components
+.tmp
+.vscode
+.sass-cache
+nbproject
+coverage

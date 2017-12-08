@@ -1,0 +1,19 @@
+peux-tu allumer les <START:object> lumières <END> dans la <START:location> chambre <END>
+peux-tu allumer les <START:object> lampes <END>
+peux-tu mettre en marche la <START:object> télévision <END> 
+peux-tu mettre en marche le <START:object> lave-vaisselle <END> 
+mets en marche le <START:object> radiateur <END> dans la <START:location> cuisine <END>
+active le <START:object> ventilateur <END> du <START:location> salon <END>
+lance le <START:object> lave-vaisselle <END>
+allume la <START:object> télévision <END>
+allume la <START:object> lumière <END>
+allume l' <START:object> éclairage <END>
+allume le <START:object> chauffage <END>
+allume le <START:object> chauffage <END> du <START:location> salon <END>
+allume le <START:object> chauffage <END> de la <START:location> chambre <END>
+allume le <START:object> chauffage <END> dans le <START:location> sous-sol <END>
+allume le <START:object> radiateur <END> dans la <START:location> cave <END>
+allume le <START:object> radiateur <END> au <START:location> 1er étage <END>
+allume le <START:object> radiateur <END> au <START:location> premier étage <END>
+allume le <START:object> radiateur <END> au <START:location> deuxième étage <END>
+allume le <START:object> radiateur <END> au <START:location> rez-de-chaussée <END>

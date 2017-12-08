@@ -1,0 +1,29 @@
+give me the status of the <START:object> lighting <END> on the <START:location> first floor <END>
+what's the status of the <START:object> lights <END> in the <START:location> bedroom <END> ?
+show me the <START:object> temperatures <END> of the <START:location> second floor <END>
+give me the <START:object> luminosity <END>
+give me the <START:object> humidity <END> in the <START:location> garage <END>
+<START:object> humidity <END> in the <START:location> attic <END>
+<START:object> water consumption <END> in the <START:location> kitchen <END>
+current <START:object> power consumption <END>
+<START:object> temperature <END> of the <START:location> living room <END>
+<START:object> heating <END> in the <START:location> kitchen <END>
+<START:object> fan <END> in the <START:location> patio  <END>
+<START:object> a/c <END> in the <START:location> bedroom <END>
+is the <START:object> front door <END> open?
+is the <START:object> window <END> closed?
+are the <START:object> doors <END> locked?
+what's the <START:object> power consumption <END> now
+show me the <START:object> water pump <END>
+is the <START:object> alarm <END> activated?
+tell me if the <START:object> fan <END> in the <START:location> living room <END> is on?
+is the <START:object> fridge <END> in the <START:location> kitchen <END> off?
+tell me how the <START:object> heat pump <END> in the <START:location> attic <END> is
+show me the state of the <START:object> heating <END> in the <START:location> basement <END>
+is the <START:object> tv <END> on?
+is the <START:location> bedroom <END> <START:object> tv <END> on?
+can you check if the <START:object> télé <END> dans la <START:location> chambre <END> est allumée ?
+show the <START:object> temperature <END>
+give the <START:object> temperature <END> in the <START:location> bathroom <END>
+<START:object> light <END> in the <START:location> ground floor <END>
+<START:object> humidity <END> of the <START:location> garden <END>
