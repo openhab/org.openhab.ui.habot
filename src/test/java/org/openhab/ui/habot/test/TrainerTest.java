@@ -60,9 +60,9 @@ public class TrainerTest {
                 .interpret("show me a graph of the temperature in the living room for the last 3 hours").toString());
         System.out.println(trainer.interpret("show me the temperature in the kitchen").toString());
         System.out.println(trainer.interpret("start the heating in the garage").toString());
-        System.out.println(trainer.interpret("Temperature in the child's room").toString());
-        System.out.println(trainer.interpret("start the ac").toString());
-        System.out.println(trainer.interpret("what's the temperature in the garage").toString());
+        System.out.println(trainer.interpret("Temperature in the bedroom?").toString());
+        System.out.println(trainer.interpret("start the ac please!").toString());
+        System.out.println(trainer.interpret("what's the temperature in the garage?").toString());
         System.out.println(trainer.interpret("show a graph of the electricity consumption over 2 days").toString());
         System.out.println(trainer.interpret("turn on the lights in the kitchen").toString());
     }
@@ -74,7 +74,7 @@ public class TrainerTest {
         System.out.println(trainer
                 .interpret("donne-moi un graphique de la température du salon pour les dernières heures").toString());
         System.out.println(trainer.interpret("montre-moi la température du salon").toString());
-        System.out.println(trainer.interpret("Température du salon").toString());
+        System.out.println(trainer.interpret("Température du salon ?").toString());
         System.out.println(trainer.interpret("active le thermostat dans le garage").toString());
         System.out.println(trainer.interpret("mets en route la climatisation").toString());
         System.out.println(trainer
