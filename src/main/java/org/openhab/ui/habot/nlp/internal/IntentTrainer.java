@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.openhab.ui.habot.nlp.Intent;
 import org.openhab.ui.habot.nlp.Skill;
+import org.openhab.ui.habot.nlp.Tokenizer;
 import org.openhab.ui.habot.nlp.UnsupportedLanguageException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +22,6 @@ import opennlp.tools.namefind.NameSample;
 import opennlp.tools.namefind.NameSampleDataStream;
 import opennlp.tools.namefind.TokenNameFinderFactory;
 import opennlp.tools.namefind.TokenNameFinderModel;
-import opennlp.tools.tokenize.WhitespaceTokenizer;
 import opennlp.tools.util.InputStreamFactory;
 import opennlp.tools.util.ObjectStream;
 import opennlp.tools.util.ObjectStreamUtils;
@@ -101,7 +101,7 @@ public class IntentTrainer {
     }
 
     public Intent interpret(String query) {
-        String[] tokens = WhitespaceTokenizer.INSTANCE.tokenize(query);
+        String[] tokens = Tokenizer.INSTANCE.tokenize(query.toLowerCase());
         double[] outcome = categorizer.categorize(tokens);
         logger.debug(categorizer.getAllResults(outcome));
 
