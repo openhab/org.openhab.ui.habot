@@ -8,8 +8,8 @@ give me the <START:object> humidity <END> in the <START:location> garage <END>
 current <START:object> power consumption <END>
 <START:object> temperature <END> of the <START:location> living room <END>
 <START:object> heating <END> in the <START:location> kitchen <END>
-<START:object> fan <END> in the <START:location> patio  <END>
-<START:object> a/c <END> in the <START:location> bedroom <END>
+<START:object> fan <END> in the <START:location> patio <END>
+<START:object> air conditioning <END> in the <START:location> bedroom <END>
 <START:object> temperature <END> on the <START:location> ground floor <END>
 show the <START:object> lights <END> of the <START:location> first floor <END>
 <START:object> heating <END> on the <START:location> ground floor <END>
@@ -25,7 +25,7 @@ tell me how the <START:object> heat pump <END> in the <START:location> attic <EN
 show me the state of the <START:object> heating <END> in the <START:location> basement <END>
 is the <START:object> tv <END> on?
 is the <START:location> bedroom <END> <START:object> tv <END> on?
-can you check if the <START:object> télé <END> dans la <START:location> chambre <END> est allumée ?
+can you check if the <START:object> television <END> in the <START:location> bedroom <END> is switched on?
 show the <START:object> temperature <END>
 give the <START:object> temperature <END> in the <START:location> bathroom <END>
 <START:object> light <END> in the <START:location> ground floor <END>

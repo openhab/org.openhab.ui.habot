@@ -7,4 +7,4 @@ graph today's <START:object> temperature <END> in the <START:location> bathroom 
 evolution of the <START:object> temperature <END> in the <START:location> dinner room <END> over <START:period> 3 <END> days
 changes of the <START:object> water consumption <END> in the <START:location> garden <END> these last <START:period> 4 <END> days
 what was the <START:object> natural gas consumption <END> of the last <START:period> 4 <END> days
-graph the <START:object> humidity <END> over <START:period> 5 <END> jours
+graph the <START:object> humidity <END> over <START:period> 5 <END> days
