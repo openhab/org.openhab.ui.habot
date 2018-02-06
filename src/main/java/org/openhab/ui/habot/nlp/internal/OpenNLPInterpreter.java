@@ -1,6 +1,8 @@
 package org.openhab.ui.habot.nlp.internal;
 
+import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -8,7 +10,10 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.commons.io.IOUtils;
+import org.eclipse.smarthome.core.common.registry.RegistryChangeListener;
 import org.eclipse.smarthome.core.events.EventPublisher;
+import org.eclipse.smarthome.core.items.Item;
 import org.eclipse.smarthome.core.items.ItemRegistry;
 import org.eclipse.smarthome.core.voice.text.HumanLanguageInterpreter;
 import org.eclipse.smarthome.core.voice.text.InterpretationException;
@@ -35,6 +40,31 @@ public class OpenNLPInterpreter implements HumanLanguageInterpreter {
 
     private HashMap<String, Skill> skills = new HashMap<String, Skill>();
 
+    private RegistryChangeListener<Item> registryChangeListener = new RegistryChangeListener<Item>() {
+        @Override
+        public void added(Item element) {
+            // Only invalidate the trainer if the new item has tags
+            if (element.getTags().stream().anyMatch(tag -> tag.startsWith("object:") || tag.startsWith("location:"))) {
+                intentTrainer = null;
+            }
+        }
+
+        @Override
+        public void removed(Item element) {
+            // Only invalidate the trainer if the removed item had tags
+            if (element.getTags().stream().anyMatch(tag -> tag.startsWith("object:") || tag.startsWith("location:"))) {
+                intentTrainer = null;
+            }
+        }
+
+        @Override
+        public void updated(Item oldElement, Item element) {
+            if (!element.getTags().equals(oldElement.getTags())) {
+                intentTrainer = null;
+            }
+        }
+    };
+
     @Override
     public String getId() {
         return "opennlp";
@@ -55,6 +85,22 @@ public class OpenNLPInterpreter implements HumanLanguageInterpreter {
         return reply.getAnswer();
     }
 
+    private InputStream getNameFinderTrainingDataFromTags() {
+        StringBuilder nameSamplesDoc = new StringBuilder();
+        Collection<Item> items = itemRegistry.getItems();
+        for (Item item : items) {
+            for (String tag : item.getTags()) {
+                if (tag.startsWith("object:")) {
+                    nameSamplesDoc.append(String.format("<START:object> %s <END>%n", tag.split(":")[1]));
+                } else if (tag.startsWith("location:")) {
+                    nameSamplesDoc.append(String.format("<START:location> %s <END>%n", tag.split(":")[1]));
+                }
+            }
+        }
+
+        return IOUtils.toInputStream(nameSamplesDoc.toString());
+    }
+
     /**
      * This variant of interpret() returns a more complete interpretation result.
      *
@@ -66,7 +112,8 @@ public class OpenNLPInterpreter implements HumanLanguageInterpreter {
     public ChatReply reply(Locale locale, String text) throws InterpretationException {
         if (!locale.equals(currentLocale) || intentTrainer == null) {
             try {
-                intentTrainer = new IntentTrainer(locale.getLanguage(), skills.values());
+                intentTrainer = new IntentTrainer(locale.getLanguage(), skills.values(),
+                        getNameFinderTrainingDataFromTags());
                 currentLocale = locale;
             } catch (Exception e) {
                 InterpretationException fe = new InterpretationException(
@@ -117,13 +164,13 @@ public class OpenNLPInterpreter implements HumanLanguageInterpreter {
     public void setItemRegistry(ItemRegistry itemRegistry) {
         if (this.itemRegistry == null) {
             this.itemRegistry = itemRegistry;
-            // this.itemRegistry.addRegistryChangeListener(registryChangeListener);
+            this.itemRegistry.addRegistryChangeListener(registryChangeListener);
         }
     }
 
     public void unsetItemRegistry(ItemRegistry itemRegistry) {
         if (itemRegistry == this.itemRegistry) {
-            // this.itemRegistry.removeRegistryChangeListener(registryChangeListener);
+            this.itemRegistry.removeRegistryChangeListener(registryChangeListener);
             this.itemRegistry = null;
         }
     }

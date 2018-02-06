@@ -119,7 +119,7 @@ It will then behave almost like a real app, however there is no upgrade function
 In somewhat descreasing order of priority:
 
 - [ ] Some basic skills are absent or not implemented (last changes in an item's state, weekly/monthly graphs, activate/deactivate objects, set/increase/decrease numerical values, send open/close commands, player control...);
-- [ ] The ability to use item tags as training data to improve the entity extraction accuracy;
+- [x] The ability to use item tags as training data to improve the entity extraction accuracy;
 - [ ] More training data in general;
 - [ ] Use a lemmitizer from OpenNLP to retrieve the dictionary form (i.e. singular) of entities;
 - [x] Improve the tokenization (problems with _'s_ in English, _l'_ _d'_ in French, remove punctuation, lowercase);

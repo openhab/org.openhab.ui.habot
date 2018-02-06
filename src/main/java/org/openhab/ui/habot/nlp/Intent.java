@@ -26,7 +26,7 @@ public class Intent {
 
     @Override
     public String toString() {
-        return "Intent [name=" + name + ", slots=" + entities + "]";
+        return "Intent [name=" + name + ", entities=" + entities + "]";
     }
 
     public Intent(String name) {

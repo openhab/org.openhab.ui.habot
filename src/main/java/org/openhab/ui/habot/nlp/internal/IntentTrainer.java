@@ -34,10 +34,16 @@ public class IntentTrainer {
     private final Logger logger = LoggerFactory.getLogger(IntentTrainer.class);
 
     private DocumentCategorizerME categorizer;
-    private NameFinderME[] nameFinderMEs;
+    private NameFinderME nameFinder;
 
     public IntentTrainer(String language, Collection<Skill> skills) throws Exception {
+        this(language, skills, null);
+    }
 
+    public IntentTrainer(String language, Collection<Skill> skills, InputStream additionalNameSamples)
+            throws Exception {
+
+        /* Prepare the streams of document samples sourced from each skill's training data */
         List<ObjectStream<DocumentSample>> categoryStreams = new ArrayList<ObjectStream<DocumentSample>>();
         for (Skill skill : skills) {
             String intent = skill.getIntentId();
@@ -59,15 +65,19 @@ public class IntentTrainer {
                         language);
             }
         }
+
+        /* concatenate the document samples object streams into one to feed to the trainer */
         ObjectStream<DocumentSample> combinedDocumentSampleStream = ObjectStreamUtils
                 .concatenateObjectStream(categoryStreams);
 
+        /* train the categorizer! */
         DoccatModel doccatModel = DocumentCategorizerME.train(language, combinedDocumentSampleStream,
                 TrainingParameters.defaultParams(), new DoccatFactory());
         combinedDocumentSampleStream.close();
 
         List<TokenNameFinderModel> tokenNameFinderModels = new ArrayList<TokenNameFinderModel>();
 
+        /* Use the skill's training data again, to train the entity extractor (token name finder) this time */
         List<ObjectStream<NameSample>> nameStreams = new ArrayList<ObjectStream<NameSample>>();
         for (Skill skill : skills) {
             try {
@@ -86,18 +96,32 @@ public class IntentTrainer {
                         language);
             }
         }
+
+        /* Also use the additional training data for entity extraction (i.e. actual items' tags) if provided */
+        if (additionalNameSamples != null) {
+            ObjectStream<String> additionalLineStream = new PlainTextByLineStream(new InputStreamFactory() {
+
+                @Override
+                public InputStream createInputStream() throws IOException {
+                    return additionalNameSamples;
+                }
+
+            }, "UTF-8");
+            ObjectStream<NameSample> additionalNameSamplesStream = new NameSampleDataStream(additionalLineStream);
+            nameStreams.add(additionalNameSamplesStream);
+        }
+
+        /* concatenate the name samples object streams into one to feed to the trainer */
         ObjectStream<NameSample> combinedNameSampleStream = ObjectStreamUtils.concatenateObjectStream(nameStreams);
 
+        /* train the token name finder! */
         TokenNameFinderModel tokenNameFinderModel = NameFinderME.train(language, null, combinedNameSampleStream,
                 TrainingParameters.defaultParams(), new TokenNameFinderFactory());
         combinedNameSampleStream.close();
         tokenNameFinderModels.add(tokenNameFinderModel);
 
         categorizer = new DocumentCategorizerME(doccatModel);
-        nameFinderMEs = new NameFinderME[tokenNameFinderModels.size()];
-        for (int i = 0; i < tokenNameFinderModels.size(); i++) {
-            nameFinderMEs[i] = new NameFinderME(tokenNameFinderModels.get(i));
-        }
+        nameFinder = new NameFinderME(tokenNameFinderModel);
     }
 
     public Intent interpret(String query) {
@@ -107,12 +131,10 @@ public class IntentTrainer {
 
         Intent intent = new Intent(categorizer.getBestCategory(outcome));
 
-        for (NameFinderME nameFinderME : nameFinderMEs) {
-            Span[] spans = nameFinderME.find(tokens);
-            String[] names = Span.spansToStrings(spans, tokens);
-            for (int i = 0; i < spans.length; i++) {
-                intent.getEntities().put(spans[i].getType(), names[i]);
-            }
+        Span[] spans = nameFinder.find(tokens);
+        String[] names = Span.spansToStrings(spans, tokens);
+        for (int i = 0; i < spans.length; i++) {
+            intent.getEntities().put(spans[i].getType(), names[i]);
         }
 
         logger.debug(intent.toString());
