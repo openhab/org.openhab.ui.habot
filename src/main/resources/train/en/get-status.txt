@@ -10,6 +10,9 @@ current <START:object> power consumption <END>
 <START:object> heating <END> in the <START:location> kitchen <END>
 <START:object> fan <END> in the <START:location> patio  <END>
 <START:object> a/c <END> in the <START:location> bedroom <END>
+<START:object> temperature <END> on the <START:location> ground floor <END>
+show the <START:object> lights <END> of the <START:location> first floor <END>
+<START:object> heating <END> on the <START:location> ground floor <END>
 is the <START:object> front door <END> open?
 is the <START:object> window <END> closed?
 are the <START:object> doors <END> locked?
