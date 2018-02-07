@@ -21,8 +21,6 @@
     <meta name="msapplication-TileImage" content="<%= htmlWebpackPlugin.files.publicPath %>statics/icons/ms-icon-144x144.png">
     <meta name="msapplication-TileColor" content="#ff6600">
 
-    <meta name="theme-color" content="#027be3">
-
     <% for (var chunk of webpack.chunks) {
         for (var file of chunk.files) {
           if (file.match(/\.(js|css)$/)) { %>
@@ -36,5 +34,6 @@
     <!-- Todo: only include in production -->
     <%= htmlWebpackPlugin.options.serviceWorkerLoader %>
     <!-- built files will be auto injected -->
+    <script src="statics/js/recorder.js"></script>
   </body>
 </html>

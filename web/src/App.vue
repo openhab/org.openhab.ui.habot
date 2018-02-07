@@ -48,7 +48,10 @@
       <router-view class="layout-view"></router-view>
 
       <q-fixed-position corner="bottom-right" :offset="[18, 18]" v-if="$route.path == '/' || $route.path == '/chat'">
-        <q-btn round color="primary" @click="speak" icon="mic" />
+        <q-btn v-show="startSpeak" round color="primary" @click="startRecording" icon="mic" />
+        <q-btn v-show="stopSpeak" round loader color="red" @click="stopRecording" icon="mic off">
+          <q-spinner-radio slot="loading" />
+        </q-btn>
       </q-fixed-position>
 
       <q-toolbar slot="footer" class="chat-input bg-grey-3" v-if="$route.path == '/' || $route.path == '/chat'">
@@ -62,9 +65,14 @@
 </template>
 
 <script>
+
+var audioContext
+var recorder
+
 /*
  * Root component
  */
+// import { Recorder } from '@accentdotai/recorderjs'
 import {
   Events,
   Toast,
@@ -92,8 +100,11 @@ import {
   QTabs,
   QRouteTab,
   QChatMessage,
-  QSideLink
+  QSideLink,
+  QSpinnerRadio,
+  LocalStorage
 } from 'quasar'
+
 export default {
   components: {
     QLayout,
@@ -120,7 +131,8 @@ export default {
     QTabs,
     QRouteTab,
     QSideLink,
-    QChatMessage
+    QChatMessage,
+    QSpinnerRadio
   },
   data () {
     return {
@@ -129,7 +141,25 @@ export default {
         icon: 'arrow_send',
         content: true,
         handler: this.send
-      }]
+      }],
+
+      startSpeak: true,
+      stopSpeak: false,
+      speakLoader: false,
+      speakResult: false,
+      speakError: false,
+      speakTextResult: '',
+      speakGoogleApiKey: null,
+      speakData: {
+        audio: {
+          content: null
+        },
+        config: {
+          encoding: 'LINEAR16',
+          // sampleRateHertz: 16000,
+          languageCode: null
+        }
+      }
     }
   },
   methods: {
@@ -152,15 +182,92 @@ export default {
         el.scrollTop = el.scrollHeight
       })
     },
-    speak () {
-      Toast.create.negative({
-        html: 'Speak is not implemented yet!',
-        icon: 'mic off'
+    startRecording () {
+      try {
+        this.speakResult = false
+        audioContext = new AudioContext()
+        console.log('Audio context set up')
+
+        this.speakGoogleApiKey = LocalStorage.get.item('habot.googleApiKey')
+        if (!this.speakGoogleApiKey) {
+          Toast.create.negative({
+            html: 'The Google API Key is not set.',
+            icon: 'mic off'
+          })
+          return
+        }
+
+        var vm = this
+        navigator.getUserMedia({
+          audio: true
+        }, function (stream) {
+          const input = audioContext.createMediaStreamSource(stream)
+          // eslint-disable-next-line no-undef
+          recorder = new Recorder(input)
+          vm.startSpeak = false
+          vm.stopSpeak = true
+          recorder && recorder.record()
+          setTimeout(() => { vm.stopRecording() }, 10000)
+        }, function (e) {
+          Toast.create.negative({
+            html: 'No live audio input: ' + e,
+            icon: 'mic off'
+          })
+        })
+      }
+      catch (e) {
+        Toast.create.negative({
+          html: 'This browser has no support for web audio',
+          icon: 'mic off'
+        })
+      }
+    },
+    stopRecording (event, doneCallback) {
+      recorder && recorder.stop()
+      this.speakLoader = true
+      this.processRecording(doneCallback)
+      recorder.clear()
+    },
+    processRecording (doneCallback) {
+      const vm = this
+
+      recorder && recorder.exportWAV(function (blob) {
+        var reader = new window.FileReader()
+        reader.readAsDataURL(blob)
+        reader.onloadend = () => {
+          const baseData = reader.result
+          const base64Data = baseData.replace('data:audio/wav;base64,', '')
+          vm.speakData.audio.content = base64Data
+          vm.speakData.config.languageCode = 'fr'
+          vm.$http.post(`https://speech.googleapis.com/v1/speech:recognize?key=${vm.speakGoogleApiKey}`, vm.speakData)
+            .then(response => {
+              if (response.data.results) {
+                const result = response.data.results[0].alternatives[0]
+                Events.$emit('chat-send', result.transcript)
+              }
+              vm.startSpeak = true
+              vm.stopSpeak = false
+              vm.speakResult = true
+              if (doneCallback) doneCallback()
+            }).catch(error => {
+              vm.speakError = true
+              vm.startSpeak = true
+              vm.stopSpeak = false
+              vm.speakResult = false
+              Toast.create.negative({
+                html: error,
+                icon: 'mic off'
+              })
+              if (doneCallback) doneCallback()
+            })
+        }
       })
     }
   },
   created () {
     // this.$q.events.$on('chat-added', this.scrollToBottom)
+    window.AudioContext = window.AudioContext || window.webkitAudioContext
+    navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia
   }
 }
 </script>

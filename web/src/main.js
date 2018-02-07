@@ -11,7 +11,7 @@ require(`./themes/app.${__THEME}.styl`)
 // require(`quasar/dist/quasar.ie.${__THEME}.css`)
 
 import Vue from 'vue'
-import Quasar from 'quasar'
+import Quasar, * as All from 'quasar'
 import router from './router'
 import axios from 'axios'
 import VueChatScroll from 'vue-chat-scroll'
@@ -30,6 +30,8 @@ import 'quasar-extras/material-icons'
 // import 'quasar-extras/ionicons'
 // import 'quasar-extras/fontawesome'
 // import 'quasar-extras/animate'
+
+All.AddressbarColor.set('#ff6600')
 
 /* eslint-disable no-new */
 new Vue({
