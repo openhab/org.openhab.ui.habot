@@ -198,9 +198,7 @@ export default {
         }
 
         var vm = this
-        navigator.getUserMedia({
-          audio: true
-        }, function (stream) {
+        navigator.mediaDevices.getUserMedia({ audio: true }).then(function (stream) {
           const input = audioContext.createMediaStreamSource(stream)
           // eslint-disable-next-line no-undef
           recorder = new Recorder(input)
@@ -208,7 +206,7 @@ export default {
           vm.stopSpeak = true
           recorder && recorder.record()
           setTimeout(() => { vm.stopRecording() }, 10000)
-        }, function (e) {
+        }).catch(function (e) {
           Toast.create.negative({
             html: 'No live audio input: ' + e,
             icon: 'mic off'
@@ -220,6 +218,7 @@ export default {
           html: 'This browser has no support for web audio',
           icon: 'mic off'
         })
+        throw e
       }
     },
     stopRecording (event, doneCallback) {
