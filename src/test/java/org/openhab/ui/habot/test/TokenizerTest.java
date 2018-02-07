@@ -1,7 +1,7 @@
 package org.openhab.ui.habot.test;
 
 import org.junit.Test;
-import org.openhab.ui.habot.nlp.Tokenizer;
+import org.openhab.ui.habot.nlp.AlphaNumericTokenizer;
 
 public class TokenizerTest {
 
@@ -11,7 +11,7 @@ public class TokenizerTest {
 
     @Test
     public void testTokenizer() {
-        Tokenizer tokenizer = Tokenizer.INSTANCE;
+        AlphaNumericTokenizer tokenizer = AlphaNumericTokenizer.INSTANCE;
 
         printTokens(tokenizer.tokenize("show me the temperature in the kitchen please!"));
         printTokens(tokenizer.tokenize("what's the temperature in the kitchen please?"));

@@ -6,12 +6,12 @@ import java.util.stream.Stream;
 import opennlp.tools.tokenize.SimpleTokenizer;
 import opennlp.tools.util.Span;
 
-public class Tokenizer extends SimpleTokenizer {
+public class AlphaNumericTokenizer extends SimpleTokenizer {
 
-    public static final Tokenizer INSTANCE;
+    public static final AlphaNumericTokenizer INSTANCE;
 
     static {
-        INSTANCE = new Tokenizer();
+        INSTANCE = new AlphaNumericTokenizer();
     }
 
     /**
@@ -19,7 +19,7 @@ public class Tokenizer extends SimpleTokenizer {
      *             will be made private in the future.
      */
     @Deprecated
-    public Tokenizer() {
+    public AlphaNumericTokenizer() {
     }
 
     @Override

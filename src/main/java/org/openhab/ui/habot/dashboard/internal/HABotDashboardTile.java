@@ -24,8 +24,8 @@ import org.slf4j.LoggerFactory;
  * @author Yannick Schaus
  *
  */
-@Component(service = DashboardTile.class, immediate = true, property = { "service.config.description.uri=ui:habot",
-        "service.config.label=HABot", "service.config.category=ui" })
+@Component(service = DashboardTile.class, immediate = true, name = "org.openhab.habot", property = {
+        "service.config.description.uri=ui:habot", "service.config.label=HABot", "service.config.category=ui" })
 public class HABotDashboardTile implements DashboardTile {
 
     @Override

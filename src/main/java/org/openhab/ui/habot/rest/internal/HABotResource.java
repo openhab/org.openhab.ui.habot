@@ -22,6 +22,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.eclipse.smarthome.core.auth.Role;
+import org.eclipse.smarthome.core.i18n.LocaleProvider;
 import org.eclipse.smarthome.core.voice.VoiceManager;
 import org.eclipse.smarthome.io.rest.LocaleUtil;
 import org.eclipse.smarthome.io.rest.RESTResource;
@@ -56,6 +57,8 @@ public class HABotResource implements RESTResource {
 
     private VoiceManager voiceManager;
 
+    private LocaleProvider localeProvider;
+
     @Reference
     public void setVoiceManager(VoiceManager voiceManager) {
         this.voiceManager = voiceManager;
@@ -63,6 +66,15 @@ public class HABotResource implements RESTResource {
 
     public void unsetVoiceManager(VoiceManager voiceManager) {
         this.voiceManager = null;
+    }
+
+    @Reference
+    public void setLocaleProvider(LocaleProvider localeProvider) {
+        this.localeProvider = localeProvider;
+    }
+
+    public void unsetLocaleProvider(LocaleProvider localeProvider) {
+        this.localeProvider = null;
     }
 
     public static final String PATH_HABOT = "habot";
@@ -77,7 +89,9 @@ public class HABotResource implements RESTResource {
     public Response greet(
             @HeaderParam(HttpHeaders.ACCEPT_LANGUAGE) @ApiParam(value = "language (will use the default if omitted)") String language) {
 
-        final Locale locale = LocaleUtil.getLocale(language);
+        final Locale locale = (this.localeProvider != null && this.localeProvider.getLocale() != null)
+                ? this.localeProvider.getLocale()
+                : LocaleUtil.getLocale(language);
 
         AnswerFormatter answerFormatter = new AnswerFormatter(locale);
 
@@ -99,7 +113,9 @@ public class HABotResource implements RESTResource {
     public Response chat(@HeaderParam(HttpHeaders.ACCEPT_LANGUAGE) @ApiParam(value = "language") String language,
             @ApiParam(value = "human language query", required = true) String query) throws Exception {
 
-        final Locale locale = LocaleUtil.getLocale(language);
+        final Locale locale = (this.localeProvider != null && this.localeProvider.getLocale() != null)
+                ? this.localeProvider.getLocale()
+                : LocaleUtil.getLocale(language);
 
         // interpret
         OpenNLPInterpreter hli = (OpenNLPInterpreter) voiceManager.getHLI(OPENNLP_HLI);

@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -21,12 +22,18 @@ import org.openhab.ui.habot.nlp.ChatReply;
 import org.openhab.ui.habot.nlp.Intent;
 import org.openhab.ui.habot.nlp.IntentInterpretation;
 import org.openhab.ui.habot.nlp.Skill;
+import org.osgi.framework.BundleContext;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 
-@Component(service = HumanLanguageInterpreter.class, immediate = true)
+@Component(service = HumanLanguageInterpreter.class, immediate = true, name = "org.openhab.opennlphli", property = {
+        "service.config.description.uri=voice:opennlphli", "service.config.label=OpenNLP Interpreter for HABot",
+        "service.config.category=voice" })
 public class OpenNLPInterpreter implements HumanLanguageInterpreter {
 
     private static final Set<Locale> supportedLocales = Collections
@@ -34,6 +41,7 @@ public class OpenNLPInterpreter implements HumanLanguageInterpreter {
 
     private IntentTrainer intentTrainer = null;
     private Locale currentLocale = null;
+    private String tokenizerId = null;
 
     private ItemRegistry itemRegistry;
     private EventPublisher eventPublisher;
@@ -113,7 +121,7 @@ public class OpenNLPInterpreter implements HumanLanguageInterpreter {
         if (!locale.equals(currentLocale) || intentTrainer == null) {
             try {
                 intentTrainer = new IntentTrainer(locale.getLanguage(), skills.values(),
-                        getNameFinderTrainingDataFromTags());
+                        getNameFinderTrainingDataFromTags(), this.tokenizerId);
                 currentLocale = locale;
             } catch (Exception e) {
                 InterpretationException fe = new InterpretationException(
@@ -199,5 +207,28 @@ public class OpenNLPInterpreter implements HumanLanguageInterpreter {
         this.skills.remove(skill.getIntentId());
         // reset the trainer
         this.intentTrainer = null;
+    }
+
+    @Activate
+    protected void activate(Map<String, Object> configProps, BundleContext bundleContext) {
+        if (configProps.containsKey("tokenizer")) {
+            this.tokenizerId = configProps.get("tokenizer").toString();
+        }
+
+        this.intentTrainer = null;
+    }
+
+    @Modified
+    protected void modified(Map<String, Object> configProps) {
+        if (configProps.containsKey("tokenizer")) {
+            this.tokenizerId = configProps.get("tokenizer").toString();
+        }
+
+        this.intentTrainer = null;
+    }
+
+    @Deactivate
+    protected void deactivate() {
+
     }
 }

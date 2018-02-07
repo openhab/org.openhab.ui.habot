@@ -16,6 +16,10 @@ show the <START:object> lights <END> of the <START:location> first floor <END>
 is the <START:object> front door <END> open?
 is the <START:object> window <END> closed?
 are the <START:object> doors <END> locked?
+how's the <START:object> heating <END> in <START:location> Amy's room <END>
+<START:object> temperature <END> in <START:location> Ben's room <END>
+<START:object> rollershutters <END> in <START:location> Charles' room <END>
+<START:object> window <END> in <START:location> David's room <END>
 what's the <START:object> power consumption <END> now
 show me the <START:object> water pump <END>
 is the <START:object> alarm <END> activated?

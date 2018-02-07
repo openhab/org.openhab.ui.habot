@@ -6,9 +6,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.openhab.ui.habot.nlp.AlphaNumericTokenizer;
 import org.openhab.ui.habot.nlp.Intent;
 import org.openhab.ui.habot.nlp.Skill;
-import org.openhab.ui.habot.nlp.Tokenizer;
 import org.openhab.ui.habot.nlp.UnsupportedLanguageException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +22,8 @@ import opennlp.tools.namefind.NameSample;
 import opennlp.tools.namefind.NameSampleDataStream;
 import opennlp.tools.namefind.TokenNameFinderFactory;
 import opennlp.tools.namefind.TokenNameFinderModel;
+import opennlp.tools.tokenize.Tokenizer;
+import opennlp.tools.tokenize.WhitespaceTokenizer;
 import opennlp.tools.util.InputStreamFactory;
 import opennlp.tools.util.ObjectStream;
 import opennlp.tools.util.ObjectStreamUtils;
@@ -35,13 +37,17 @@ public class IntentTrainer {
 
     private DocumentCategorizerME categorizer;
     private NameFinderME nameFinder;
+    private Tokenizer tokenizer;
 
     public IntentTrainer(String language, Collection<Skill> skills) throws Exception {
-        this(language, skills, null);
+        this(language, skills, null, null);
     }
 
-    public IntentTrainer(String language, Collection<Skill> skills, InputStream additionalNameSamples)
-            throws Exception {
+    public IntentTrainer(String language, Collection<Skill> skills, InputStream additionalNameSamples,
+            String tokenizerId) throws Exception {
+
+        this.tokenizer = (tokenizerId == "alphanumeric") ? AlphaNumericTokenizer.INSTANCE
+                : WhitespaceTokenizer.INSTANCE;
 
         /* Prepare the streams of document samples sourced from each skill's training data */
         List<ObjectStream<DocumentSample>> categoryStreams = new ArrayList<ObjectStream<DocumentSample>>();
@@ -125,7 +131,7 @@ public class IntentTrainer {
     }
 
     public Intent interpret(String query) {
-        String[] tokens = Tokenizer.INSTANCE.tokenize(query.toLowerCase());
+        String[] tokens = this.tokenizer.tokenize(query.toLowerCase());
         double[] outcome = categorizer.categorize(tokens);
         logger.debug(categorizer.getAllResults(outcome));
 
