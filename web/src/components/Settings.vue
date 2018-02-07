@@ -28,7 +28,7 @@
           <q-item-tile label>About HABot</q-item-tile>
         </q-item-main>
       </q-item>
-      <q-item>
+      <q-item @click="refreshApp">
         <q-item-main>
           <q-item-tile label>Refresh the application</q-item-tile>
           <q-item-tile sublabel>Empty and refresh the application cache to upgrade the app.</q-item-tile>
@@ -40,6 +40,8 @@
 
 <script>
 import {
+  Dialog,
+  Loading,
   QAlert,
   QList,
   QListHeader,
@@ -57,8 +59,38 @@ export default {
     QItemMain,
     QItemTile
   },
-  data: {
-
+  data () {
+    return {
+    }
+  },
+  methods: {
+    refreshApp () {
+      Dialog.create({
+        title: 'Refresh app',
+        message: 'This will empty the cache and reload the app from the server. Continue?',
+        buttons: [
+          {
+            label: 'Cancel',
+            handler () {
+            }
+          },
+          {
+            label: 'OK',
+            handler () {
+              Loading.show({ delay: 0 })
+              setTimeout(() => {
+                navigator.serviceWorker.getRegistrations().then((registrations) => {
+                  for (let registration of registrations) {
+                    registration.unregister()
+                  }
+                  location.reload()
+                })
+              }, 3000)
+            }
+          }
+        ]
+      })
+    }
   }
 }
 </script>

@@ -124,7 +124,7 @@ In somewhat descreasing order of priority:
 - [ ] Use a lemmitizer from OpenNLP to retrieve the dictionary form (i.e. singular) of entities;
 - [x] Improve the tokenization (problems with _'s_ in English, _l'_ _d'_ in French, remove punctuation, lowercase);
 - [ ] Authenticate to myopenhab.org without user interaction (OAuth2 or store the basic auth credentials securely?);
-- [ ] Unregister the service worker and empty the resource cache to update the PWA;
+- [x] Unregister the service worker and empty the resource cache to update the PWA;
 - [ ] Debug mode to show raw intents and entities in the web app;
 - [ ] Speech support - either using the browser's API or sending the audio stream to openHAB to process locally;
 - [ ] Support for additional languages (English and French for now) - contributions welcome! Also, ability to force the language in the web app;
