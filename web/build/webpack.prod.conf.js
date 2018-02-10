@@ -54,8 +54,10 @@ module.exports = merge(baseWebpackConfig, {
       // necessary to consistently work with multiple chunks via CommonsChunkPlugin
       chunksSortMode: 'dependency',
       serviceWorkerLoader: `<script>${fsUtils.loadMinified(path.join(__dirname,
-        './service-worker-prod.js'))}</script>`
-    }),
+        './service-worker-prod.js'))}</script>`,
+      // recorder: `<script>${fsUtils.loadMinified(path.join(__dirname,
+      //   '../src/recorder.js'))}</script>`
+      }),
     // split vendor js into its own file
     new webpack.optimize.CommonsChunkPlugin({
       name: 'vendor',
@@ -87,13 +89,27 @@ module.exports = merge(baseWebpackConfig, {
         ignore: ['.*']
       }
     ]),
+    new CopyWebpackPlugin([
+      {
+        from: path.resolve(__dirname, '../src/sw-webpush.js'),
+        to: '.'
+      }
+    ]),
+    // copy unminified recorder
+    new CopyWebpackPlugin([
+      {
+        from: path.resolve(__dirname, '../src/recorder.js'),
+        to: 'js'
+      }
+    ]),
     // service worker caching
     new SWPrecacheWebpackPlugin({
-      cacheId: 'my-quasar-app',
-      filename: 'service-worker.js',
+      cacheId: 'habot',
+      filename: 'sw-precache.js',
       staticFileGlobs: ['dist/**/*.{js,html,css,woff,ttf,eof,woff2,json,svg,gif,jpg,png,mp3}'],
       minify: true,
-      stripPrefix: 'dist/'
+      stripPrefix: 'dist/',
+      importScripts: ['sw-webpush.js']
     })
   ]
 })

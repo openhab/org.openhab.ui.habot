@@ -126,13 +126,12 @@ In somewhat descreasing order of priority:
 - [ ] Authenticate to myopenhab.org without user interaction (OAuth2 or store the basic auth credentials securely?);
 - [x] Unregister the service worker and empty the resource cache to update the PWA;
 - [ ] Debug mode to show raw intents and entities in the web app;
-- [ ] Speech support - either using the browser's API or sending the audio stream to openHAB to process locally;
+- [x] **(in progress, Google Cloud supported only)** Speech support - either using the browser's API or sending the audio stream to openHAB to process locally;
 - [ ] Support for additional languages (English and French for now) - contributions welcome! Also, ability to force the language in the web app;
 - [ ] Support for images in cards (like webcams - "show me the webcam in the garden");
 - [ ] Use other metadata from things and items (like labels and the location for things) instead of relying only on item tagging;
-- [ ] More settings in the web app;
-- [ ] Replace chart images by interactive graphs, ability to change the period and date in the card;
+- [ ] Add an "analyze" buttons underneath chart images to bring up a modal with an interactive chart;
 - [ ] Cards are currently static, the goal is to make them interactive - render switches as actual switches, dimmer as sliders etc. Also consider the ability to use tags to alter the default control for an item;
 - [ ] Ability to design custom cards as a JSON object and show them instead of simple controls (in the chat or in a separate web app page, for example to group complete thermostat controls);
-- [ ] Use Web Push notifications to push rich notifications and cards when relevant (e.g. push a card or notification with a webcam image and action buttons when motion was detected, tbd.). If possible show those notifications as messages from HABot in the chat;
+- [x] **(in progress)** Use Web Push notifications to push rich notifications and cards when relevant (e.g. push a card or notification with a webcam image and action buttons when motion was detected, tbd.). If possible show those notifications as messages from HABot in the chat;
 - [ ] Improve date/time entity extraction to pave the way for skill able to build rules on the fly ("activate the alarm tomorrow at 8", "show a graph of the power consumption last Wednesday", "I want to build a rule to run at 20 hours on weekdays" -> show a card)

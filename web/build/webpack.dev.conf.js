@@ -7,6 +7,7 @@ var
   cssUtils = require('./css-utils'),
   baseWebpackConfig = require('./webpack.base.conf'),
   HtmlWebpackPlugin = require('html-webpack-plugin'),
+  CopyWebpackPlugin = require('copy-webpack-plugin'),
   FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin')
 
 // add hot-reload related code to entry chunks
@@ -16,7 +17,7 @@ Object.keys(baseWebpackConfig.entry).forEach(function (name) {
 
 module.exports = merge(baseWebpackConfig, {
   // eval-source-map is faster for development
-  devtool: '#cheap-module-eval-source-map',
+  devtool: 'inline-source-map', //'eval-source-map', // '#cheap-module-eval-source-map',
   devServer: {
     historyApiFallback: true,
     noInfo: true
@@ -30,12 +31,26 @@ module.exports = merge(baseWebpackConfig, {
   plugins: [
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoEmitOnErrorsPlugin(),
+    new CopyWebpackPlugin([
+      {
+        from: path.resolve(__dirname, '../src/sw-webpush.js'),
+        to: '.'
+      }
+    ]),
+    new CopyWebpackPlugin([
+      {
+        from: path.resolve(__dirname, '../src/recorder.js'),
+        to: 'js'
+      }
+    ]),
     new HtmlWebpackPlugin({
       filename: 'index.html',
       template: 'src/index.html',
       inject: true,
       serviceWorkerLoader: `<script>${fs.readFileSync(path.join(__dirname,
-        './service-worker-dev.js'), 'utf-8')}</script>`
+        './service-worker-dev.js'), 'utf-8')}</script>`,
+      // recorder: `<script>${fs.readFileSync(path.join(__dirname,
+      //   '../src/recorder.js'), 'utf-8')}</script>`
     }),
     new FriendlyErrorsPlugin({
       clearConsole: config.dev.clearConsoleOnRebuild

@@ -29,10 +29,14 @@ import org.eclipse.smarthome.io.rest.RESTResource;
 import org.openhab.ui.habot.nlp.ChatReply;
 import org.openhab.ui.habot.nlp.internal.AnswerFormatter;
 import org.openhab.ui.habot.nlp.internal.OpenNLPInterpreter;
+import org.openhab.ui.habot.notification.internal.NotificationService;
+import org.openhab.ui.habot.notification.internal.webpush.Subscription;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.gson.Gson;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -59,6 +63,8 @@ public class HABotResource implements RESTResource {
 
     private LocaleProvider localeProvider;
 
+    private NotificationService notificationService;
+
     @Reference
     public void setVoiceManager(VoiceManager voiceManager) {
         this.voiceManager = voiceManager;
@@ -75,6 +81,15 @@ public class HABotResource implements RESTResource {
 
     public void unsetLocaleProvider(LocaleProvider localeProvider) {
         this.localeProvider = null;
+    }
+
+    @Reference
+    public void setNotificationService(NotificationService notificationService) {
+        this.notificationService = notificationService;
+    }
+
+    public void unsetNotificationService(NotificationService notificationService) {
+        this.notificationService = null;
     }
 
     public static final String PATH_HABOT = "habot";
@@ -124,4 +139,35 @@ public class HABotResource implements RESTResource {
         return Response.ok(reply).build();
     }
 
+    @POST
+    @Path("/notifications/subscribe")
+    // Can't POST JSON data with openHAB Cloud since Jan 2017
+    // (https://github.com/openhab/openhab-cloud/issues/31)
+    // so have to work around that...
+    @Consumes(MediaType.TEXT_PLAIN) // @Consumes(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Subscribes a new client for push notifications")
+    @ApiResponses(value = { @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 500, message = "An error occured") })
+    public Response webPushSubscribe(String subscriptionJson) throws Exception {
+        Gson gson = new Gson();
+        Subscription subscription = gson.fromJson(subscriptionJson, Subscription.class);
+        notificationService.addSubscription(subscription);
+
+        // send a test notification to the client
+        notificationService.sendNotification(subscription, "Congratulations, push notifications are working properly!");
+
+        return Response.ok().build();
+    }
+
+    @GET
+    @Path("/notifications/vapid")
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Gets or generates the public VAPID key used for push notifications.")
+    @ApiResponses(value = { @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 500, message = "An error occured") })
+    public Response webPushConfig() throws Exception {
+        String publicVAPIDKey = notificationService.getVAPIDPublicKey();
+
+        return Response.ok(publicVAPIDKey).build();
+    }
 }

@@ -33,7 +33,9 @@
     <div id="q-app" class="fakebody test" style="width: 100%; height: 100%; position: absolute; top: 0; z-index: 2; margin: 0; padding: 0; overflow-y: auto;"></div>
     <!-- Todo: only include in production -->
     <%= htmlWebpackPlugin.options.serviceWorkerLoader %>
+    <!-- <%= htmlWebpackPlugin.options.recorder %> -->
     <!-- built files will be auto injected -->
-    <script src="statics/js/recorder.js"></script>
+    <!-- recorder.js doesn't like minification so we have to include it here -->
+    <script src="js/recorder.js"></script>
   </body>
 </html>

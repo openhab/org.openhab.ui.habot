@@ -72,7 +72,10 @@ var recorder
 /*
  * Root component
  */
-// import { Recorder } from '@accentdotai/recorderjs'
+
+// // eslint-disable-next-line no-unused-vars
+// import * as recorderjs from '@accentdotai/recorderjs'
+
 import {
   Events,
   Toast,
@@ -201,7 +204,7 @@ export default {
         navigator.mediaDevices.getUserMedia({ audio: true }).then(function (stream) {
           const input = audioContext.createMediaStreamSource(stream)
           // eslint-disable-next-line no-undef
-          recorder = new Recorder(input)
+          recorder = new Recorder(input, { numChannels: 1 })
           vm.startSpeak = false
           vm.stopSpeak = true
           recorder && recorder.record()

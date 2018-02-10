@@ -2,7 +2,10 @@ package org.openhab.ui.habot.card;
 
 import java.util.List;
 
-public class Card extends Component {
+import org.eclipse.smarthome.core.common.registry.Identifiable;
+
+public class Card extends Component implements Identifiable<String> {
+    String uid;
     String title;
     String subtitle;
 
@@ -12,6 +15,16 @@ public class Card extends Component {
 
     public Card(String name) {
         super(name);
+    }
+
+    public Card(String uid, String name) {
+        super(name);
+        this.uid = uid;
+    }
+
+    @Override
+    public String getUID() {
+        return uid;
     }
 
     public String getTitle() {

@@ -1,16 +1,5 @@
 <template>
   <div class="layout-padding" style="max-width: 600px; padding-top: 50px;">
-    <!-- <q-alert
-            type="negative"
-            ref="destroyableAlert"
-            enter="bounceInRight"
-            leave="bounceOutLeft"
-            v-model="visible2"
-            dismissible
-          >
-            Note: nothing on this screen is implemented yet!
-    </q-alert> -->
-
     <br />
     <q-list link>
       <q-list-header>Speech recognition API</q-list-header>
@@ -23,7 +12,7 @@
           <q-item-tile sublabel>Uses Google services, requires an API key.</q-item-tile>
         </q-item-main>
         <q-item-side right>
-          <q-btn @click="setGoogleApiKey()">Set&nbsp;API&nbsp;Key</q-btn>
+          <q-btn @click="setGoogleApiKey()" color="primary" flat>Set&nbsp;API&nbsp;Key</q-btn>
         </q-item-side>
       </q-item>
       <q-item tag="label" disabled>
@@ -53,6 +42,14 @@
         </q-item-main>
       </q-item>
 
+      <q-list-header>Notifications</q-list-header>
+      <q-item @click="enableNotifications">
+        <q-item-main>
+          <q-item-tile label>Enable push notifications</q-item-tile>
+          <q-item-tile sublabel>Give the permission to receive push notifications on this device.</q-item-tile>
+        </q-item-main>
+      </q-item>
+
       <q-list-header>About</q-list-header>
       <q-item disabled>
         <q-item-main>
@@ -70,6 +67,23 @@
 </template>
 
 <script>
+/* This function is used to convert the server's public VAPID key for push notifications
+   Source: https://github.com/GoogleChromeLabs/web-push-codelab/blob/master/app/scripts/main.js */
+function urlB64ToUint8Array (base64String) {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4)
+  const base64 = (base64String + padding)
+    .replace(/-/g, '+')
+    .replace(/_/g, '/')
+
+  const rawData = window.atob(base64)
+  const outputArray = new Uint8Array(rawData.length)
+
+  for (let i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i)
+  }
+  return outputArray
+}
+
 import {
   Dialog,
   Loading,
@@ -104,6 +118,7 @@ export default {
     }
   },
   methods: {
+
     setGoogleApiKey () {
       Dialog.create({
         title: 'Set the Google Cloud API key',
@@ -142,10 +157,97 @@ export default {
         ]
       })
     },
+
+    enableNotifications () {
+      var vm = this
+      const isLocalhost = Boolean(window.location.hostname === 'localhost' ||
+          // [::1] is the IPv6 localhost address.
+          window.location.hostname === '[::1]' ||
+          // 127.0.0.1/8 is considered localhost for IPv4.
+          window.location.hostname.match(/^127(?:\.(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}$/)
+      )
+      if (!('serviceWorker' in navigator)) {
+        Toast.create.negative('Sorry, notifications are not supported on this browser')
+        return
+      }
+      if (!(window.location.protocol === 'https:' || isLocalhost)) {
+        Toast.create.negative('Sorry, HTTPS is required for the notifications to work')
+        return
+      }
+
+      // Basic service worker checks passed
+      navigator.serviceWorker.getRegistration()
+      // navigator.serviceWorker.register('sw-webpush.js')
+        .then((registration) => {
+          // Check if desktop notifications are supported
+          if (!('showNotification' in ServiceWorkerRegistration.prototype)) {
+            Toast.create.negative('Notifications aren\'t supported.')
+            return
+          }
+
+          if (Notification.permission === 'denied') {
+            Toast.create.negative('You have refused notifications previously - please check the browser\'s site settings')
+            return
+          }
+
+          if (!('PushManager' in window)) {
+            Toast.create.negative('Push messaging isn\'t supported.')
+            return
+          }
+
+          // Get the notification subscription object
+          registration.pushManager.getSubscription().then((subscription) => {
+            // send the subscription to the server
+            var sendSubscriptionToServer = (subscription) => {
+              // send the subscription to the server for storage
+              // can't use JSON (see server code and https://github.com/openhab/openhab-cloud/issues/31)
+              // so stringify and send as plain text and the server will deserialize it
+              vm.$http.post('/rest/habot/notifications/subscribe', JSON.stringify(subscription), {
+                headers: {
+                  'Content-Type': 'text/plain'
+                }
+              }).then((response) => {
+                Toast.create.positive('Notifications from HABot are successfully activated!')
+              }).catch((e) => {
+                Toast.create.negative('Error while subscribing for notifications: ' + e)
+              })
+            }
+
+            // No subscription yet, create one
+            if (!subscription) {
+              // Get the VAPID key from the server first
+              vm.$http.get('/rest/habot/notifications/vapid').then((response) => {
+                // we got the key, first convert it to a byte array
+                const applicationServerKey = urlB64ToUint8Array(response.data)
+
+                // then perform the subscription
+                registration.pushManager.subscribe({
+                  userVisibleOnly: true,
+                  applicationServerKey: applicationServerKey
+                }).then((subscription) => {
+                  sendSubscriptionToServer(subscription)
+                }).catch((e) => {
+                  Toast.create.negative('Error while subscribing to push notifications: ' + e)
+                })
+              }).catch((e) => {
+                Toast.create.negative('Error while getting the public VAPID key from the server: ' + e)
+              })
+            }
+            else {
+              sendSubscriptionToServer(subscription)
+            }
+          })
+        })
+        .catch((e) => {
+          Toast.create.negative('Error while registering the service worker: ' + e)
+        })
+    },
+
     refreshApp () {
       Dialog.create({
         title: 'Refresh app',
-        message: 'This will empty the cache and reload the newest version of the app from the server. Continue?',
+        message: 'This will empty the cache and reload the newest version of the app from the server. ' +
+                 'You will need to enable push notifications again. Continue?',
         buttons: [
           {
             label: 'Cancel',
@@ -169,6 +271,7 @@ export default {
         ]
       })
     }
+
   }
 }
 </script>
