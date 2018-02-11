@@ -15,7 +15,7 @@
           <q-icon name="menu" />
         </q-btn>
         <q-toolbar-title>
-          Chat with HABot
+          HABot
         </q-toolbar-title>
       </q-toolbar>
 

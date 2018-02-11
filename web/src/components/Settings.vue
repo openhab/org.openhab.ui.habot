@@ -12,7 +12,7 @@
           <q-item-tile sublabel>Uses Google services, requires an API key.</q-item-tile>
         </q-item-main>
         <q-item-side right>
-          <q-btn @click="setGoogleApiKey()" color="primary" flat>Set&nbsp;API&nbsp;Key</q-btn>
+          <q-btn @click="setGoogleApiKey()" color="primary" flat>Setup</q-btn>
         </q-item-side>
       </q-item>
       <q-item tag="label" disabled>
@@ -45,8 +45,8 @@
       <q-list-header>Notifications</q-list-header>
       <q-item @click="enableNotifications">
         <q-item-main>
-          <q-item-tile label>Enable push notifications</q-item-tile>
-          <q-item-tile sublabel>Give the permission to receive push notifications on this device.</q-item-tile>
+          <q-item-tile label>Enable/test push notifications</q-item-tile>
+          <q-item-tile sublabel>Subscribe to push notifications on this device, and check whether notifications are received.</q-item-tile>
         </q-item-main>
       </q-item>
 
@@ -227,7 +227,7 @@ export default {
                 // we got the key, first convert it to a byte array
                 const applicationServerKey = urlB64ToUint8Array(response.data)
 
-                Loading.show({ message: 'Subscribing to notifications... Please allow the notifications if prompted!', delay: 1000, messageColor: 'orange' })
+                Loading.show({ message: 'Preparing the subscription... Please allow the notifications if prompted!', delay: 1000 })
                 // then perform the subscription
                 registration.pushManager.subscribe({
                   userVisibleOnly: true,

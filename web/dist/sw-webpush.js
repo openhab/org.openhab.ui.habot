@@ -1,9 +1,26 @@
-'use strict';
+'use strict'
 
 /* eslint-env browser, serviceworker */
 
+// Determines whether a client is currently focused
+// Source: https://web-push-book.gauntface.com/chapter-05/04-common-notification-patterns/
+function isClientFocused () {
+  return clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
+    let clientIsFocused = false
+
+    for (let i = 0; i < windowClients.length; i++) {
+      const windowClient = windowClients[i]
+      if (windowClient.focused && windowClient.url.indexOf('/chat') > 0) {
+        clientIsFocused = true
+        break
+      }
+    }
+
+    return clientIsFocused
+  })
+}
+
 self.addEventListener('push', function (event) {
-  console.log('Received push')
   let notificationTitle = 'HABot'
   let notificationOptions = {
     body: 'Notification from HABot',
@@ -17,16 +34,23 @@ self.addEventListener('push', function (event) {
     Object.assign(notificationOptions, payload)
   }
 
-  self.clients.matchAll().then(function (clientList) {
-    for (let client of clientList) {
-      client.postMessage(notificationOptions.body)
-    }
-  })
-
   event.waitUntil(
-    Promise.all([
-      self.registration.showNotification(notificationTitle, notificationOptions)
-    ])
+    isClientFocused().then(function (focused) {
+      // add the message to the chat list of clients to handle
+      return self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function (clientList) {
+        for (let client of clientList) {
+          client.postMessage(notificationOptions.body)
+        }
+
+        if (focused) {
+          // No need to display a notification
+          return
+        }
+
+        // then display the notification
+        self.registration.showNotification(notificationTitle, notificationOptions)
+      })
+    })
   )
 })
 
@@ -34,7 +58,7 @@ self.addEventListener('notificationclick', function (event) {
   event.notification.close()
 
   event.waitUntil(
-    self.clients.matchAll().then(function (clientList) {
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function (clientList) {
       if (clientList.length > 0) {
         for (let client of clientList) {
           client.navigate('index.html#/notification#' + event.notification.body)
@@ -45,21 +69,8 @@ self.addEventListener('notificationclick', function (event) {
       return self.clients.openWindow('index.html#/notification#' + event.notification.body)
     })
   )
-
-// TODO: do something when the notification is clicked
-//  let clickResponsePromise = Promise.resolve()
-
-//   if (event.notification.data && event.notification.data.url) {
-//     clickResponsePromise = clients.openWindow(event.notification.data.url);
-//   }
-
-//   event.waitUntil(
-//     Promise.all([
-//       clickResponsePromise
-//     ])
-//   )
 })
 
-self.addEventListener('notificationclose', function (event) {
-
-})
+// don't do anything for now if the notification is dismissed
+// self.addEventListener('notificationclose', function (event) {
+// })

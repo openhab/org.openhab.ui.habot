@@ -238,7 +238,17 @@ export default {
   },
   methods: {
     pushNotificationReceived (ev) {
-      this.chats[0].messages.push({
+      var currentChat = this.chats[this.chats.length - 1]
+      if (currentChat.finished) {
+        this.chats.push({
+          messages: [],
+          card: null,
+          finished: false
+        })
+        currentChat = this.chats[this.chats.length - 1]
+      }
+
+      currentChat.messages.push({
         id: new Date(),
         name: 'HABot',
         text: [ev.data],
