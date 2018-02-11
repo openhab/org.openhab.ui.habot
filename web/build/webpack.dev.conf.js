@@ -17,7 +17,7 @@ Object.keys(baseWebpackConfig.entry).forEach(function (name) {
 
 module.exports = merge(baseWebpackConfig, {
   // eval-source-map is faster for development
-  devtool: 'inline-source-map', //'eval-source-map', // '#cheap-module-eval-source-map',
+  //devtool: '#eval-source-map', //'eval-source-map', // '#cheap-module-eval-source-map',
   devServer: {
     historyApiFallback: true,
     noInfo: true
@@ -29,6 +29,9 @@ module.exports = merge(baseWebpackConfig, {
     })
   },
   plugins: [
+    new webpack.SourceMapDevToolPlugin({
+      filename: '[file].map'
+    }),
     new webpack.HotModuleReplacementPlugin(),
     new webpack.NoEmitOnErrorsPlugin(),
     new CopyWebpackPlugin([

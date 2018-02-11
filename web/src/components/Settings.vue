@@ -182,36 +182,43 @@ export default {
           // Check if desktop notifications are supported
           if (!('showNotification' in ServiceWorkerRegistration.prototype)) {
             Toast.create.negative('Notifications aren\'t supported.')
+            Loading.hide()
             return
           }
 
           if (Notification.permission === 'denied') {
-            Toast.create.negative('You have refused notifications previously - please check the browser\'s site settings')
+            Toast.create.negative('Notifications are blocked - please check the browser\'s site settings')
+            Loading.hide()
             return
           }
 
           if (!('PushManager' in window)) {
             Toast.create.negative('Push messaging isn\'t supported.')
+            Loading.hide()
             return
           }
 
           // Get the notification subscription object
           registration.pushManager.getSubscription().then((subscription) => {
-            // send the subscription to the server
             var sendSubscriptionToServer = (subscription) => {
               // send the subscription to the server for storage
               // can't use JSON (see server code and https://github.com/openhab/openhab-cloud/issues/31)
               // so stringify and send as plain text and the server will deserialize it
+              Loading.show({ message: 'Subscribing to notifications...' })
               vm.$http.post('/rest/habot/notifications/subscribe', JSON.stringify(subscription), {
                 headers: {
                   'Content-Type': 'text/plain'
                 }
               }).then((response) => {
-                Toast.create.positive('Notifications from HABot are successfully activated!')
+                Toast.create.positive('Success! You should receive a test notification!')
+                Loading.hide()
               }).catch((e) => {
-                Toast.create.negative('Error while subscribing for notifications: ' + e)
+                Toast.create.negative('Error while sending the subscription to the openHAB server: ' + e)
+                Loading.hide()
               })
             }
+
+            Loading.show({ message: 'Initializing, please wait...' })
 
             // No subscription yet, create one
             if (!subscription) {
@@ -220,6 +227,7 @@ export default {
                 // we got the key, first convert it to a byte array
                 const applicationServerKey = urlB64ToUint8Array(response.data)
 
+                Loading.show({ message: 'Subscribing to notifications... Please allow the notifications if prompted!', delay: 1000, messageColor: 'orange' })
                 // then perform the subscription
                 registration.pushManager.subscribe({
                   userVisibleOnly: true,
@@ -227,10 +235,17 @@ export default {
                 }).then((subscription) => {
                   sendSubscriptionToServer(subscription)
                 }).catch((e) => {
-                  Toast.create.negative('Error while subscribing to push notifications: ' + e)
+                  if (Notification.permission === 'denied') {
+                    Toast.create.negative('Notifications are blocked - please check the browser\'s site settings')
+                  }
+                  else {
+                    Toast.create.negative('Error while subscribing to push notifications: ' + e)
+                  }
+                  Loading.hide()
                 })
               }).catch((e) => {
                 Toast.create.negative('Error while getting the public VAPID key from the server: ' + e)
+                Loading.hide()
               })
             }
             else {
@@ -257,7 +272,7 @@ export default {
           {
             label: 'OK',
             handler () {
-              Loading.show({ delay: 0 })
+              Loading.show({ delay: 0, message: 'Refreshing the app...' })
               setTimeout(() => {
                 navigator.serviceWorker.getRegistrations().then((registrations) => {
                   for (let registration of registrations) {

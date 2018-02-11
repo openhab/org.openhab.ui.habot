@@ -181,7 +181,8 @@ public class PushService {
         }
 
         final DefaultHttpClient httpClient = new DefaultHttpClient();
-        return httpClient.execute(httpPost);
+        HttpResponse response = httpClient.execute(httpPost);
+        return response;
     }
 
     private boolean verifyKeyPair() {
