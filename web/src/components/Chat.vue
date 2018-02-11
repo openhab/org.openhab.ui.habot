@@ -198,6 +198,12 @@ export default {
 
     this.$q.events.$on('chat-send', this.chatReceived)
 
+    if (this.$route.redirectedFrom && this.$route.redirectedFrom.indexOf('/notification#') === 0) {
+      var notificationData = this.$route.redirectedFrom.replace('/notification#', '')
+      this.pushNotificationReceived({ data: notificationData })
+      return
+    }
+
     this.$http.get('/rest/habot/greet').then(function (response) {
       vm.language = response.data.language
       if (!vm.language) {
@@ -226,8 +232,20 @@ export default {
       var appEl = document.getElementById('q-app')
       appEl.scrollTop = appEl.scrollHeight
     })).observe(this.$el, {childList: true, subtree: true})
+    if (navigator.serviceWorker) {
+      navigator.serviceWorker.addEventListener('message', this.pushNotificationReceived)
+    }
   },
   methods: {
+    pushNotificationReceived (ev) {
+      this.chats[0].messages.push({
+        id: new Date(),
+        name: 'HABot',
+        text: [ev.data],
+        avatar: 'statics/icons/icon-192x192.png',
+        stamp: date.formatDate(new Date(), 'HH:mm')
+      })
+    },
     send () {
       var currentChat = this.chats[this.chats.length - 1]
       currentChat.messages.push({
@@ -297,6 +315,9 @@ export default {
   },
   beforeDestroyed () {
     this.$q.events.$off('chat-send', this.chatReceived)
+    if (navigator.serviceWorker) {
+      navigator.serviceWorker.removeEventListener('message', this.pushNotificationReceived)
+    }
   }
 }
 </script>

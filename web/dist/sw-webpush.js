@@ -17,6 +17,12 @@ self.addEventListener('push', function (event) {
     Object.assign(notificationOptions, payload)
   }
 
+  self.clients.matchAll().then(function (clientList) {
+    for (let client of clientList) {
+      client.postMessage(notificationOptions.body)
+    }
+  })
+
   event.waitUntil(
     Promise.all([
       self.registration.showNotification(notificationTitle, notificationOptions)
@@ -26,6 +32,19 @@ self.addEventListener('push', function (event) {
 
 self.addEventListener('notificationclick', function (event) {
   event.notification.close()
+
+  event.waitUntil(
+    self.clients.matchAll().then(function (clientList) {
+      if (clientList.length > 0) {
+        for (let client of clientList) {
+          client.navigate('index.html#/notification#' + event.notification.body)
+        }
+        return clientList[0].focus()
+      }
+
+      return self.clients.openWindow('index.html#/notification#' + event.notification.body)
+    })
+  )
 
 // TODO: do something when the notification is clicked
 //  let clickResponsePromise = Promise.resolve()

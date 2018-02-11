@@ -30,8 +30,13 @@ export default new VueRouter({
    */
 
   routes: [
-    { path: '/', component: Chat },
-    { path: '/chat', component: Chat },
+    { path: '/', redirect: '/chat' },
+    { path: '/chat', component: Chat, props: (route) => ({ action: route.query.action }) },
+    { path: '/notification',
+      redirect: (to) => {
+        return { path: '/chat', hash: '', query: '', params: { action: to.hash } }
+      }
+    },
     { path: '/settings', component: Settings }
   ]
 })
