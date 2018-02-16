@@ -17,6 +17,9 @@ import java.security.Security;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+
+import javax.ws.rs.core.Response;
 
 import org.apache.commons.io.IOUtils;
 import org.bouncycastle.jce.ECNamedCurveTable;
@@ -82,15 +85,17 @@ public class NotificationService {
         }
     }
 
-    public void sendNotification(Subscription subscription, String payload) throws GeneralSecurityException {
+    public Future<Response> sendNotification(Subscription subscription, String payload)
+            throws GeneralSecurityException {
         getPushService();
 
         Notification notification = new Notification(subscription, payload);
         try {
-            this.pushService.send(notification);
+            return this.pushService.send(notification);
         } catch (IOException | JoseException | ExecutionException | InterruptedException e) {
             logger.error("Unable to send the notification to {}: {}",
                     this.subscriptionProvider.keyToString(subscription.keys), e.toString());
+            return null;
         }
     }
 

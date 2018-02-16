@@ -14,6 +14,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
@@ -21,6 +22,8 @@ import javax.ws.rs.client.Invocation;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Variant;
 
 import org.bouncycastle.jce.ECNamedCurveTable;
 import org.bouncycastle.jce.interfaces.ECPublicKey;
@@ -121,7 +124,7 @@ public class PushService {
      * @throws ExecutionException
      * @throws InterruptedException
      */
-    public void send(Notification notification)
+    public Future<Response> send(Notification notification)
             throws GeneralSecurityException, IOException, JoseException, ExecutionException, InterruptedException {
         assert (verifyKeyPair());
 
@@ -181,10 +184,10 @@ public class PushService {
         invocationBuilder.headers(headers);
 
         if (notification.hasPayload()) {
-            invocationBuilder.async()
-                    .post(Entity.entity(encrypted.getCiphertext(), MediaType.APPLICATION_OCTET_STREAM_TYPE));
+            return invocationBuilder.async().post(Entity.entity(encrypted.getCiphertext(),
+                    new Variant(MediaType.APPLICATION_OCTET_STREAM_TYPE, (String) null, "aesgcm")));
         } else {
-            invocationBuilder.async().post(null);
+            return invocationBuilder.async().post(null);
         }
     }
 

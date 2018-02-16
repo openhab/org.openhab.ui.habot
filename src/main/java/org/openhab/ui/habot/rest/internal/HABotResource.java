@@ -154,10 +154,13 @@ public class HABotResource implements RESTResource {
         notificationService.addSubscription(subscription);
 
         // send a test notification to the client
-        notificationService.sendNotification(subscription,
-                "{ \"body\": \"Congratulations, push notifications are working properly! 🎉👌\" }");
+        Response testNotificationResponse = notificationService.sendNotification(subscription,
+                "{ \"body\": \"Congratulations, push notifications are working properly! 🎉👌\" }").get();
 
-        return Response.ok().build();
+        logger.debug("Test notification response: {}", testNotificationResponse.toString());
+        logger.debug("Test notification response body: {}", testNotificationResponse.readEntity(String.class));
+
+        return Response.ok(testNotificationResponse.getStatusInfo()).build();
     }
 
     @GET
