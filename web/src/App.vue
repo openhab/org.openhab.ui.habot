@@ -30,16 +30,35 @@
         <div class="logo">
           <img src="~assets/logo.png" alt="HABot">
         </div>
-        <q-list no-border link inset-delimiter>
+        <q-list link inset-delimiter>
           <!-- <q-list-header>Essential Links</q-list-header> -->
+        <!-- <q-list-header>Chat</q-list-header> -->
           <q-side-link item to="/chat">
             <q-item-side icon="chat" />
             <q-item-main label="Chat with HABot" />
           </q-side-link>
-          <q-side-link item to="/settings">
-            <q-item-side icon="settings" />
-            <q-item-main label="Settings" />
-          </q-side-link>
+
+        <q-item-separator></q-item-separator>
+        <q-list-header>My Cards</q-list-header>
+        <q-side-link item to="/cards/favorites">
+          <q-item-side icon="bookmark" />
+          <q-item-main label="Bookmarks"></q-item-main>
+        </q-side-link>
+        <q-side-link item to="/cards/recent">
+          <q-item-side icon="history" />
+          <q-item-main label="Recent"></q-item-main>
+        </q-side-link>
+        <q-side-link item to="/cards/deck">
+          <q-item-side icon="dashboard" />
+          <q-item-main label="Card deck"></q-item-main>
+        </q-side-link>
+
+        <q-item-separator></q-item-separator>
+        <!-- <q-list-header>Settings</q-list-header> -->
+        <q-side-link item to="/settings">
+          <q-item-side icon="settings" />
+          <q-item-main label="Settings" />
+        </q-side-link>
         </q-list>
       </div>
 
@@ -274,8 +293,14 @@ export default {
 }
 </script>
 
-<style lang="stylus">
+<style lang="stylus" scoped>
 @import '~variables'
+
+.layout-aside.fixed
+  z-index 10000 !important
+
+.q-list
+  border-bottom 0
 
 main
   min-height auto
@@ -289,8 +314,11 @@ header
 
 .logo
   padding 3px 12px
+  height 80px
   text-align center
   background white
+  img
+    padding-top 16px
 
 #q-app
     width 100%

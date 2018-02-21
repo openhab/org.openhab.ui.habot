@@ -1,5 +1,5 @@
 <template>
-  <div class="layout-padding" style="max-width: 600px; padding-top: 50px;">
+  <div class="layout-padding" style="max-width: 600px;">
     <br />
     <q-list link>
       <q-list-header>Speech recognition API</q-list-header>

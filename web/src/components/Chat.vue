@@ -1,5 +1,5 @@
 <template>
-  <div class="layout-padding" style="max-width: 600px; margin-top: 100px; padding-top: 60px;">
+  <div class="layout-padding" style="max-width: 600px; margin-top: 100px;">
     <div class="chat-area" v-for="chat in chats" :key="chat" ref="chat">
 
 

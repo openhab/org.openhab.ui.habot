@@ -4,6 +4,7 @@ import VueRouter from 'vue-router'
 // import Hello from '@/Hello.vue'
 import Chat from '@/Chat.vue'
 import Settings from '@/Settings.vue'
+import CardDeck from '@/CardDeck.vue'
 
 Vue.use(VueRouter)
 
@@ -37,6 +38,7 @@ export default new VueRouter({
         return { path: '/chat', hash: '', query: '', params: { action: to.hash } }
       }
     },
-    { path: '/settings', component: Settings }
+    { path: '/settings', component: Settings },
+    { path: '/cards/deck', component: CardDeck }
   ]
 })
