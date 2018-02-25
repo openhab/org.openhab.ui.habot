@@ -8,7 +8,6 @@ import org.eclipse.smarthome.core.transform.TransformationHelper;
 import org.eclipse.smarthome.core.types.StateDescription;
 import org.openhab.ui.habot.card.Card;
 import org.openhab.ui.habot.card.Component;
-import org.openhab.ui.habot.card.Slot;
 import org.openhab.ui.habot.nlp.AbstractItemIntentInterpreter;
 import org.openhab.ui.habot.nlp.Intent;
 import org.openhab.ui.habot.nlp.IntentInterpretation;
@@ -39,8 +38,6 @@ public class GetStatusSkill extends AbstractItemIntentInterpreter {
                 singleCard.setTitle(item.getLabel());
                 singleCard.setSubtitle(item.getName());
 
-                Slot rightSlot = singleCard.addSlot("right");
-
                 Component component = new Component("HbSingleItemValue");
                 component.addConfig("item", item.getName());
                 component.addConfig("type", item.getType());
@@ -56,7 +53,7 @@ public class GetStatusSkill extends AbstractItemIntentInterpreter {
                     component.addConfig("state", item.getState().toString());
                 }
 
-                rightSlot.addComponent(component);
+                singleCard.addComponent("right", component);
 
                 interpretation.setCard(singleCard);
 
@@ -67,10 +64,7 @@ public class GetStatusSkill extends AbstractItemIntentInterpreter {
                 // TODO: maybe figure out a title for the card
                 card.setSubtitle(matchedItems.size() + " items"); // TODO: i18n
 
-                Slot mainSlot = card.addSlot("list");
-
                 Component list = new Component("HbList");
-                Slot listSlot = list.addSlot("main");
                 for (Item item : matchedItems) {
                     Component listItem = new Component("HbListItem");
                     listItem.addConfig("item", item.getName());
@@ -88,10 +82,10 @@ public class GetStatusSkill extends AbstractItemIntentInterpreter {
                         listItem.addConfig("state", item.getState().toString());
                     }
 
-                    listSlot.addComponent(listItem);
+                    list.addComponent("items", listItem);
                 }
 
-                mainSlot.addComponent(list);
+                card.addComponent("list", list);
 
                 interpretation.setCard(card);
 

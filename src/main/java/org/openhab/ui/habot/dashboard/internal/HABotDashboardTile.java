@@ -57,7 +57,7 @@ public class HABotDashboardTile implements DashboardTile {
     @Activate
     protected void activate() {
         try {
-            httpService.registerResources(HABOT_ALIAS, "web/dist", null);
+            httpService.registerResources(HABOT_ALIAS, "web-new/dist/pwa-mat", null);
             logger.info("Started HABot at " + HABOT_ALIAS);
         } catch (NamespaceException e) {
             logger.error("Error during HABot startup: {}", e.getMessage());
