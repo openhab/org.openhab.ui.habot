@@ -2,7 +2,7 @@
 <q-item separator tag="label">
   <q-item-main>
     <q-item-tile label>{{model.config.label}}</q-item-tile>
-    <q-item-tile class="item-subtitle" sublabel>{{model.config.item}}</q-item-tile>
+    <q-item-tile v-if="model.config.item" class="item-subtitle" sublabel>{{model.config.item}}</q-item-tile>
   </q-item-main>
   <q-item-side right>
     <big class="big-value" v-if="model.config.state">{{model.config.state}}</big>

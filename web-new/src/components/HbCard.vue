@@ -6,10 +6,37 @@
   <q-card-title>
     <span>{{model.title}}</span>
     <span v-if="model.subtitle" slot="subtitle">{{model.subtitle}}</span>
-    <div slot="right" v-if="model.slots && model.slots.right">
-      <div v-for="component in model.slots.right" :key="component">
+    <div slot="right">
+      <div v-if="model.slots && model.slots.right" class="inline-block" v-for="component in model.slots.right" :key="component">
         <big v-if="component.component == 'HbSingleItemValue'" class="big-value">{{component.config.state}}</big>
       </div>
+      <q-btn round flat icon="more_vert" slot="right">
+        <q-popover>
+          <q-list link class="no-border">
+            <q-item v-close-overlay v-if="this.menu === 'chat' && !this.model.uid" @click.native="addCardToDeck()">
+              <q-item-main label="Add to Card deck" />
+            </q-item>
+            <q-item v-close-overlay v-if="this.menu === 'chat' && !this.model.uid" @click.native="addCardToDeckAndBookmark()">
+              <q-item-main label="Add &amp; bookmark" />
+            </q-item>
+            <q-item v-close-overlay v-if="this.menu === 'deck'" @click.native="editCard()">
+              <q-item-main label="Edit" />
+            </q-item>
+            <q-item v-close-overlay v-if="this.menu === 'deck'" @click.native="bookmarkCard()">
+              <q-item-main label="Bookmark" />
+            </q-item>
+            <q-item v-close-overlay v-if="this.menu === 'deck'" @click="deleteCard()">
+              <q-item-main label="Delete" />
+            </q-item>
+            <q-item v-close-overlay v-if="this.menu === 'bookmark'" @click.native="unbookmarkCard()">
+              <q-item-main label="Remove bookmark" />
+            </q-item>
+            <q-item v-close-overlay v-if="this.menu === 'designer'" @click.native="forceRefresh()">
+              <q-item-main label="Force refresh" />
+            </q-item>
+          </q-list>
+        </q-popover>
+      </q-btn>
     </div>
   </q-card-title>
   <q-card-main v-if="model.slots && model.slots.main">
@@ -25,6 +52,7 @@
   font-weight 300
   color black
   font-size 200%
+  vertical-align middle
 </style>
 
 <script>
@@ -41,9 +69,27 @@ export default {
     HbKnob,
     HbSlider
   },
-  props: ['model'],
+  props: ['model', 'menu'],
   data () {
     return {
+    }
+  },
+  methods: {
+    addCardToDeck () {
+      this.$q.notify('Not implemented')
+    },
+    addCardToDeckAndBookmark () {
+      this.$q.notify('Not implemented')
+    },
+    bookmarkCard () {
+      this.$q.notify('Not implemented')
+    },
+    editCard () {
+      if (!this.model.uid) return
+      this.$router.push('/designer/' + this.model.uid)
+    },
+    forceRefresh () {
+      this.$forceUpdate()
     }
   }
 }

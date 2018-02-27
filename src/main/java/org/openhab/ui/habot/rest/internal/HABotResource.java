@@ -25,6 +25,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import org.eclipse.smarthome.core.auth.Role;
 import org.eclipse.smarthome.core.i18n.LocaleProvider;
@@ -203,6 +204,22 @@ public class HABotResource implements RESTResource {
         Collection<Card> cards = this.cardRegistry.getAll();
 
         return Response.ok(cards).build();
+    }
+
+    @GET
+    @Path("/cards/{cardUID}")
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Gets a card from the card deck by its UID.", response = Card.class)
+    @ApiResponses(value = { @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 404, message = "The card with the provided UID doesn't exist"),
+            @ApiResponse(code = 500, message = "An error occured") })
+    public Response getCardByUid(@PathParam("cardUID") @ApiParam(value = "cardUID", required = true) String cardUID) {
+        Card card = this.cardRegistry.get(cardUID);
+        if (card == null) {
+            return Response.status(Status.NOT_FOUND).build();
+        }
+
+        return Response.ok(card).build();
     }
 
     @POST

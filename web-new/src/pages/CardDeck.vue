@@ -6,18 +6,9 @@
       <q-select multiple filter chips color="secondary" v-model="locations" class="col-sm-6" :options="locationSet" float-label="Locations"></q-select>
     </div>
     <div class="row">
-      <div class="col-sm-6 hb-cards">
-        <component :is="'HbCard'" :model="cardModel"></component>
+      <div class="hb-cards">
+        <component :is="'HbCard'" :model="card" menu="deck" v-for="card in cards" :key="card.uid"></component>
       </div>
-      <div class="col-sm-6">
-        <q-input
-          v-model="modelJson"
-          type="textarea"
-          float-label="Card Model"
-          :min-rows="7"
-        />
-      </div>
-
     </div>
     <q-page-sticky position="bottom-right" :offset="[18, 18]">
       <q-fab
@@ -25,13 +16,13 @@
         icon="add" direction="up">
         <q-fab-action
           color="secondary"
-          @click="someMethod"
-          icon="mail"
+          @click="addCard"
+          icon="aspect_ratio"
         />
         <q-fab-action
           color="secondary"
-          @click="someMethod"
-          icon="alarm"
+          @click="addListCard"
+          icon="list"
         />
       </q-fab>
     </q-page-sticky>
@@ -47,46 +38,44 @@
     margin-top 5px
 .hb-cards
   padding 20px
-  .q-card
-    width 100%
-  // .bigger
-  //   width 450px
+  width 100%
+  @media (min-width $breakpoint-xs-max)
+    .q-card
+      min-width 400px
+      margin 20px
   @media (max-width $breakpoint-xs-max)
     .q-card
       width 100%
+      margin-bottom 20px
       margin-left -0.25rem
 </style>
 
 <script>
+import CardDesigner from 'layouts/designer/CardDesigner.vue'
 import HbCard from 'components/HbCard.vue'
+import { uid } from 'quasar'
 
 export default {
   components: {
+    CardDesigner,
     HbCard
   },
   data () {
     return {
       objects: [],
       locations: [],
-      modelJson: '{\n}',
-      testModel: {
-        imageUri: null,
-        title: 'Test',
-        subtitle: 'Subtitle'
-      }
+      cards: []
+    }
+  },
+  methods: {
+    addCard () {
+      this.$router.push('/designer/' + uid())
+    },
+    addListCard () {
+      this.$router.push('/designer/' + uid() + '?type=list')
     }
   },
   computed: {
-    cardModel () {
-      try {
-        return JSON.parse(this.modelJson)
-      } catch (err) {
-        return {
-          title: 'Model error',
-          subtitle: err.message
-        }
-      }
-    },
     objectSet: {
       get () {
         return this.$store.getters['items/objectSet'].map((tag) => {
@@ -107,6 +96,11 @@ export default {
         })
       }
     }
+  },
+  created () {
+    this.$http.get('/rest/habot/cards').then((resp) => {
+      this.cards = resp.data
+    })
   }
 }
 </script>

@@ -83,6 +83,8 @@ module.exports = function (ctx) {
         'QFabAction',
         'QToolbar',
         'QToolbarTitle',
+        'QModal',
+        'QModalLayout',
         'QBtn',
         'QIcon',
         'QList',
@@ -92,6 +94,7 @@ module.exports = function (ctx) {
         'QItemSeparator',
         'QItemSide',
         'QItemTile',
+        'QField',
         'QSelect',
         'QInput',
         'QChatMessage',
@@ -99,15 +102,18 @@ module.exports = function (ctx) {
         'QWindowResizeObservable',
         'QCard',
         'QCardTitle',
+        'QPopover',
         'QCardMain',
         'QCardMedia',
         'QRadio',
         'QToggle',
         'QKnob',
-        'QSlider'
+        'QSlider',
+        'QTree'
       ],
       directives: [
-        'Ripple'
+        'Ripple',
+        'CloseOverlay'
       ],
       plugins: [
         'Notify',

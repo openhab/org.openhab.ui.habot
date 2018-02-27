@@ -19,6 +19,11 @@ export default [
       }
     ]
   },
+  {
+    path: '/designer/:uid',
+    component: () => import('layouts/designer/CardDesigner'),
+    props: true
+  },
 
   { // Always leave this as last one
     path: '*',

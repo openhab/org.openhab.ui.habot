@@ -18,7 +18,7 @@ export default {
     itemState: {
       get () {
         if (this.wait) return this.next
-        return parseFloat(this.$store.getters['items/itemState'](this.model.config.item))
+        return parseFloat(this.$store.getters['items/itemState'](this.model.config.item)) || 0
       },
       set (val) {
         this.next = val

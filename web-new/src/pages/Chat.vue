@@ -3,7 +3,7 @@
 
     <div style="width: 600px; margin-top: 100px;">
       <div class="chat-area" v-for="chat in chats" :key="chat" ref="chat">
-        <q-resize-observable @resize="scrollToBottom"></q-resize-observable>
+        <q-resize-observable @resize="onChatAreaResized"></q-resize-observable>
         <q-window-resize-observable @resize="scrollToBottom"></q-window-resize-observable>
 
         <q-chat-message
@@ -19,7 +19,7 @@
           :stamp="msg.stamp"
         />
 
-        <hb-card v-if="chat.card && chat.card.component === 'HbCard'" :model="chat.card">
+        <hb-card v-if="chat.card && chat.card.component === 'HbCard'" :model="chat.card" menu="chat">
 
         </hb-card>
 
@@ -139,7 +139,7 @@ export default {
     })
   },
   mounted () {
-    (new MutationObserver(this.scrollToBottom)).observe(this.$el, {childList: true, subtree: true})
+    // (new MutationObserver(this.scrollToBottom)).observe(this.$el, {childList: true, subtree: true})
     if (navigator.serviceWorker) {
       navigator.serviceWorker.addEventListener('message', this.pushNotificationReceived)
     }
@@ -229,6 +229,10 @@ export default {
           event.currentTarget.blur()
         }
       }
+    },
+    onChatAreaResized (size) {
+      console.log('Resize: ' + JSON.stringify(size))
+      this.scrollToBottom()
     },
     scrollToBottom () {
       var appEl = document.getElementById('q-app')

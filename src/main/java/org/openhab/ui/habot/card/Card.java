@@ -2,6 +2,7 @@ package org.openhab.ui.habot.card;
 
 import java.util.List;
 
+import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.smarthome.core.common.registry.Identifiable;
 
 public class Card extends Component implements Identifiable<String> {
@@ -57,6 +58,28 @@ public class Card extends Component implements Identifiable<String> {
 
     public void setActions(List<CardAction> cardActions) {
         this.actions = cardActions;
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        Card other = (Card) obj;
+        if (this.getUID() == null) {
+            if (other.getUID() != null) {
+                return false;
+            }
+        } else if (!this.getUID().equals(other.getUID())) {
+            return false;
+        }
+        return true;
     }
 
 }
