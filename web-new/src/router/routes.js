@@ -9,9 +9,9 @@ export default [
     component: () => import('layouts/default'),
     children: [
       { path: '/', redirect: '/chat' },
-      { path: '/chat', component: ChatPage },
-      { path: '/settings', component: SettingsPage },
-      { path: '/cards/deck', component: CardDeckPage },
+      { path: '/chat', component: ChatPage, meta: { title: 'Chat with HABot' } },
+      { path: '/settings', component: SettingsPage, meta: { title: 'Settings' } },
+      { path: '/cards/deck', component: CardDeckPage, meta: { title: 'Card deck' } },
       { path: '/notification',
         redirect: (to) => {
           return { path: '/chat', hash: '', query: '', params: { action: to.hash } }

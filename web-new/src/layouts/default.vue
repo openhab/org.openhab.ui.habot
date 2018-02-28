@@ -12,7 +12,7 @@
         </q-btn>
 
         <q-toolbar-title>
-          HABot
+          {{$route.meta.title}}
         </q-toolbar-title>
       </q-toolbar>
     </q-layout-header>

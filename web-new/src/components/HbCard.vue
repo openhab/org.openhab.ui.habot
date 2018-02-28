@@ -11,7 +11,7 @@
         <big v-if="component.component == 'HbSingleItemValue'" class="big-value">{{component.config.state}}</big>
       </div>
       <q-btn round flat icon="more_vert" slot="right">
-        <q-popover>
+        <q-popover anchor="bottom right" self="top right">
           <q-list link class="no-border">
             <q-item v-close-overlay v-if="this.menu === 'chat' && !this.model.uid" @click.native="addCardToDeck()">
               <q-item-main label="Add to Card deck" />

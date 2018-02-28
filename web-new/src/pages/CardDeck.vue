@@ -31,11 +31,18 @@
 
 <style lang="stylus">
 @import '~variables'
+// mat theme fixes for the filters
+body.mat
+  .q-popover.no-wrap.column:not(.animate-popup-down)
+    display none
+  .filters
+    padding 10px
+    .q-select
+      .q-if-label
+        top 21px
+        &.q-if-label-above
+          transform scale(0.75) translate(0, -28px)
 
-.filters
-  padding 10px
-  .q-select
-    margin-top 5px
 .hb-cards
   padding 20px
   width 100%
