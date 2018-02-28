@@ -6,7 +6,8 @@ var
 module.exports = function (ctx) {
   return {
     plugins: [
-      'axios'
+      'axios',
+      'jexl'
     ],
     css: [
       'app.styl'
