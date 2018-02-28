@@ -1,10 +1,7 @@
-// import something here
 import jexl from 'jexl'
 import AsyncComputed from 'vue-async-computed'
-import store from '../store'
 
-// leave the export, even if you don't use it
-export default ({ app, router, Vue }) => {
+export default ({ app, router, store, Vue }) => {
   Vue.use(AsyncComputed)
   Vue.prototype.$jexl = jexl
   Vue.prototype.$expr = (value) => {
