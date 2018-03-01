@@ -7,12 +7,15 @@ export const initialLoad = (context) => {
   if (context.state.items.length) return Promise.resolve()
   console.log('Fetching initial state of all items...')
 
-  return axios.get('/rest/items').then((resp) => {
-    context.commit('updateAll', resp.data)
-    context.commit('setReady')
-    context.dispatch('watchEvents')
-
-    return Promise.resolve()
+  return new Promise((resolve, reject) => {
+    axios.get('/rest/items').then((resp) => {
+      context.commit('updateAll', resp.data)
+      context.commit('setReady')
+      context.dispatch('watchEvents')
+      resolve()
+    }).catch(err => {
+      reject(err)
+    })
   })
 }
 

@@ -36,9 +36,13 @@
 
         <q-item-separator></q-item-separator>
         <q-list-header>My Cards</q-list-header>
-        <q-item to="/cards/favorites">
+        <q-item to="/cards/bookmarks">
           <q-item-side icon="bookmark" />
           <q-item-main label="Bookmarks"></q-item-main>
+        </q-item>
+        <q-item to="/cards/suggestions">
+          <q-item-side icon="star" />
+          <q-item-main label="Suggestions"></q-item-main>
         </q-item>
         <q-item to="/cards/recent">
           <q-item-side icon="history" />
@@ -54,6 +58,10 @@
         <q-item to="/settings">
           <q-item-side icon="settings" />
           <q-item-main label="Settings" />
+        </q-item>
+        <q-item to="/help">
+          <q-item-side icon="help" />
+          <q-item-main label="Help" />
         </q-item>
 
       </q-list>

@@ -27,6 +27,7 @@ import HbSwitch from 'components/HbSwitch.vue'
 import HbSlider from 'components/HbSlider.vue'
 import HbKnob from 'components/HbKnob.vue'
 import HbCollapsible from 'components/HbCollapsible.vue'
+import HbTabs from 'components/HbTabs.vue'
 
 export default {
   name: 'HbCollapsible',
@@ -35,7 +36,8 @@ export default {
     HbSwitch,
     HbSlider,
     HbKnob,
-    HbCollapsible
+    HbCollapsible,
+    HbTabs
   },
   data () {
     return {

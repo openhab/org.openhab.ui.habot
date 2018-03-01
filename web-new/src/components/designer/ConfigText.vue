@@ -1,5 +1,5 @@
 <template>
-  <q-input :value="value" @input="$emit('input', $event)"></q-input>
+  <q-input :value="value" @input="$emit('input', $event)" color="secondary"></q-input>
 </template>
 
 <script>

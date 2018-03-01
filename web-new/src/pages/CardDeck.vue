@@ -17,18 +17,21 @@
         <q-fab-action
           color="secondary"
           @click="addCard"
-          icon="aspect_ratio"
-        />
+          icon="aspect_ratio">
+          <q-tooltip anchor="center left" self="center right" :offset="[10, 10]">Create simple card</q-tooltip>
+        </q-fab-action>
         <q-fab-action
           color="secondary"
           @click="addListCard"
-          icon="list"
-        />
+          icon="list">
+          <q-tooltip anchor="center left" self="center right" :offset="[10, 10]">Create list card</q-tooltip>
+        </q-fab-action>
         <q-fab-action
           color="secondary"
           @click="addTabbedCard"
-          icon="tab"
-        />
+          icon="tab">
+          <q-tooltip anchor="center left" self="center right" :offset="[10, 10]">Create tabbed card</q-tooltip>
+        </q-fab-action>
       </q-fab>
     </q-page-sticky>
   </div>
@@ -72,8 +75,8 @@ export default {
   data () {
     return {
       objects: [],
-      locations: [],
-      cards: []
+      locations: []
+      // cards: []
     }
   },
   methods: {
@@ -107,12 +110,17 @@ export default {
           }
         })
       }
+    },
+    cards: {
+      get () {
+        return this.$store.getters['cards/all']
+      }
     }
-  },
-  created () {
-    this.$http.get('/rest/habot/cards').then((resp) => {
-      this.cards = resp.data
-    })
   }
+  // created () {
+  //   this.$http.get('/rest/habot/cards').then((resp) => {
+  //     this.cards = resp.data
+  //   })
+  // }
 }
 </script>

@@ -24,7 +24,7 @@ const Router = new VueRouter({
 })
 
 Router.beforeEach((to, from, next) => {
-  store.dispatch('items/initialLoad').then(() => next())
+  store.dispatch('initialLoad').then(() => next())
 })
 
 export default Router

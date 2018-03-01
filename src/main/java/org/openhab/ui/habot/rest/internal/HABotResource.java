@@ -229,6 +229,7 @@ public class HABotResource implements RESTResource {
     @ApiResponses(value = { @ApiResponse(code = 200, message = "The card was created"),
             @ApiResponse(code = 500, message = "An error occured") })
     public Response createCard(@ApiParam(value = "card", required = true) Card card) {
+        card.updateTimestamp();
         Card createdCard = this.cardRegistry.add(card);
 
         return Response.ok(createdCard).build();
@@ -244,6 +245,7 @@ public class HABotResource implements RESTResource {
             throw new InvalidParameterException(
                     "The card UID in the body of the request should match the UID in the URL");
         }
+        card.updateTimestamp();
         Card updatedCard = this.cardRegistry.update(card);
 
         return Response.ok(updatedCard).build();
@@ -255,6 +257,60 @@ public class HABotResource implements RESTResource {
     @ApiOperation(value = "Deletes a card from the card deck.")
     public Response deleteCard(@PathParam("cardUID") @ApiParam(value = "cardUID", required = true) String cardUID) {
         this.cardRegistry.remove(cardUID);
+
+        return Response.ok().build();
+    }
+
+    @PUT
+    @Path("/cards/{cardUID}/bookmark")
+    @ApiOperation(value = "Sets a bookmark on a card.")
+    @ApiResponses(value = { @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 404, message = "The card with the provided UID doesn't exist"),
+            @ApiResponse(code = 500, message = "An error occured") })
+    public Response setCardBookmark(
+            @PathParam("cardUID") @ApiParam(value = "cardUID", required = true) String cardUID) {
+        Card card = this.cardRegistry.get(cardUID);
+        if (card == null) {
+            return Response.status(Status.NOT_FOUND).build();
+        }
+        card.setBookmark(true);
+        this.cardRegistry.update(card);
+
+        return Response.ok().build();
+    }
+
+    @DELETE
+    @Path("/cards/{cardUID}/bookmark")
+    @ApiOperation(value = "Removes the bookmark on a card.")
+    @ApiResponses(value = { @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 404, message = "The card with the provided UID doesn't exist"),
+            @ApiResponse(code = 500, message = "An error occured") })
+    public Response unsetCardBookmark(
+            @PathParam("cardUID") @ApiParam(value = "cardUID", required = true) String cardUID) {
+        Card card = this.cardRegistry.get(cardUID);
+        if (card == null) {
+            return Response.status(Status.NOT_FOUND).build();
+        }
+        card.setBookmark(false);
+        this.cardRegistry.update(card);
+
+        return Response.ok().build();
+    }
+
+    @PUT
+    @Path("/cards/{cardUID}/timestamp")
+    @ApiOperation(value = "Updates the timestamp on a card to the current time")
+    @ApiResponses(value = { @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 404, message = "The card with the provided UID doesn't exist"),
+            @ApiResponse(code = 500, message = "An error occured") })
+    public Response updateCardTimestamp(
+            @PathParam("cardUID") @ApiParam(value = "cardUID", required = true) String cardUID) {
+        Card card = this.cardRegistry.get(cardUID);
+        if (card == null) {
+            return Response.status(Status.NOT_FOUND).build();
+        }
+        card.updateTimestamp();
+        this.cardRegistry.update(card);
 
         return Response.ok().build();
     }

@@ -1,5 +1,5 @@
 <template>
-  <q-select :value="value" @input="$emit('input', $event)" :options="items" filter></q-select>
+  <q-select :value="value" color="secondary" @input="$emit('input', $event)" :options="items" filter></q-select>
 </template>
 
 <script>

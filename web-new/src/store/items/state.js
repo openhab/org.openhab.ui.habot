@@ -1,4 +1,5 @@
 export default {
   ready: false,
-  items: []
+  items: [],
+  state: []
 }

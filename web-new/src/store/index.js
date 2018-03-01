@@ -2,13 +2,18 @@ import Vue from 'vue'
 import Vuex from 'vuex'
 
 import items from './items'
+import cards from './cards'
+
+import * as actions from './actions'
 
 Vue.use(Vuex)
 
 const store = new Vuex.Store({
   modules: {
-    items
-  }
+    items,
+    cards
+  },
+  actions
 })
 
 export default store

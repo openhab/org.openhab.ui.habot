@@ -1,10 +1,18 @@
 {
     "HbCard": {
-        "description": "A card",
+        "description": "The HbCard is the root component of all HABot cards",
         "configDescriptions": {
             "bigger": {
                 "type": "boolean",
                 "description": "Make the card a little bigger (except on phones where it will always span the entire screen width)"
+            },
+            "color": {
+                "type": "color",
+                "description": "The background color of the card"
+            },
+            "textcolor": {
+                "type": "color",
+                "description": "The color of the text in the card"
             }
         },
         "slotDescriptions": {
@@ -21,7 +29,8 @@
                 "allowedComponents": [ "HbTabs"]
             },
             "right": {
-                "description": "The area on the right of the card title along the context menu"
+                "description": "The area on the right of the card title along the context menu",
+                "allowedComponents": [ "HbSingleItemValue", "HbSwitch" ]
             }
         }
     },
@@ -191,6 +200,30 @@
             "item": {
                 "type": "item",
                 "description": "The item controlled by this list item"
+            }
+        }
+    },
+
+    "HbSwitch": {
+        "description": "A switch operating an item",
+        "configDescriptions": {
+            "item": {
+                "type": "item",
+                "description": "The item controlled by this list item"
+            }
+        }
+    },
+
+    "HbSingleItemValue": {
+        "description": "Displays the formatted state of an item. Designed to be placed in the right slot of a HbCard",
+        "configDescriptions": {
+            "item": {
+                "type": "item",
+                "description": "The item whose state should be displayed this component"
+            },
+            "state": {
+                "type": "text",
+                "description": "A textual value to display instead of the state of the state of the configyured item"
             }
         }
     }

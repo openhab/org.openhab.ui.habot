@@ -6,16 +6,16 @@
         <q-toolbar-title>
           Card Designer
         </q-toolbar-title>
-        <q-btn @click="save()" icon="save" flat></q-btn>
+        <q-btn @click="save()" icon="save" flat label="Save"></q-btn>
       </q-toolbar>
     </q-layout-header>
 
     <q-layout-footer>
       <q-toolbar>
-        <q-btn @click="layout.treepane=!layout.treepane" icon="format_indent_increase" flat></q-btn>
+        <q-btn @click="layout.treepane=!layout.treepane" icon="format_indent_increase" flat label="Tree"></q-btn>
         <q-toolbar-title>
         </q-toolbar-title>
-        <q-btn @click="layout.toolpane=!layout.toolpane" icon="build" flat></q-btn>
+        <q-btn @click="layout.toolpane=!layout.toolpane" icon-right="build" flat label="Tools"></q-btn>
       </q-toolbar>
     </q-layout-footer>
 
@@ -37,6 +37,23 @@
         <div v-if="selectedNode.type === 'component'">
           <div class="q-body-2">{{currentComponent.description}}</div>
           <br />
+
+          <!-- Special handling for the root HbCard -->
+          <div v-if="selectedNode && selectedNode.id === 'card'">
+            <q-field label="Title" class="config-field" orientation="vertical"
+                     helper="The title of the card">
+              <config-text v-model="selectedNode.component.title"></config-text>
+            </q-field>
+            <q-field label="Subtitle" class="config-field" orientation="vertical"
+                     helper="The subtitle of the card">
+              <config-text v-model="selectedNode.component.subtitle"></config-text>
+            </q-field>
+            <q-field label="Tags" class="config-field" orientation="vertical"
+                    helper="The tags attached to the card - use object:<tag> and location:<tag> to make HABot present this card instead of the default generated one when asked about those tags">
+              <q-chips-input v-model="selectedNode.component.tags" color="secondary"></q-chips-input>
+            </q-field>
+          </div>
+
           <q-field
               v-if="currentComponent && currentComponent.configDescriptions && selectedNode.config"
               v-for="(configDesc, prop) in currentComponent.configDescriptions"
@@ -229,8 +246,9 @@ export default {
     },
     save () {
       this.card.uid = this.uid
-      let request = (this.newCard) ? this.$http.post('/rest/habot/cards/', this.card) : this.$http.put('/rest/habot/cards/' + this.uid, this.card)
-      request.then(() => {
+      // let request = (this.newCard) ? this.$http.post('/rest/habot/cards/', this.card) : this.$http.put('/rest/habot/cards/' + this.uid, this.card)
+      let action = (this.newCard) ? this.$store.dispatch('cards/create', this.card) : this.$store.dispatch('cards/update', this.card)
+      action.then(() => {
         this.$q.notify({ type: 'positive', message: 'Card saved' })
       }).catch((err) => {
         this.$q.notify(err.message)
@@ -339,91 +357,95 @@ export default {
   },
   created () {
     let vm = this
-    this.$http.get('/rest/habot/cards/' + this.uid).then((resp) => {
-      vm.card = resp.data
+    let card = vm.$store.getters['cards/copy'](this.uid)
+    debugger
+    if (card) {
+      vm.card = card
+      if (!vm.card.tags) vm.card.tags = [] // temp
       vm.buildTree()
-    }).catch((err) => {
-      if (err.response.status === 404) {
-        vm.newCard = true
-        vm.card = {
-          title: 'New Card',
-          subtitle: 'Subtitle',
-          component: 'HbCard',
-          config: {},
-          slots: {}
-        }
-
-        // adds a list skeleton if the designer was invoked with a 'type' query string
-        if (vm.$route.query.type === 'list') {
-          vm.card.title = 'New List Card'
-          vm.card.slots = {
-            list: [
-              {
-                component: 'HbList',
-                config: {},
-                slots: {
-                  items: []
-                }
-              }
-            ]
-          }
-        } else if (vm.$route.query.type === 'tabs') {
-          vm.card.title = 'New Tabbed Card'
-          vm.card.slots = {
-            tabs: [
-              {
-                component: 'HbTabs',
-                config: { inverted: true },
-                slots: {
-                  tabs: [
-                    {
-                      component: 'HbTab',
-                      config: {
-                        name: 'tab1',
-                        label: 'Tab 1'
-                      }
-                    },
-                    {
-                      component: 'HbTab',
-                      config: {
-                        name: 'tab2',
-                        label: 'Tab 2'
-                      }
-                    }
-                  ],
-                  tabpanes: [
-                    {
-                      component: 'HbTabPane',
-                      config: {
-                        name: 'tab1'
-                      },
-                      slots: {
-                        main: []
-                      }
-                    },
-                    {
-                      component: 'HbTabPane',
-                      config: {
-                        name: 'tab2'
-                      },
-                      slots: {
-                        main: []
-                      }
-                    }
-                  ]
-                }
-              }
-            ]
-          }
-        } else {
-          vm.card.slots = {
-            main: []
-          }
-        }
-
-        vm.buildTree()
+    } else {
+      debugger
+      vm.newCard = true
+      vm.card = {
+        title: 'New Card',
+        subtitle: 'Subtitle',
+        component: 'HbCard',
+        tags: [],
+        bookmarked: false,
+        config: {},
+        slots: {}
       }
-    })
+
+      // adds a list skeleton if the designer was invoked with a 'type' query string
+      if (vm.$route.query.type === 'list') {
+        vm.card.title = 'New List Card'
+        vm.card.slots = {
+          list: [
+            {
+              component: 'HbList',
+              config: {},
+              slots: {
+                items: []
+              }
+            }
+          ]
+        }
+      } else if (vm.$route.query.type === 'tabs') {
+        vm.card.title = 'New Tabbed Card'
+        vm.card.slots = {
+          tabs: [
+            {
+              component: 'HbTabs',
+              config: { inverted: true },
+              slots: {
+                tabs: [
+                  {
+                    component: 'HbTab',
+                    config: {
+                      name: 'tab1',
+                      label: 'Tab 1'
+                    }
+                  },
+                  {
+                    component: 'HbTab',
+                    config: {
+                      name: 'tab2',
+                      label: 'Tab 2'
+                    }
+                  }
+                ],
+                tabpanes: [
+                  {
+                    component: 'HbTabPane',
+                    config: {
+                      name: 'tab1'
+                    },
+                    slots: {
+                      main: []
+                    }
+                  },
+                  {
+                    component: 'HbTabPane',
+                    config: {
+                      name: 'tab2'
+                    },
+                    slots: {
+                      main: []
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      } else {
+        vm.card.slots = {
+          main: []
+        }
+      }
+
+      vm.buildTree()
+    }
   }
 }
 </script>

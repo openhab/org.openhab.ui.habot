@@ -1,16 +1,15 @@
 <template>
-<q-card inline v-if="model" :class="{ bigger: model.config && model.config.bigger }">
+<q-card inline v-if="model" :class="{ bigger: model.config && model.config.bigger }" :color="model.config.color" :text-color="model.config.textcolor">
   <q-card-media v-if="model.imageUri">
     <img :src="model.imageUri" />
   </q-card-media>
   <q-card-title>
-    <span>{{model.title}}</span>
-    <span v-if="model.subtitle" slot="subtitle">{{model.subtitle}}</span>
+    <span>{{title}}</span>
+    <span v-if="model.subtitle" slot="subtitle">{{subtitle}}</span>
     <div slot="right">
-      <!-- <div v-if="model.slots && model.slots.right" class="inline-block" v-for="component in model.slots.right" :key="component">
-        <big v-if="component.component == 'HbSingleItemValue'" class="big-value">{{component.config.state}}</big>
-        <component :is="component.component" :model="component"></component>
-      </div> -->
+      <div v-if="model.slots && model.slots.right" class="inline-block">
+        <component v-for="component in model.slots.right" :key="component" :is="component.component" :model="component"></component>
+      </div>
       <q-btn round flat icon="more_vert" slot="right">
         <q-popover anchor="bottom right" self="top right">
           <q-list link class="no-border">
@@ -23,17 +22,20 @@
             <q-item v-close-overlay v-if="this.menu === 'deck'" @click.native="editCard()">
               <q-item-main label="Edit" />
             </q-item>
-            <q-item v-close-overlay v-if="this.menu === 'deck'" @click.native="bookmarkCard()">
+            <q-item v-close-overlay v-if="this.menu === 'deck' && !this.model.bookmarked" @click.native="bookmarkCard()">
               <q-item-main label="Bookmark" />
             </q-item>
-            <q-item v-close-overlay v-if="this.menu === 'deck'" @click="deleteCard()">
+            <q-item v-close-overlay v-if="this.menu === 'deck' && this.model.bookmarked" @click.native="unbookmarkCard()">
+              <q-item-main label="Remove bookmark" />
+            </q-item>
+            <q-item v-close-overlay v-if="this.menu === 'deck'" @click.native="deleteCard()">
               <q-item-main label="Delete" />
             </q-item>
             <q-item v-close-overlay v-if="this.menu === 'bookmark'" @click.native="unbookmarkCard()">
               <q-item-main label="Remove bookmark" />
             </q-item>
-            <q-item v-close-overlay v-if="this.menu === 'designer'" @click.native="forceRefresh()">
-              <q-item-main label="Force refresh" />
+            <q-item v-close-overlay v-if="this.menu === 'designer'" @click.native="forceRedraw()">
+              <q-item-main label="Force redraw" />
             </q-item>
           </q-list>
         </q-popover>
@@ -63,6 +65,7 @@
 
 <script>
 
+import HbSingleItemValue from 'components/HbSingleItemValue.vue'
 import HbList from 'components/HbList.vue'
 import HbCollapsible from 'components/HbCollapsible.vue'
 import HbTabs from 'components/HbTabs.vue'
@@ -70,9 +73,12 @@ import HbSwitch from 'components/HbSwitch.vue'
 import HbKnob from 'components/HbKnob.vue'
 import HbSlider from 'components/HbSlider.vue'
 
+import { uid, extend } from 'quasar'
+
 export default {
   name: 'HbCard',
   components: {
+    HbSingleItemValue,
     HbList,
     HbSwitch,
     HbKnob,
@@ -87,20 +93,70 @@ export default {
   },
   methods: {
     addCardToDeck () {
-      this.$q.notify('Not implemented')
+      let newcard = extend({}, this.model)
+      newcard.uid = uid()
+      if (!newcard.tags) newcard.tags = [] // todo add tags from the chat reply
+      if (!newcard.slots) newcard.slots = {} // temp
+      return new Promise((resolve, reject) => {
+        this.$store.dispatch('cards/create', newcard).then((card) => {
+          this.$q.notify({ type: 'positive', message: 'Added to card deck' })
+          resolve(card)
+        }).catch((err) => {
+          reject(err)
+        })
+      })
     },
     addCardToDeckAndBookmark () {
-      this.$q.notify('Not implemented')
+      return this.addCardToDeck().then((card) => {
+        return this.$store.dispatch('cards/bookmark', card).then(() => {
+          this.$q.notify({ type: 'info', message: 'Added to bookmarks' })
+        })
+      })
     },
     bookmarkCard () {
-      this.$q.notify('Not implemented')
+      this.$store.dispatch('cards/bookmark', this.model).then(() => {
+        this.$q.notify({ type: 'info', message: 'Added to bookmarks' })
+      })
+    },
+    unbookmarkCard () {
+      this.$store.dispatch('cards/unbookmark', this.model).then(() => {
+        this.$q.notify({ type: 'info', message: 'Removed from bookmarks' })
+      })
     },
     editCard () {
       if (!this.model.uid) return
       this.$router.push('/designer/' + this.model.uid)
     },
-    forceRefresh () {
+    deleteCard () {
+      this.$store.dispatch('cards/remove', this.model).then((deletedCard) => {
+        this.$q.notify({
+          type: 'warning',
+          message: 'Deleted',
+          actions: [
+            {
+              label: 'Undo',
+              handler: () => {
+                this.$store.dispatch('cards/create', deletedCard)
+              }
+            }
+          ]
+        })
+      })
+    },
+    forceRedraw () {
       this.$forceUpdate()
+    }
+  },
+  asyncComputed: {
+    title: {
+      get () {
+        return this.$expr(this.model.title)
+      }
+    },
+    subtitle: {
+      get () {
+        return this.$expr(this.model.subtitle)
+      }
     }
   }
 }

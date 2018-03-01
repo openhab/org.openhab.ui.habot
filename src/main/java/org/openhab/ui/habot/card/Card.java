@@ -1,6 +1,12 @@
 package org.openhab.ui.habot.card;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.smarthome.core.common.registry.Identifiable;
@@ -9,6 +15,9 @@ public class Card extends Component implements Identifiable<String> {
     String uid;
     String title;
     String subtitle;
+    Set<String> tags = new HashSet<String>();
+    boolean bookmarked;
+    Date timestamp;
 
     String imageUri;
 
@@ -54,6 +63,54 @@ public class Card extends Component implements Identifiable<String> {
 
     public List<CardAction> getActions() {
         return actions;
+    }
+
+    public Set<String> getTags() {
+        return Collections.unmodifiableSet(new HashSet<>(tags));
+    }
+
+    public boolean isBookmarked() {
+        return bookmarked;
+    }
+
+    public void setBookmark(boolean bookmarked) {
+        this.bookmarked = bookmarked;
+    }
+
+    public Date getTimestamp() {
+        return this.timestamp;
+    }
+
+    public void setTimestamp(Date date) {
+        this.timestamp = date;
+    }
+
+    public void updateTimestamp() {
+        this.timestamp = new Date();
+    }
+
+    public boolean hasTag(String tag) {
+        return (tags.contains(tag));
+    }
+
+    public void addTag(String tag) {
+        tags.add(tag);
+    }
+
+    public void addTags(Collection<String> tags) {
+        this.tags.addAll(tags);
+    }
+
+    public void addTags(String... tags) {
+        this.tags.addAll(Arrays.asList(tags));
+    }
+
+    public void removeTag(String tag) {
+        tags.remove(tag);
+    }
+
+    public void removeAllTags() {
+        tags.clear();
     }
 
     public void setActions(List<CardAction> cardActions) {

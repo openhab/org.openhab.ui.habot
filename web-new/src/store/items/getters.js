@@ -27,6 +27,15 @@ export const locationSet = (state) => {
   return unique(tags)
 }
 
+export const allStates = (state) => {
+  // return state.items.
+  let states = {}
+  for (let i of state.items) {
+    states[i.name] = state.state[i.name]
+  }
+  return states
+}
+
 export const itemState = (state) => (name) => {
   if (!state.items) return []
   let item = state.items.find(item => item.name === name)
