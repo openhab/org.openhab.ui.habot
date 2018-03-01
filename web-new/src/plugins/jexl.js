@@ -5,6 +5,7 @@ export default ({ app, router, store, Vue }) => {
   Vue.use(AsyncComputed)
   Vue.prototype.$jexl = jexl
   Vue.prototype.$expr = (value) => {
+    if (!value) return null
     if (value.startsWith('=')) {
       try {
         return jexl.eval(value.substring(1), store.state.items).then((res) => {

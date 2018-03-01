@@ -1,0 +1,198 @@
+{
+    "HbCard": {
+        "description": "A card",
+        "configDescriptions": {
+            "bigger": {
+                "type": "boolean",
+                "description": "Make the card a little bigger (except on phones where it will always span the entire screen width)"
+            }
+        },
+        "slotDescriptions": {
+            "main": {
+                "description": "The main area of the card",
+                "deniedComponents": [ "HbCard", "HbList", "HbListItem", "HbListHeader", "HbTab", "HbTabPane" ]
+            },
+            "list": {
+                "description": "A slot for hosting a list component (HbList)",
+                "allowedComponents": [ "HbList"]
+            },
+            "tabs": {
+                "description": "A slot for hosting a tabs component (HbTabs)",
+                "allowedComponents": [ "HbTabs"]
+            },
+            "right": {
+                "description": "The area on the right of the card title along the context menu"
+            }
+        }
+    },
+
+    "HbList": {
+        "description": "Container for a list of HbListItems",
+        "configDescriptions": {
+            "link": {
+                "type": "boolean",
+                "description": "Display the list items in gray when hovering on desktops"
+            }
+        },
+        "slotDescriptions": {
+            "items": {
+                "description": "Contains the list items",
+                "allowedComponents": [ "HbListItem", "HbCollapsible" ]
+            }
+        }
+    },
+
+    "HbListItem": {
+        "description": "A list item",
+        "configDescriptions": {
+            "label": {
+                "type": "text",
+                "description": "The label of the item"
+            },
+            "item": {
+                "type": "item",
+                "description": "The item controlled by this list item"
+            },
+            "state": {
+                "type": "text",
+                "description": "The state to display on the right"
+            },
+            "control": {
+                "type": "optiongroup",
+                "description": "The type of control displayed on the right",
+                "options": [
+                    {"value": "", "label": "Default"},
+                    {"value": "Switch", "label": "Switch"}
+                ]
+            }
+        }
+    },
+
+    "HbCollapsible": {
+        "description": "A collapsible, useable both in a HbList and standalone",
+        "configDescriptions": {
+            "label": {
+                "type": "text",
+                "description": "The label in the header"
+            },
+            "sublabel": {
+                "type": "text",
+                "description": "The sublabel in the header"
+            },
+            "group": {
+                "type": "text",
+                "description": "Use the same group identifier on several HbCollapsibles to make a group act as an accordion"
+            },
+            "indent": {
+                "type": "boolean",
+                "description": "Indent the collapsible's contents (for example to build a hierarchy)"
+            }
+        },
+        "slotDescriptions": {
+            "main": {
+                "description": "The main area of the collapsible",
+                "deniedComponents": [ "HbCard", "HbList", "HbListItem", "HbListHeader" ]
+            }
+        }
+    },
+
+    "HbTabs": {
+        "description": "A set of tabs",
+        "configDescriptions": {
+            "align": {
+                "type": "optiongroup",
+                "description": "Alignment of the tabs in the bar",
+                "options": [
+                    {"value": "left", "label": "Left"},
+                    {"value": "center", "label": "Center"},
+                    {"value": "right", "label": "Right"},
+                    {"value": "justify", "label": "Justify"}
+                ]
+            },
+            "inverted": {
+                "type": "boolean",
+                "description": "Invert the background of the tab"
+            },
+            "position": {
+                "type": "optiongroup",
+                "description": "Position the tab above or below the tab panes",
+                "options": [
+                    {"value": "top", "label": "Top"},
+                    {"value": "bottom", "label": "Bottom"}
+                ]
+            },
+            "color": {
+                "type": "color",
+                "description": "Color of the tab header's background"
+            },
+            "glossy": {
+                "type": "boolean",
+                "description": "Apply a glossy effect to the tab header"
+            },
+            "noborder": {
+                "type": "boolean",
+                "description": "Don't draw a border around the tab panes"
+            }
+        },
+        "slotDescriptions": {
+            "tabs": {
+                "description": "The collection of tabs",
+                "allowedComponents": [ "HbTab" ]
+            },
+            "tabpanes": {
+                "description": "The collection of tab panes which must match the tabs",
+                "allowedComponents": [ "HbTabPane" ]
+            }
+        }
+    },
+
+    "HbTab": {
+        "description": "A tab - use in HbTabs and be sure to add a HbTabPane with the same name in the tabpanes slot",
+        "configDescriptions": {
+            "name": {
+                "type": "text",
+                "description": "Name of the tab - should match the name of the corresponding HbTabPane in the tabpanes slot"
+            },
+            "label": {
+                "type": "text",
+                "description": "Label of the tab"
+            }
+        }
+    },
+
+    "HbTabPane": {
+        "description": "A tab pane - use in HbTabs's tabpanes slot and be sure to match the name with a HbTab",
+        "configDescriptions": {
+            "name": {
+                "type": "text",
+                "description": "Name of the tab pane - should match the name of the corresponding HbTab in the tabs slot"
+            }
+        },
+        "slotDescriptions": {
+            "main": {
+                "description": "The main area of the tab pane"
+            }
+        }
+    },
+
+    "HbSlider": {
+        "description": "A slider operating an item",
+        "configDescriptions": {
+            "item": {
+                "type": "item",
+                "description": "The item controlled by this list item"
+            }
+        }
+    },
+
+    "HbKnob": {
+        "description": "A knob operating an item",
+        "configDescriptions": {
+            "item": {
+                "type": "item",
+                "description": "The item controlled by this list item"
+            }
+        }
+    }
+    
+}

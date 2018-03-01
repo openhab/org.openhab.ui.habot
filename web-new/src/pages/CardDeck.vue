@@ -24,6 +24,11 @@
           @click="addListCard"
           icon="list"
         />
+        <q-fab-action
+          color="secondary"
+          @click="addTabbedCard"
+          icon="tab"
+        />
       </q-fab>
     </q-page-sticky>
   </div>
@@ -32,24 +37,21 @@
 <style lang="stylus">
 @import '~variables'
 // mat theme fixes for the filters
-body.mat
-  .q-popover.no-wrap.column:not(.animate-popup-down)
-    display none
-  .filters
-    padding 10px
-    .q-select
-      .q-if-label
-        top 21px
-        &.q-if-label-above
-          transform scale(0.75) translate(0, -28px)
+.filters
+  padding 10px
+  .q-select
+    .q-if-label
+      top 21px
+      &.q-if-label-above
+        transform scale(0.75) translate(0, -28px)
 
 .hb-cards
-  padding 20px
+  padding 15px
   width 100%
-  @media (min-width $breakpoint-xs-max)
+  @media (min-width $breakpoint-xs-min)
     .q-card
-      min-width 400px
-      margin 20px
+      min-width $card-min-width
+      margin 15px
   @media (max-width $breakpoint-xs-max)
     .q-card
       width 100%
@@ -80,6 +82,9 @@ export default {
     },
     addListCard () {
       this.$router.push('/designer/' + uid() + '?type=list')
+    },
+    addTabbedCard () {
+      this.$router.push('/designer/' + uid() + '?type=tabs')
     }
   },
   computed: {

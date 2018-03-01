@@ -1,5 +1,5 @@
 <template>
-<q-card inline class="bigger">
+<q-card inline v-if="model" :class="{ bigger: model.config && model.config.bigger }">
   <q-card-media v-if="model.imageUri">
     <img :src="model.imageUri" />
   </q-card-media>
@@ -7,9 +7,10 @@
     <span>{{model.title}}</span>
     <span v-if="model.subtitle" slot="subtitle">{{model.subtitle}}</span>
     <div slot="right">
-      <div v-if="model.slots && model.slots.right" class="inline-block" v-for="component in model.slots.right" :key="component">
+      <!-- <div v-if="model.slots && model.slots.right" class="inline-block" v-for="component in model.slots.right" :key="component">
         <big v-if="component.component == 'HbSingleItemValue'" class="big-value">{{component.config.state}}</big>
-      </div>
+        <component :is="component.component" :model="component"></component>
+      </div> -->
       <q-btn round flat icon="more_vert" slot="right">
         <q-popover anchor="bottom right" self="top right">
           <q-list link class="no-border">
@@ -40,34 +41,44 @@
     </div>
   </q-card-title>
   <q-card-main v-if="model.slots && model.slots.main">
-    <component :is="component.component" v-for="component in model.slots.main" :key="component" :model="component"></component>
+    <component :is="component.component" v-for="(component, idx) in model.slots.main" :key="component" :model="component" :name="'card-main-' + idx"></component>
   </q-card-main>
-  <hb-list v-if="model.slots && model.slots.list && model.slots.list[0].component === 'HbList'" :model="model.slots.list[0]" />
+  <hb-list v-if="model.slots && model.slots.list && model.slots.list[0] && model.slots.list[0].component === 'HbList'" :model="model.slots.list[0]" />
+  <hb-tabs v-if="model.slots && model.slots.tabs && model.slots.tabs[0] && model.slots.tabs[0].component === 'HbTabs'" :model="model.slots.tabs[0]" />
 </q-card>
 
 </template>
 
 <style lang="stylus">
+@import '~variables'
 .big-value
   font-weight 300
   color black
   font-size 200%
   vertical-align middle
+@media (min-width $breakpoint-sm-min)
+  .bigger
+    width 400px !important
 </style>
 
 <script>
 
 import HbList from 'components/HbList.vue'
+import HbCollapsible from 'components/HbCollapsible.vue'
+import HbTabs from 'components/HbTabs.vue'
 import HbSwitch from 'components/HbSwitch.vue'
 import HbKnob from 'components/HbKnob.vue'
 import HbSlider from 'components/HbSlider.vue'
 
 export default {
+  name: 'HbCard',
   components: {
     HbList,
     HbSwitch,
     HbKnob,
-    HbSlider
+    HbSlider,
+    HbCollapsible,
+    HbTabs
   },
   props: ['model', 'menu'],
   data () {

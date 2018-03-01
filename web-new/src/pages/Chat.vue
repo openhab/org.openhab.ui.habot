@@ -52,6 +52,8 @@
 </template>
 
 <style lang="stylus">
+@import '~variables'
+
 .chat-input-sticky > span
   width 100%
 .chat-input-toolbar
@@ -60,8 +62,12 @@
 
 .chat-area
   padding-bottom 40px
-.q-card
-  width 400px
+  @media (min-width $breakpoint-xs-min)
+    .q-card
+      width $card-min-width
+  @media (max-width $breakpoint-xs-max)
+    .q-card
+      width calc(100% - 20px)
 .chat-input-toolbar
   input
     margin-right 34px
@@ -69,9 +75,6 @@
   .q-icon
     position absolute
     right 0
-@media (max-width 575px)
-  .q-card
-    width calc(100% - 20px)
 </style>
 
 <script>
@@ -139,7 +142,10 @@ export default {
     })
   },
   mounted () {
-    // (new MutationObserver(this.scrollToBottom)).observe(this.$el, {childList: true, subtree: true})
+    // if (this.$q.platform.is.iphone) {
+    //   (new MutationObserver(this.scrollToBottom)).observe(this.$el, {childList: true, subtree: true})
+    //   console.log('enabled the MutationObserver (platform is iPhone)')
+    // }
     if (navigator.serviceWorker) {
       navigator.serviceWorker.addEventListener('message', this.pushNotificationReceived)
     }
@@ -193,6 +199,9 @@ export default {
 
         if (response.data.card) {
           currentChat.card = response.data.card
+          if (!currentChat.card.uid) {
+            currentChat.card.config = { bigger: true }
+          }
           currentChat.finished = true
           this.chats.push({
             messages: [],
@@ -236,7 +245,10 @@ export default {
     },
     scrollToBottom () {
       var appEl = document.getElementById('q-app')
+      console.log('scrollToBottom: ' + appEl.scrollTop + ' -> ' + appEl.scrollHeight)
       appEl.scrollTop = appEl.scrollHeight
+      console.log('scrollToBottom (document.body): ' + appEl.scrollTop + ' -> ' + appEl.scrollHeight)
+      document.body.scrollTop = document.body.scrollHeight
     }
   },
   beforeDestroyed () {
