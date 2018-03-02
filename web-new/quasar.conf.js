@@ -1,7 +1,8 @@
 // Configuration for your app
 var
   path = require('path'),
-  CopyWebpackPlugin = require('copy-webpack-plugin')
+  CopyWebpackPlugin = require('copy-webpack-plugin'),
+  webpack = require('webpack')
 
 module.exports = function (ctx) {
   return {
@@ -48,6 +49,13 @@ module.exports = function (ctx) {
             // fix wrong path separator when building on Windows
             plugin.options.stripPrefix = plugin.options.stripPrefix.replace('\\', '/')
           }
+
+          if (plugin.definitions && plugin.definitions['process.env']) {
+            plugin.definitions['process.env']['BUILD_TIMESTAMP'] = Date.now().toString()
+          }
+
+          console.log(JSON.stringify(plugin))
+          console.log('----')
         }
 
         cfg.plugins.push(new CopyWebpackPlugin([
@@ -60,6 +68,10 @@ module.exports = function (ctx) {
             to: '.'
           }
         ]))
+
+        cfg.plugins.push(new webpack.EnvironmentPlugin({
+          BUILD_TIMESTAMP: '123'
+        }))
       }
     },
     devServer: {

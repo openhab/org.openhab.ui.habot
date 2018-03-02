@@ -54,6 +54,7 @@
       <q-item disabled>
         <q-item-main>
           <q-item-tile label>About HABot</q-item-tile>
+          <q-item-tile sublabel>Build date: {{buildTimestamp}}</q-item-tile>
         </q-item-main>
       </q-item>
       <q-item @click.native="refreshApp()">
@@ -87,7 +88,8 @@ function urlB64ToUint8Array (base64String) {
 export default {
   data () {
     return {
-      speechApi: 'google'
+      speechApi: 'google',
+      buildTimestamp: new Date(process.env.BUILD_TIMESTAMP).toString()
     }
   },
   methods: {

@@ -358,13 +358,11 @@ export default {
   created () {
     let vm = this
     let card = vm.$store.getters['cards/copy'](this.uid)
-    debugger
     if (card) {
       vm.card = card
       if (!vm.card.tags) vm.card.tags = [] // temp
       vm.buildTree()
     } else {
-      debugger
       vm.newCard = true
       vm.card = {
         title: 'New Card',
