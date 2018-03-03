@@ -41,6 +41,9 @@ module.exports = function (ctx) {
           exclude: /(node_modules|quasar)/
         })
 
+        // console.log(JSON.stringify(cfg, null, 2))
+        if (cfg.output) cfg.output.chunkFilename = 'js/[name].[chunkhash].js'
+
         // Adding importScripts to the sw-precache plugin config
         for (let plugin of cfg.plugins) {
           if (plugin.options && plugin.options.cacheId) {
@@ -54,8 +57,8 @@ module.exports = function (ctx) {
             plugin.definitions['process.env']['BUILD_TIMESTAMP'] = Date.now().toString()
           }
 
-          console.log(JSON.stringify(plugin))
-          console.log('----')
+          // console.log(JSON.stringify(plugin))
+          // console.log('----')
         }
 
         cfg.plugins.push(new CopyWebpackPlugin([
@@ -122,9 +125,10 @@ module.exports = function (ctx) {
         'QChatMessage',
         'QResizeObservable',
         'QWindowResizeObservable',
+        'QPopover',
         'QCard',
         'QCardTitle',
-        'QPopover',
+        'QCardActions',
         'QCardMain',
         'QCardMedia',
         'QRadio',
@@ -146,6 +150,8 @@ module.exports = function (ctx) {
     },
     // animations: 'all' --- includes all animations
     animations: [
+      'fadeIn',
+      'fadeOut'
     ],
     pwa: {
       cacheExt: 'js,html,css,ttf,eot,otf,woff,woff2,json,svg,gif,jpg,jpeg,png,wav,ogg,webm,flac,aac,mp4,mp3',

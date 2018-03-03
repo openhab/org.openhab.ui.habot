@@ -40,18 +40,23 @@
 
           <!-- Special handling for the root HbCard -->
           <div v-if="selectedNode && selectedNode.id === 'card'">
-            <q-field label="Title" class="config-field" orientation="vertical"
+            <q-field label="title" class="config-field" orientation="vertical"
                      helper="The title of the card">
               <config-text v-model="selectedNode.component.title"></config-text>
             </q-field>
-            <q-field label="Subtitle" class="config-field" orientation="vertical"
+            <q-field label="subtitle" class="config-field" orientation="vertical"
                      helper="The subtitle of the card">
               <config-text v-model="selectedNode.component.subtitle"></config-text>
             </q-field>
-            <q-field label="Tags" class="config-field" orientation="vertical"
+            <q-field label="tags" class="config-field" orientation="vertical"
                     helper="The tags attached to the card - use object:<tag> and location:<tag> to make HABot present this card instead of the default generated one when asked about those tags">
               <q-chips-input v-model="selectedNode.component.tags" color="secondary"></q-chips-input>
             </q-field>
+            <q-field label="suggestcriteria" class="config-field" orientation="vertical"
+                    helper="The expression to evaluate in order to determine whether the card will be considered as a suggestion. Leave blank if the card is not to be suggested. Example: items.Temperature.state < 16">
+              <config-expr v-model="selectedNode.config.suggestcriteria" color="secondary"></config-expr>
+            </q-field>
+            Result: {{suggestcriteriaError}}
           </div>
 
           <q-field
@@ -167,6 +172,7 @@ import ConfigText from 'components/designer/ConfigText.vue'
 import ConfigBool from 'components/designer/ConfigBool.vue'
 import ConfigOptionGroup from 'components/designer/ConfigOptionGroup.vue'
 import ConfigItem from 'components/designer/ConfigItem.vue'
+import ConfigExpr from 'components/designer/ConfigExpr.vue'
 
 import Vue from 'vue'
 import { extend } from 'quasar'
@@ -225,7 +231,8 @@ export default {
     ConfigText,
     ConfigBool,
     ConfigOptionGroup,
-    ConfigItem
+    ConfigItem,
+    ConfigExpr
   },
   data () {
     return {
@@ -353,6 +360,14 @@ export default {
     currentComponent () {
       if (!this.selectedNode) return null
       return this.components[this.selectedNode.component.component]
+    }
+  },
+  asyncComputed: {
+    suggestcriteriaError () {
+      let suggestresult = this.$expr('=' + this.selectedNode.config.suggestcriteria)
+      debugger
+      console.log(suggestresult)
+      return suggestresult
     }
   },
   created () {

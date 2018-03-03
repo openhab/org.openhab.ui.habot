@@ -31,10 +31,38 @@
             "right": {
                 "description": "The area on the right of the card title along the context menu",
                 "allowedComponents": [ "HbSingleItemValue", "HbSwitch" ]
+            },
+            "actions": {
+                "description": "The area on the bottom of the card where action buttons may be added",
+                "allowedComponents": [ "HbCommandActionButton", "HbAnalyzeActionButton" ]
             }
         }
     },
 
+    "HbCommandActionButton": {
+        "description": "An action button sending a command to an item",
+        "configDescriptions": {
+            "item": {
+                "type": "item",
+                "description": "The item to send the command to"
+            },
+            "command": {
+                "type": "text",
+                "description": "The command to send"
+            }
+        }
+    },
+
+    "HbAnalyzeActionButton": {
+        "description": "An action button opening the analyze window for a set of items",
+        "configDescriptions": {
+            "item": {
+                "type": "itemgroup",
+                "description": "The items to analyze"
+            }
+        }
+    },
+    
     "HbList": {
         "description": "Container for a list of HbListItems",
         "configDescriptions": {

@@ -1,7 +1,5 @@
-/*
-export const someMutation = (state) => {
-}
-*/
+import { extend } from 'quasar'
+
 export const updateAll = (state, cards) => {
   console.log('Loaded ' + cards.length + ' cards')
   state.cards = cards
@@ -14,7 +12,7 @@ export const createCard = (state, card) => {
 export const updateCard = (state, payload) => {
   let idx = state.cards.findIndex((c) => c.uid === payload.uid)
   if (idx < 0) return
-  state.cards[idx] = payload
+  state.cards.splice(idx, 1, extend(true, {}, payload))
 }
 
 export const bookmarkCard = (state, payload) => {
@@ -32,7 +30,7 @@ export const unbookmarkCard = (state, payload) => {
 export const updateCardTimestamp = (state, payload) => {
   let idx = state.cards.findIndex((c) => c.uid === payload.uid)
   if (idx < 0) return
-  state.cards[idx].timetamp = Date.now()
+  state.cards[idx].timestamp = Date.now()
 }
 
 export const removeCard = (state, payload) => {

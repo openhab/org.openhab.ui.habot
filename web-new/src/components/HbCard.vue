@@ -47,6 +47,9 @@
   </q-card-main>
   <hb-list v-if="model.slots && model.slots.list && model.slots.list[0] && model.slots.list[0].component === 'HbList'" :model="model.slots.list[0]" />
   <hb-tabs v-if="model.slots && model.slots.tabs && model.slots.tabs[0] && model.slots.tabs[0].component === 'HbTabs'" :model="model.slots.tabs[0]" />
+  <q-card-actions v-if="model.slots && model.slots.actions">
+    <component :is="component.component" v-for="(component, idx) in model.slots.actions" :key="component" :model="component" :name="'card-action-' + idx"></component>
+  </q-card-actions>
 </q-card>
 
 </template>
@@ -72,6 +75,7 @@ import HbTabs from 'components/HbTabs.vue'
 import HbSwitch from 'components/HbSwitch.vue'
 import HbKnob from 'components/HbKnob.vue'
 import HbSlider from 'components/HbSlider.vue'
+import HbAnalyzeActionButton from 'components/HbAnalyzeActionButton.vue'
 
 import { uid, extend } from 'quasar'
 
@@ -84,7 +88,8 @@ export default {
     HbKnob,
     HbSlider,
     HbCollapsible,
-    HbTabs
+    HbTabs,
+    HbAnalyzeActionButton
   },
   props: ['model', 'menu'],
   data () {

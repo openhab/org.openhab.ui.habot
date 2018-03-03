@@ -17,7 +17,7 @@ export default ({ app, router, store, Vue }) => {
         return jexl.eval(value.substring(1), context).then((res) => {
           return res
         }).catch((e) => {
-          return e.message
+          return 'Error: ' + e.message
         })
       } catch (e) {
         return e

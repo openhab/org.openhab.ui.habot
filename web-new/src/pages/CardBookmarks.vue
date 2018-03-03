@@ -3,6 +3,10 @@
       <div class="hb-cards">
         <component :is="'HbCard'" :model="card" menu="deck" v-for="card in cards" :key="card.uid"></component>
       </div>
+      <div v-if="cards.length === 0" class="fit text-center q-pt-xl text-grey">
+        <h4 class="q-display-1">No bookmarked cards</h4>
+        <p>Bookmark cards using their context menu in the <a href="#/cards/deck">Card deck</a> or while chatting with HABot.</p>
+      </div>
     </div>
 </template>
 
