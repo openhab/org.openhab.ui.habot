@@ -8,7 +8,7 @@
     <span v-if="model.subtitle" slot="subtitle">{{subtitle}}</span>
     <div slot="right">
       <div v-if="model.slots && model.slots.right" class="inline-block">
-        <component v-for="component in model.slots.right" :key="component" :is="component.component" :model="component"></component>
+        <component v-for="(component, idx) in model.slots.right" :key="'card-right-' + idx" :is="component.component" :model="component"></component>
       </div>
       <q-btn round flat icon="more_vert" slot="right">
         <q-popover anchor="bottom right" self="top right">
@@ -43,12 +43,12 @@
     </div>
   </q-card-title>
   <q-card-main v-if="model.slots && model.slots.main">
-    <component :is="component.component" v-for="(component, idx) in model.slots.main" :key="component" :model="component" :name="'card-main-' + idx"></component>
+    <component :is="component.component" v-for="(component, idx) in model.slots.main" :key="'card-main-' + idx" :model="component" :name="'card-main-' + idx"></component>
   </q-card-main>
   <hb-list v-if="model.slots && model.slots.list && model.slots.list[0] && model.slots.list[0].component === 'HbList'" :model="model.slots.list[0]" />
   <hb-tabs v-if="model.slots && model.slots.tabs && model.slots.tabs[0] && model.slots.tabs[0].component === 'HbTabs'" :model="model.slots.tabs[0]" />
   <q-card-actions v-if="model.slots && model.slots.actions">
-    <component :is="component.component" v-for="(component, idx) in model.slots.actions" :key="component" :model="component" :name="'card-action-' + idx"></component>
+    <component :is="component.component" v-for="(component, idx) in model.slots.actions" :key="'card-action-' + idx" :model="component" :name="'card-action-' + idx"></component>
   </q-card-actions>
 </q-card>
 

@@ -1,11 +1,23 @@
 <template>
   <div>
-    <div class="row filters bg-grey-2 shadow-2">
+    <div class="row bg-grey-2 shadow-2">
+      <q-checkbox class="multiple-toggle" color="secondary" v-model="multiple" unchecked-icon="done" checked-icon="done_all"></q-checkbox>
+      <div :class="['filters', 'row', (multiple) ? 'multiple' : '']">
+        <q-select :multiple="multiple" filter clearable chips color="secondary" v-model="objects" class="col-sm-6" :options="objectSet" float-label="Objects"></q-select>
+        <q-select :multiple="multiple" filter clearable chips color="secondary" v-model="locations" class="col-sm-6" :options="locationSet" float-label="Locations"></q-select>
+      </div>
       <!-- <q-search v-model="search" color="none" class="col"></q-search> -->
-      <q-select multiple filter chips color="secondary" v-model="objects" class="col-sm-6" :options="objectSet" float-label="Objects"></q-select>
-      <q-select multiple filter chips color="secondary" v-model="locations" class="col-sm-6" :options="locationSet" float-label="Locations"></q-select>
     </div>
     <div class="row">
+      <div v-if="nofilters" class="fit text-center q-pt-xl text-grey">
+        <p>Use the filters above to show the relevant cards, or click on the button below to create one.</p>
+        <q-btn flat icon="bookmark" @click="$router.push('/cards/bookmarks')" style="margin-top: -1px">Bookmarks</q-btn>
+        <q-btn flat icon="star" @click="$router.push('/cards/suggestions')" style="margin-top: -1px">Suggestions</q-btn>
+      </div>
+      <div v-if="!nofilters && !cards.length" class="fit text-center q-pt-xl text-grey">
+        <h4 class="q-display-1">No cards found</h4>
+        <p>Change the filters or click on the button below to create one.</p>
+      </div>
       <div class="hb-cards">
         <component :is="'HbCard'" :model="card" menu="deck" v-for="card in cards" :key="card.uid"></component>
       </div>
@@ -39,10 +51,22 @@
 
 <style lang="stylus">
 @import '~variables'
+.multiple-toggle
+  position absolute
+  right 0
+  margin 30px
 // mat theme fixes for the filters
 .filters
   padding 10px
+  width 100%
+  margin-right 50px
   .q-select
+    margin-top 3px
+    .q-input-target
+      margin-top 3px !important
+      margin-left 3px !important
+      margin-bottom -3px !important
+      min-height 31px
     .q-if-label
       top 21px
       &.q-if-label-above
@@ -74,53 +98,78 @@ export default {
   },
   data () {
     return {
-      objects: [],
-      locations: []
+      multiple: false,
+      objects: null,
+      locations: null
       // cards: []
     }
   },
   methods: {
     addCard () {
-      this.$router.push('/designer/' + uid())
+      this.$router.push({ path: '/designer/' + uid(), query: { tags: this.currentFilterTags.join(',') } })
     },
     addListCard () {
-      this.$router.push('/designer/' + uid() + '?type=list')
+      this.$router.push({ path: '/designer/' + uid(), query: { type: 'list', tags: this.currentFilterTags.join(',') } })
     },
     addTabbedCard () {
-      this.$router.push('/designer/' + uid() + '?type=tabs')
+      this.$router.push({ path: '/designer/' + uid(), query: { type: 'tabs', tags: this.currentFilterTags.join(',') } })
+    }
+  },
+  watch: {
+    multiple: function (val) {
+      if (val) {
+        this.objects = (!this.objects) ? [] : [this.objects]
+        this.locations = (!this.locations) ? [] : [this.locations]
+      } else {
+        this.objects = (this.objects.length) ? this.objects[0] : null
+        this.locations = (this.locations.length) ? this.locations[0] : null
+      }
     }
   },
   computed: {
+    nofilters () {
+      if (this.multiple) return (!this.objects.length && !this.locations.length)
+      else return (!this.objects && !this.locations)
+    },
     objectSet: {
       get () {
-        return this.$store.getters['items/objectSet'].map((tag) => {
+        return this.$store.getters['cards/objectSet'].map((tag) => {
           return {
-            label: tag,
-            value: tag
+            value: tag,
+            label: tag.replace('object:', ''),
+            stamp: '(' + this.$store.getters['cards/tag'](tag).length + ')'
           }
         })
       }
     },
     locationSet: {
       get () {
-        return this.$store.getters['items/locationSet'].map((tag) => {
+        return this.$store.getters['cards/locationSet'].map((tag) => {
           return {
-            label: tag,
-            value: tag
+            value: tag,
+            label: tag.replace('location:', ''),
+            stamp: '(' + this.$store.getters['cards/tag'](tag).length + ')'
           }
         })
       }
     },
     cards: {
       get () {
-        return this.$store.getters['cards/all']
+        let objects = (this.multiple) ? this.objects : (this.objects) ? [this.objects] : []
+        let locations = (this.multiple) ? this.locations : (this.locations) ? [this.locations] : []
+        return this.$store.getters['cards/tags'](objects, locations)
       }
+    },
+    currentFilterTags () {
+      let tags = []
+      if (!this.multiple) {
+        if (this.objects) tags.push(this.objects)
+        if (this.locations) tags.push(this.locations)
+      } else {
+        tags = tags.concat(this.objects).concat(this.locations)
+      }
+      return tags
     }
   }
-  // created () {
-  //   this.$http.get('/rest/habot/cards').then((resp) => {
-  //     this.cards = resp.data
-  //   })
-  // }
 }
 </script>

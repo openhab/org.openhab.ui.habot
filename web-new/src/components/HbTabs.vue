@@ -3,9 +3,9 @@
         :inverted="model.config.inverted" :align="model.config.align"
         :color="model.config.color" :glossy="model.config.glossy" :no-pane-border="model.config.noborder"
         :position="model.config.position">
-  <q-tab v-for="(component, idx) in model.slots.tabs" :key="component" :name="component.config.name" :label="component.config.label" :default="idx === 0" slot="title" />
-  <q-tab-pane v-for="component in model.slots.tabpanes" :key="component" :name="component.config.name" keep-alive>
-    <component :is="component.component" v-for="(component, idx) in component.slots.main" :model="component" :key="component" :name="'tabpane-' + idx" />
+  <q-tab v-for="(component, idx) in model.slots.tabs" :key="'tab-' + idx" :name="component.config.name" :label="component.config.label" :default="idx === 0" slot="title" />
+  <q-tab-pane v-for="(component, idx) in model.slots.tabpanes" :key="'tabpane-' + idx" :name="component.config.name" keep-alive>
+    <component :is="component.component" v-for="(component, idx2) in component.slots.main" :model="component" :key="'tabpane-main-' + idx2" />
   </q-tab-pane>
 </q-tabs>
 </template>

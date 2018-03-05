@@ -5,7 +5,9 @@
       </div>
       <div v-if="cards.length === 0" class="fit text-center q-pt-xl text-grey">
         <h4 class="q-display-1">No bookmarked cards</h4>
-        <p>Bookmark cards using their context menu in the <a href="#/cards/deck">Card deck</a> or while chatting with HABot.</p>
+        <p>Bookmark cards using their context menu in the
+        <q-btn flat icon="dashboard" @click="$router.push('/cards/deck')" style="margin-top: -1px">Card deck</q-btn>
+        or while chatting with HABot.</p>
       </div>
     </div>
 </template>

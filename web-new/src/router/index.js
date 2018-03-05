@@ -27,6 +27,4 @@ Router.beforeEach((to, from, next) => {
   store.dispatch('initialLoad').then(() => next())
 })
 
-console.log(process.env)
-
 export default Router

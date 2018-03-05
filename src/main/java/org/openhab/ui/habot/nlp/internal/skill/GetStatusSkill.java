@@ -4,19 +4,17 @@ import java.util.List;
 
 import org.eclipse.smarthome.core.items.Item;
 import org.eclipse.smarthome.core.items.ItemRegistry;
-import org.eclipse.smarthome.core.transform.TransformationHelper;
-import org.eclipse.smarthome.core.types.StateDescription;
-import org.openhab.ui.habot.card.Card;
-import org.openhab.ui.habot.card.Component;
+import org.openhab.ui.habot.card.CardBuilder;
 import org.openhab.ui.habot.nlp.AbstractItemIntentInterpreter;
 import org.openhab.ui.habot.nlp.Intent;
 import org.openhab.ui.habot.nlp.IntentInterpretation;
 import org.openhab.ui.habot.nlp.Skill;
-import org.osgi.framework.FrameworkUtil;
 import org.osgi.service.component.annotations.Reference;
 
 @org.osgi.service.component.annotations.Component(service = Skill.class, immediate = true)
 public class GetStatusSkill extends AbstractItemIntentInterpreter {
+
+    private CardBuilder cardBuilder;
 
     @Override
     public String getIntentId() {
@@ -32,83 +30,21 @@ public class GetStatusSkill extends AbstractItemIntentInterpreter {
             interpretation.setAnswer(answerFormatter.getRandomAnswer("answer_nothing_found"));
         } else {
             interpretation.setMatchedItems(matchedItems);
-            if (matchedItems.size() == 1) {
-                Item item = matchedItems.get(0);
-                Card singleCard = new Card("HbCard");
-                singleCard.setTitle(item.getLabel());
-                singleCard.setSubtitle(item.getName());
+            interpretation.setCard(cardBuilder.buildCard(intent, matchedItems));
+            interpretation.setAnswer(answerFormatter.getRandomAnswer("info_found_simple"));
 
-                Component component = new Component("HbSingleItemValue");
-                component.addConfig("item", item.getName());
-                component.addConfig("type", item.getType());
-                if (item.getStateDescription() != null) {
-                    String transformedState = considerTransformation(item.getState().toString(),
-                            item.getStateDescription());
-                    if (!transformedState.equals(item.getState().toString())) {
-                        component.addConfig("state", transformedState);
-                    } else {
-                        component.addConfig("state", item.getState().format(item.getStateDescription().getPattern()));
-                    }
-                } else {
-                    component.addConfig("state", item.getState().toString());
-                }
-
-                singleCard.addComponent("right", component);
-
-                interpretation.setCard(singleCard);
-
-                interpretation.setAnswer(answerFormatter.getRandomAnswer("info_found_simple"));
-            } else {
-                Card card = new Card("HbCard");
-
-                // TODO: maybe figure out a title for the card
-                card.setSubtitle(matchedItems.size() + " items"); // TODO: i18n
-
-                Component list = new Component("HbList");
-                for (Item item : matchedItems) {
-                    Component listItem = new Component("HbListItem");
-                    listItem.addConfig("item", item.getName());
-                    listItem.addConfig("label", item.getLabel());
-                    if (item.getStateDescription() != null && item.getStateDescription().getPattern() != null) {
-                        String transformedState = considerTransformation(item.getState().toString(),
-                                item.getStateDescription());
-                        if (!transformedState.equals(item.getState().toString())) {
-                            listItem.addConfig("state", transformedState);
-                        } else {
-                            listItem.addConfig("state",
-                                    item.getState().format(item.getStateDescription().getPattern()));
-                        }
-                    } else {
-                        listItem.addConfig("state", item.getState().toString());
-                    }
-
-                    list.addComponent("items", listItem);
-                }
-
-                card.addComponent("list", list);
-
-                interpretation.setCard(card);
-
-                interpretation.setAnswer(answerFormatter.getRandomAnswer("info_found_simple"));
-            }
         }
 
         return interpretation;
     }
 
-    private String considerTransformation(String state, StateDescription stateDescription) {
-        if (stateDescription != null && stateDescription.getPattern() != null) {
-            try {
-                return TransformationHelper.transform(FrameworkUtil.getBundle(GetStatusSkill.class).getBundleContext(),
-                        stateDescription.getPattern(), state.toString());
-            } catch (NoClassDefFoundError ex) {
-                // TransformationHelper is optional dependency, so ignore if class not found
-                // return state as it is without transformation
-                return state;
-            }
-        } else {
-            return state;
-        }
+    @Reference
+    public void setCardBuilder(CardBuilder cardBuilder) {
+        this.cardBuilder = cardBuilder;
+    }
+
+    public void unsetCardBuilder(CardBuilder cardBuilder) {
+        this.cardBuilder = null;
     }
 
     @Reference
@@ -119,5 +55,4 @@ public class GetStatusSkill extends AbstractItemIntentInterpreter {
     public void unsetItemRegistry(ItemRegistry itemRegistry) {
         this.itemRegistry = null;
     }
-
 }

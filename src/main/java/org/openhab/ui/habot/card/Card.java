@@ -2,10 +2,8 @@ package org.openhab.ui.habot.card;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.eclipse.jdt.annotation.Nullable;
@@ -20,8 +18,6 @@ public class Card extends Component implements Identifiable<String> {
     Date timestamp;
 
     String imageUri;
-
-    List<CardAction> actions;
 
     public Card(String name) {
         super(name);
@@ -61,12 +57,8 @@ public class Card extends Component implements Identifiable<String> {
         this.imageUri = imageUri;
     }
 
-    public List<CardAction> getActions() {
-        return actions;
-    }
-
     public Set<String> getTags() {
-        return Collections.unmodifiableSet(new HashSet<>(tags));
+        return tags;
     }
 
     public boolean isBookmarked() {
@@ -90,7 +82,7 @@ public class Card extends Component implements Identifiable<String> {
     }
 
     public boolean hasTag(String tag) {
-        return (tags.contains(tag));
+        return (tags != null && tags.contains(tag));
     }
 
     public void addTag(String tag) {
@@ -111,10 +103,6 @@ public class Card extends Component implements Identifiable<String> {
 
     public void removeAllTags() {
         tags.clear();
-    }
-
-    public void setActions(List<CardAction> cardActions) {
-        this.actions = cardActions;
     }
 
     @Override

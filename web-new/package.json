@@ -13,6 +13,7 @@
   "dependencies": {
     "axios": "^0.17.1",
     "jexl": "^1.1.4",
+    "sprintf-js": "^1.1.1",
     "vue-async-computed": "^3.3.1",
     "vue-echarts": "^3.0.3"
   },

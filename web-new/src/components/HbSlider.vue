@@ -1,5 +1,5 @@
 <template>
-  <q-slider v-model="itemState" :color="model.config.color" :size="model.config.size" :min="model.config.min" :max="model.config.max" :step="model.config.step"></q-slider>
+  <q-slider v-model="itemState" :color="color" :size="model.config.size" :min="min" :max="max" :step="step"></q-slider>
 </template>
 
 <script>
@@ -7,23 +7,45 @@ export default {
   props: ['model'],
   data () {
     return {
-      wait: false
+      wait: false,
+      prev: null,
+      next: null
+    }
+  },
+  methods: {
+    sendCmd (val) {
+      this.$store.dispatch('items/sendCmd', { itemName: this.model.config.item, command: this.next.toString(), updateState: true })
     }
   },
   computed: {
+    min () {
+      return (this.model.config.min || 0)
+    },
+    max () {
+      return (this.model.config.max || 100)
+    },
+    step () {
+      return (this.model.config.step || 1)
+    },
+    color () {
+      return this.wait ? 'secondary' : 'primary'
+    },
     itemState: {
       get () {
         if (this.wait) return this.next
-        return parseFloat(this.$store.getters['items/itemState'](this.model.config.item))
+        let state = this.$store.getters['items/itemState'](this.model.config.item)
+        if (state === 'OFF') return this.min
+        if (state === 'ON') return this.max
+        return parseFloat(state)
       },
       set (val) {
         this.next = val
         if (this.wait) return
         this.wait = true
-        this.$store.dispatch('items/sendCmd', { itemName: this.model.config.item, command: val })
+        this.sendCmd(val)
         setTimeout(() => {
           this.wait = false
-          setTimeout(() => { this.$store.dispatch('items/sendCmd', { itemName: this.model.config.item, command: this.next }) })
+          setTimeout(() => { this.sendCmd(val) })
         }, 500)
       }
     }

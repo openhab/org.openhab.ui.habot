@@ -48,15 +48,20 @@
                      helper="The subtitle of the card">
               <config-text v-model="selectedNode.component.subtitle"></config-text>
             </q-field>
-            <q-field label="tags" class="config-field" orientation="vertical"
-                    helper="The tags attached to the card - use object:<tag> and location:<tag> to make HABot present this card instead of the default generated one when asked about those tags">
-              <q-chips-input v-model="selectedNode.component.tags" color="secondary"></q-chips-input>
-            </q-field>
             <q-field label="suggestcriteria" class="config-field" orientation="vertical"
                     helper="The expression to evaluate in order to determine whether the card will be considered as a suggestion. Leave blank if the card is not to be suggested. Example: items.Temperature.state < 16">
               <config-expr v-model="selectedNode.config.suggestcriteria" color="secondary"></config-expr>
             </q-field>
-            Result: {{suggestcriteriaError}}
+            <q-field label="tags" class="config-field" orientation="vertical"
+                    helper="The tags attached to the card - use object:<tag> and location:<tag> to make HABot present this card instead of the default generated one when asked about those tags. At least one object tag or one location tag is required.">
+              <q-search class="q-body-1 search-tags" color="secondary" v-model="searchTag"
+                    :error="!hasValidTags"  placeholder="Search from items">
+                  <q-autocomplete :static-data="tagSuggestions" @selected="addTag" />
+              </q-search>
+              <q-chips-input v-model="selectedNode.component.tags" color="secondary"
+                    :error="!hasValidTags" placeholder="Type more">
+              </q-chips-input>
+            </q-field>
           </div>
 
           <q-field
@@ -127,6 +132,9 @@
 
 <style lang="stylus">
 @import '~variables'
+.search-tags.q-if
+  padding 0
+  margin-bottom 8px
 .tree-drawer, .tools-drawer
   width 320px
 .designer-tree
@@ -244,7 +252,12 @@ export default {
       cardModel: null,
       treeModel: null,
       selectedNodeId: 'card',
-      newCard: false
+      newCard: false,
+      searchTag: null,
+      tagSuggestions: {
+        field: 'label',
+        list: []
+      }
     }
   },
   methods: {
@@ -252,6 +265,10 @@ export default {
       this.$router.push('/cards/deck')
     },
     save () {
+      if (!this.hasValidTags) {
+        this.$q.dialog({ title: 'Tags missing', message: 'The card must have at least one object or one location tag' })
+        return
+      }
       this.card.uid = this.uid
       // let request = (this.newCard) ? this.$http.post('/rest/habot/cards/', this.card) : this.$http.put('/rest/habot/cards/' + this.uid, this.card)
       let action = (this.newCard) ? this.$store.dispatch('cards/create', this.card) : this.$store.dispatch('cards/update', this.card)
@@ -335,6 +352,10 @@ export default {
       } else {
         return allcomponents
       }
+    },
+    addTag (tag) {
+      this.searchTag = null
+      this.card.tags.push(tag.value)
     }
   },
   computed: {
@@ -360,19 +381,26 @@ export default {
     currentComponent () {
       if (!this.selectedNode) return null
       return this.components[this.selectedNode.component.component]
-    }
-  },
-  asyncComputed: {
-    suggestcriteriaError () {
-      let suggestresult = this.$expr('=' + this.selectedNode.config.suggestcriteria)
-      debugger
-      console.log(suggestresult)
-      return suggestresult
+    },
+    hasValidTags () {
+      if (!this.card.tags) return false
+      return this.card.tags.some(tag => tag.startsWith('object:') || tag.startsWith('location:'))
     }
   },
   created () {
     let vm = this
     let card = vm.$store.getters['cards/copy'](this.uid)
+
+    vm.tagSuggestions.list = vm.$store.getters['items/objectSet']
+      .concat(vm.$store.getters['items/locationSet'])
+      .map((t) => {
+        return {
+          value: t,
+          label: t.split(':')[1],
+          stamp: t.split(':')[0]
+        }
+      })
+
     if (card) {
       vm.card = card
       if (!vm.card.tags) vm.card.tags = [] // temp
@@ -383,7 +411,7 @@ export default {
         title: 'New Card',
         subtitle: 'Subtitle',
         component: 'HbCard',
-        tags: [],
+        tags: (vm.$route.query.tags) ? vm.$route.query.tags.split(',') : [],
         bookmarked: false,
         config: {},
         slots: {}

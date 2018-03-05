@@ -28,13 +28,26 @@ export const watchEvents = (context) => {
     if (evt.type.indexOf('ItemStateEvent') >= 0) {
       let payload = JSON.parse(evt.payload)
       let itemName = evt.topic.split('/')[2]
-      context.commit('updateOne', { itemName: itemName, newState: payload.value })
+      let item = context.getters.name(itemName)
+      if (item.transformedState) {
+        // need to get the transformedState from the API
+        axios.get('/rest/items/' + itemName).then((resp) => {
+          context.commit('updateOne', { itemName: itemName, newState: payload.value, newTransformedState: resp.data.transformedState })
+        })
+      } else {
+        context.commit('updateOne', { itemName: itemName, newState: payload.value })
+      }
     }
   }
 }
 
 export const sendCmd = (context, payload) => {
-  console.log('Sending command to ' + payload.itemName + ': ' + payload.command)
+  if (payload.updateState) {
+    let currentState = context.getters.itemState(payload.itemName)
+    if (currentState && currentState === payload.command) return
+    context.commit('updateOne', { itemName: payload.itemName, newState: payload.command.toString() })
+  }
+  console.log('%cSending command to ' + payload.itemName + ': ' + payload.command, 'font-weight: bold')
   axios.post('/rest/items/' + payload.itemName, payload.command, {
     headers: { 'Content-Type': 'text/plain' }
   })

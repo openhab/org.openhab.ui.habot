@@ -1,5 +1,5 @@
 <template>
-  <big class="big-value">{{this.model.config.state}}</big>
+  <big class="big-value">{{state}}</big>
 </template>
 
 <style lang="stylus">
@@ -14,6 +14,15 @@
 <script>
 export default {
   name: 'HbSingleItemValue',
-  props: [ 'model' ]
+  props: [ 'model' ],
+  computed: {
+    state: {
+      get () {
+        if (this.model.config.item) {
+          return this.$store.getters['items/itemState'](this.model.config.item)
+        }
+      }
+    }
+  }
 }
 </script>

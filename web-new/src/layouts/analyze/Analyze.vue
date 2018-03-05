@@ -27,7 +27,6 @@
       </q-toolbar-title>
     </q-toolbar> -->
 
-    <q-resize-observable @resize="onResize" />
     <div class="fit q-pa-md">
       <chart ref="chart" v-if="showChart" class="fit-chart"></chart>
     </div>

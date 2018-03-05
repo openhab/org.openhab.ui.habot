@@ -7,7 +7,7 @@
     </q-item-main>
   </template>
   <div v-if="model.slots && model.slots.main">
-    <component :is="component.component" v-for="(component, idx) in model.slots.main" :model="component" :key="component" :name="'collapsible-' + idx" />
+    <component :is="component.component" v-for="(component, idx) in model.slots.main" :model="component" :key="'collapsible-' + idx" />
   </div>
 </q-collapsible>
 </template>

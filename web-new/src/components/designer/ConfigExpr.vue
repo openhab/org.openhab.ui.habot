@@ -1,5 +1,5 @@
 <template>
-  <q-input type="textarea" :value="value" @input="$emit('input', $event)" color="secondary" :error="isError" :float-label="exprError"></q-input>
+  <q-input :value="value" @input="$emit('input', $event)" color="secondary" :error="isError" :float-label="exprError"></q-input>
 </template>
 
 <script>
@@ -13,7 +13,7 @@ export default {
     },
     exprError () {
       if (!this.value) return ''
-      if (this.exprResult === undefined) {
+      if (this.exprResult === undefined || this.exprResult === null) {
         return 'Result indetermined'
       }
       if (this.exprResult && this.exprResult.toString().indexOf('Error:') === 0) {

@@ -1,6 +1,6 @@
 <template>
   <q-list :link="model.config.link" v-if="model.slots">
-    <component :is="component.component" v-for="component in model.slots.items" :model="component" :key="component" />
+    <component :is="component.component" v-for="(component, idx) in model.slots.items" :model="component"  :key="'list-item-' + idx" />
   </q-list>
 </template>
 

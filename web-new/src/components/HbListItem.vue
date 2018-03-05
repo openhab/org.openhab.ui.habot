@@ -1,12 +1,13 @@
 <template>
-<q-item separator tag="label">
+<q-item separator :tag="tag">
   <q-item-main>
     <q-item-tile label>{{label}}</q-item-tile>
     <q-item-tile v-if="model.config.item" class="item-subtitle" sublabel>{{model.config.item}}</q-item-tile>
+    <hb-slider :model="{ config: { item: item.name } }" v-if="item && item.type === 'Dimmer'"></hb-slider>
   </q-item-main>
   <q-item-side right>
-    <big class="big-value" v-if="model.config.state">{{state}}</big>
-    <hb-switch :model="model.config" v-if="model.config.control === 'Switch'"></hb-switch>
+    <hb-switch :model="{ config: { item: item.name } }" v-if="item && (item.type === 'Switch' || item.type === 'Dimmer')"></hb-switch>
+    <big v-else class="big-value">{{state}}</big>
   </q-item-side>
 </q-item>
 </template>
@@ -23,11 +24,13 @@
 
 <script>
 import HbSwitch from 'components/HbSwitch.vue'
+import HbSlider from 'components/HbSlider.vue'
 
 export default {
   props: ['model'],
   components: {
-    HbSwitch
+    HbSwitch,
+    HbSlider
   },
   data () {
     return {
@@ -36,15 +39,31 @@ export default {
   },
   created () {
   },
-  asyncComputed: {
-    label: {
+  computed: {
+    tag: {
       get () {
-        return this.$expr(this.model.config.label)
+        return (this.item && this.item.type === 'Switch' ? 'tag' : 'div')
       }
     },
     state: {
       get () {
-        return this.$expr(this.model.config.state)
+        if (this.model.config.item) {
+          return this.$store.getters['items/itemState'](this.model.config.item)
+        }
+      }
+    },
+    item: {
+      get () {
+        if (this.model.config.item) {
+          return this.$store.getters['items/name'](this.model.config.item)
+        }
+      }
+    }
+  },
+  asyncComputed: {
+    label: {
+      get () {
+        return this.$expr(this.model.config.label)
       }
     }
   }
