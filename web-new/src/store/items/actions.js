@@ -2,6 +2,7 @@
 export const someAction = (state) => {}
  */
 import axios from 'axios'
+import 'event-source-polyfill'
 
 export const initialLoad = (context) => {
   if (context.state.items.length) return Promise.resolve()
@@ -11,7 +12,6 @@ export const initialLoad = (context) => {
     axios.get('/rest/items').then((resp) => {
       context.commit('updateAll', resp.data)
       context.commit('setReady')
-      context.dispatch('watchEvents')
       resolve()
     }).catch(err => {
       reject(err)
@@ -19,8 +19,13 @@ export const initialLoad = (context) => {
   })
 }
 
-export const watchEvents = (context) => {
-  let eventSource = new EventSource('/rest/events')
+export const watchEvents = async (context, credential) => {
+  let eventSource
+  if (credential) {
+    eventSource = new EventSourcePolyfill('/rest/events', { headers: { 'Authorization': 'Basic ' + btoa(credential.id + ':' + credential.password) } }) // eslint-disable-line no-undef
+  } else {
+    eventSource = new EventSource('/rest/events')
+  }
 
   eventSource.onmessage = (event) => {
     let evt = JSON.parse(event.data)

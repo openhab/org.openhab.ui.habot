@@ -3,7 +3,7 @@
       <div class="hb-cards">
         <component :is="'HbCard'" :model="card" menu="deck" v-for="card in cards" :key="card.uid"></component>
       </div>
-      <div v-if="cards.length === 0" class="fit text-center q-pt-xl text-grey">
+      <div v-if="cards.length === 0" class="fit text-center q-pt-xl q-pl-lg q-pr-lg text-grey">
         <h4 class="q-display-1">There are no suggestions at this time</h4>
         <p>Edit cards from the
         <q-btn flat icon="dashboard" @click="$router.push('/cards/deck')" style="margin-top: -1px">Card deck</q-btn>

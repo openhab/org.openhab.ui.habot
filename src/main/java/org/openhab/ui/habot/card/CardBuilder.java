@@ -73,7 +73,6 @@ public class CardBuilder {
 
             card.addComponent("right", component);
         } else {
-            // TODO: maybe figure out a title for the card
             card.setTitle(getCardTitleFromGroupLabels(tags));
             card.setSubtitle(matchedItems.size() + " items"); // TODO: i18n
 
@@ -89,6 +88,38 @@ public class CardBuilder {
 
             card.addComponent("list", list);
         }
+
+        return card;
+    }
+
+    public Card buildChartCard(Intent intent, List<Item> matchedItems, String period) {
+        Set<String> tags = intent.getEntities().entrySet().stream().map(e -> e.getKey() + ":" + e.getValue())
+                .collect(Collectors.toSet());
+
+        Card card = new Card("HbCard");
+        card.addTags(tags);
+        card.updateTimestamp();
+
+        if (matchedItems.size() == 1) {
+            Item item = matchedItems.get(0);
+            card.setTitle(item.getLabel());
+            card.setSubtitle(item.getName());
+        } else {
+            card.setTitle(getCardTitleFromGroupLabels(tags));
+            card.setSubtitle(matchedItems.size() + " items"); // TODO: i18n
+        }
+
+        Component chart = new Component("HbChartImage");
+        chart.addConfig("items",
+                matchedItems.stream().map(i -> i.getName()).collect(Collectors.toList()).toArray(new String[0]));
+        chart.addConfig("period", period);
+
+        Component analyzeButton = new Component("HbAnalyzeActionButton");
+        analyzeButton.addConfig("items", chart.getConfig().get("items"));
+        analyzeButton.addConfig("period", chart.getConfig().get("period"));
+
+        card.addComponent("media", chart);
+        card.addComponent("actions", analyzeButton);
 
         return card;
     }

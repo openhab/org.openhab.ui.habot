@@ -1,7 +1,7 @@
 <template>
 <q-card inline v-if="model" :class="{ bigger: model.config && model.config.bigger }" :color="model.config.color" :text-color="model.config.textcolor">
-  <q-card-media v-if="model.imageUri">
-    <img :src="model.imageUri" />
+  <q-card-media v-if="model.slots && model.slots.media">
+    <component v-for="(component, idx) in model.slots.media" :key="'card-media-' + idx" :is="component.component" :model="component"></component>
   </q-card-media>
   <q-card-title>
     <span>{{title}}</span>
@@ -75,6 +75,7 @@ import HbTabs from 'components/HbTabs.vue'
 import HbSwitch from 'components/HbSwitch.vue'
 import HbKnob from 'components/HbKnob.vue'
 import HbSlider from 'components/HbSlider.vue'
+import HbChartImage from 'components/HbChartImage.vue'
 import HbAnalyzeActionButton from 'components/HbAnalyzeActionButton.vue'
 
 import { uid, extend } from 'quasar'
@@ -89,6 +90,7 @@ export default {
     HbSlider,
     HbCollapsible,
     HbTabs,
+    HbChartImage,
     HbAnalyzeActionButton
   },
   props: ['model', 'menu'],

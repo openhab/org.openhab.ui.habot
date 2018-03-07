@@ -22,7 +22,7 @@ module.exports = function (ctx) {
     ],
     supportIE: false,
     vendor: {
-      add: [],
+      add: ['node_modules/event-source-polyfill/src/eventsource.min.js'],
       remove: []
     },
     build: {
@@ -96,6 +96,7 @@ module.exports = function (ctx) {
         'QPageContainer',
         'QPage',
         'QPageSticky',
+        'QAlert',
         'QFab',
         'QTooltip',
         'QFabAction',
@@ -103,6 +104,7 @@ module.exports = function (ctx) {
         'QToolbarTitle',
         'QModal',
         'QModalLayout',
+        'QDialog',
         'QBtnGroup',
         'QBtn',
         'QIcon',
@@ -127,6 +129,7 @@ module.exports = function (ctx) {
         'QChatMessage',
         'QResizeObservable',
         'QWindowResizeObservable',
+        'QInnerLoading',
         'QPopover',
         'QCard',
         'QCardTitle',

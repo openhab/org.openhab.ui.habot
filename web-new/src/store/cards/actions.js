@@ -16,7 +16,11 @@ export const initialLoad = (context) => {
 }
 
 export const create = (context, card) => {
-  return axios.post('/rest/habot/cards', card).then((resp) => {
+  let request = (window && window.location && window.location.host === 'home.myopenhab.org')
+    ? axios.post('/rest/habot/compat/cards', JSON.stringify(card), { headers: { 'Content-Type': 'text/plain' } })
+    : axios.post('/rest/habot/cards', card)
+
+  return request.then((resp) => {
     context.commit('createCard', card)
 
     return Promise.resolve(card)
@@ -26,7 +30,11 @@ export const create = (context, card) => {
 }
 
 export const update = (context, card) => {
-  return axios.put('/rest/habot/cards/' + card.uid, card).then((resp) => {
+  let request = (window && window.location && window.location.host === 'home.myopenhab.org')
+    ? axios.post('/rest/habot/compat/cards/' + card.uid, JSON.stringify(card), { headers: { 'Content-Type': 'text/plain' } })
+    : axios.put('/rest/habot/cards/' + card.uid, card)
+
+  return request.then((resp) => {
     context.commit('updateCard', card)
 
     return Promise.resolve(card)
@@ -46,7 +54,11 @@ export const bookmark = (context, card) => {
 }
 
 export const unbookmark = (context, card) => {
-  return axios.delete('/rest/habot/cards/' + card.uid + '/bookmark').then((resp) => {
+  let request = (window && window.location && window.location.host === 'home.myopenhab.org')
+    ? axios.post('/rest/habot/compat/cards/' + card.uid + '/unbookmark')
+    : axios.delete('/rest/habot/cards/' + card.uid + '/bookmark')
+
+  return request.then((resp) => {
     context.commit('unbookmarkCard', card)
 
     return Promise.resolve(card)
@@ -56,7 +68,11 @@ export const unbookmark = (context, card) => {
 }
 
 export const remove = (context, card) => {
-  return axios.delete('/rest/habot/cards/' + card.uid).then((resp) => {
+  let request = (window && window.location && window.location.host === 'home.myopenhab.org')
+    ? axios.post('/rest/habot/compat/cards/' + card.uid + '/delete')
+    : axios.delete('/rest/habot/cards/' + card.uid)
+
+  return request.then((resp) => {
     context.commit('removeCard', card)
 
     // return deleted card for undo purposes

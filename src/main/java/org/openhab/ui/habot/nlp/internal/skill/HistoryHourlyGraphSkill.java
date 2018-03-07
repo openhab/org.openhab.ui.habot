@@ -1,11 +1,10 @@
 package org.openhab.ui.habot.nlp.internal.skill;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.eclipse.smarthome.core.items.Item;
 import org.eclipse.smarthome.core.items.ItemRegistry;
-import org.openhab.ui.habot.card.Card;
+import org.openhab.ui.habot.card.CardBuilder;
 import org.openhab.ui.habot.nlp.AbstractItemIntentInterpreter;
 import org.openhab.ui.habot.nlp.Intent;
 import org.openhab.ui.habot.nlp.IntentInterpretation;
@@ -14,6 +13,8 @@ import org.osgi.service.component.annotations.Reference;
 
 @org.osgi.service.component.annotations.Component(service = Skill.class)
 public class HistoryHourlyGraphSkill extends AbstractItemIntentInterpreter {
+
+    private CardBuilder cardBuilder;
 
     @Override
     public String getIntentId() {
@@ -30,37 +31,26 @@ public class HistoryHourlyGraphSkill extends AbstractItemIntentInterpreter {
         } else {
             interpretation.setMatchedItems(matchedItems);
 
-            Card graphCard = new Card("HbCard");
-
             String period = "h";
             if (intent.getEntities().containsKey("period")) {
                 period = intent.getEntities().get("period").concat(period);
             }
 
-            if (matchedItems.size() == 1) {
-                Item item = matchedItems.get(0);
-
-                graphCard.setTitle(item.getLabel());
-                graphCard.setSubtitle(item.getName());
-
-                graphCard.setImageUri(String.format("/chart?items=%s&period=%s", item.getName(), period));
-            } else {
-                graphCard.setTitle("");
-                graphCard.setSubtitle(matchedItems.size() + " items"); // TODO: i18n
-
-                String itemNames = String.join(",",
-                        matchedItems.stream().map(i -> i.getName()).collect(Collectors.toList()));
-
-                graphCard.setImageUri(String.format("/chart?items=%s&period=%s", itemNames, period));
-            }
-
-            interpretation.setCard(graphCard);
-
+            interpretation.setCard(this.cardBuilder.buildChartCard(intent, matchedItems, period));
         }
 
         interpretation.setAnswer(answerFormatter.getRandomAnswer("info_found_simple"));
 
         return interpretation;
+    }
+
+    @Reference
+    public void setCardBuilder(CardBuilder cardBuilder) {
+        this.cardBuilder = cardBuilder;
+    }
+
+    public void unsetCardBuilder(CardBuilder cardBuilder) {
+        this.cardBuilder = null;
     }
 
     @Reference

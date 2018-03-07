@@ -24,7 +24,21 @@ const Router = new VueRouter({
 })
 
 Router.beforeEach((to, from, next) => {
-  store.dispatch('initialLoad').then(() => next())
+  if (store.state.ready) return next()
+
+  // get the store ready first
+  if (navigator.credentials && navigator.credentials.preventSilentAccess) {
+    // The new Credential Management API is available
+    // try to retrieve previously stored credentials
+    navigator.credentials.get({ password: true }).then((creds) => {
+      console.log('Using stored credentials to sign in')
+      store.dispatch('initialLoad', creds).then(() => next())
+    }).catch(() => {
+      store.dispatch('initialLoad').then(() => next())
+    })
+  } else {
+    store.dispatch('initialLoad').then(() => next())
+  }
 })
 
 export default Router

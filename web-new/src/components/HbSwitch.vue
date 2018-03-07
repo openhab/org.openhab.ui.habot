@@ -16,7 +16,6 @@ export default {
   },
   methods: {
     onChange (val) {
-      console.log('switch: onchange to ' + val)
       this.$store.dispatch('items/sendCmd', { itemName: this.model.config.item, command: val })
     }
   },
@@ -26,11 +25,9 @@ export default {
     },
     itemState: {
       get () {
-        console.log('switch getter')
         let state = this.$store.getters['items/itemState'](this.model.config.item)
         if (state === 'ON' || state === 'OFF') return state
         if (this.item.type === 'Dimmer') {
-          console.log('%c updating dimmer switch to ' + ((parseFloat(state) > 0) ? 'ON' : 'OFF'), 'color:blue')
           return (parseFloat(state) > 0) ? 'ON' : 'OFF'
         } else {
           return state

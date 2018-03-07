@@ -160,9 +160,7 @@ public class HABotResource implements RESTResource {
 
     @POST
     @Path("/notifications/subscribe")
-    // Can't POST JSON data with openHAB Cloud since Jan 2017
-    // (https://github.com/openhab/openhab-cloud/issues/31)
-    // so have to work around that...
+    // TEXT_PLAIN to work around https://github.com/openhab/openhab-cloud/issues/31
     @Consumes(MediaType.TEXT_PLAIN) // @Consumes(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Subscribes a new client for push notifications.")
     @ApiResponses(value = { @ApiResponse(code = 200, message = "OK"),
@@ -313,5 +311,51 @@ public class HABotResource implements RESTResource {
         this.cardRegistry.update(card);
 
         return Response.ok().build();
+    }
+
+    /*
+     * The following are compatibility endpoints to work around (temporary) issues with home.myopenhab.org
+     */
+
+    @POST
+    @Path("/compat/cards")
+    @Consumes(MediaType.TEXT_PLAIN)
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Creates a new card in the card deck (compatibility endpoint).")
+    @ApiResponses(value = { @ApiResponse(code = 200, message = "The card was created"),
+            @ApiResponse(code = 500, message = "An error occured") })
+    public Response createCard(@ApiParam(value = "card", required = true) String card) {
+        Gson gson = new Gson();
+        return this.createCard(gson.fromJson(card, Card.class));
+    }
+
+    @POST
+    @Path("/compat/cards/{cardUID}")
+    @Consumes(MediaType.TEXT_PLAIN)
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Updates a card in the card deck (compatibility endpoint).")
+    public Response updateCard(@PathParam("cardUID") @ApiParam(value = "cardUID", required = true) String cardUID,
+            @ApiParam(value = "card", required = true) String card) {
+        Gson gson = new Gson();
+        return this.updateCard(cardUID, gson.fromJson(card, Card.class));
+    }
+
+    @POST
+    @Path("/compat/cards/{cardUID}/delete")
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Deletes a card from the card deck (compatibility endpoint).")
+    public Response deleteCardPost(@PathParam("cardUID") @ApiParam(value = "cardUID", required = true) String cardUID) {
+        return this.deleteCard(cardUID);
+    }
+
+    @POST
+    @Path("/compat/cards/{cardUID}/unbookmark")
+    @ApiOperation(value = "Removes the bookmark on a card (compatibility endpoint).")
+    @ApiResponses(value = { @ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 404, message = "The card with the provided UID doesn't exist"),
+            @ApiResponse(code = 500, message = "An error occured") })
+    public Response unsetCardBookmarkCompat(
+            @PathParam("cardUID") @ApiParam(value = "cardUID", required = true) String cardUID) {
+        return this.unsetCardBookmark(cardUID);
     }
 }

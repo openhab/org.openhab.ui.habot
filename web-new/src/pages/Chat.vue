@@ -1,5 +1,9 @@
 <template>
   <q-page padding class="row justify-center">
+    <q-alert icon="info" v-if="showPWAPrompt" color="info"
+      :actions="[{ label: 'Learn how', handler () {} }, { label: 'Dismiss', handler () { showPWAPrompt = false } }]">
+      Using Chrome on Android? Use a secure origin like myopenhab.org and add HABot to the home screen for the best experience!
+    </q-alert>
 
     <div style="width: 600px; margin-top: 100px;">
       <div class="chat-area" v-for="chat in chats" :key="chat" ref="chat">
@@ -100,7 +104,8 @@ export default {
         icon: 'arrow_send',
         content: true,
         handler: this.send
-      }]
+      }],
+      showPWAPrompt: false
     }
   },
   created () {
@@ -140,6 +145,11 @@ export default {
         stamp: date.formatDate(new Date(), 'HH:mm')
       })
     })
+
+    if (this.$q.platform.is.chrome && this.$q.platform.is.android &&
+        window.matchMedia && !window.matchMedia('(display-mode: standalone)').matches) {
+      this.showPWAPrompt = true
+    }
   },
   mounted () {
     // if (this.$q.platform.is.iphone) {
@@ -222,8 +232,6 @@ export default {
         })
       })
 
-      // Events.$emit('chat-added')
-
       this.text = ''
       if (this.$q.platform.is.mobile) {
         // force hide the virtual keyboard
@@ -240,14 +248,11 @@ export default {
       }
     },
     onChatAreaResized (size) {
-      console.log('Resize: ' + JSON.stringify(size))
       this.scrollToBottom()
     },
     scrollToBottom () {
       var appEl = document.getElementById('q-app')
-      console.log('scrollToBottom: ' + appEl.scrollTop + ' -> ' + appEl.scrollHeight)
       appEl.scrollTop = appEl.scrollHeight
-      console.log('scrollToBottom (document.body): ' + appEl.scrollTop + ' -> ' + appEl.scrollHeight)
       document.body.scrollTop = document.body.scrollHeight
     }
   },

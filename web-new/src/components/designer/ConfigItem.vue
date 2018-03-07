@@ -1,11 +1,11 @@
 <template>
-  <q-select :value="value" color="secondary" @input="$emit('input', $event)" :options="items" filter clearable></q-select>
+  <q-select :value="value" color="secondary" @input="$emit('input', $event)" :options="items" :multiple="multiple" filter clearable></q-select>
 </template>
 
 <script>
 export default {
   name: 'ConfigItem',
-  props: ['value'],
+  props: ['value', 'multiple'],
   data () {
     return {
       items: this.$store.state.items.items.map((item) => {

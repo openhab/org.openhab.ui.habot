@@ -74,7 +74,7 @@
             <div class="hidden">{{selectedNode.config[prop]}}</div>
             <config-bool v-if="configDesc.type === 'boolean'" v-model="selectedNode.config[prop]"></config-bool>
             <config-option-group v-else-if="configDesc.type === 'optiongroup'" v-model="selectedNode.config[prop]" :options="configDesc.options"></config-option-group>
-            <config-item v-else-if="configDesc.type === 'item'" v-model="selectedNode.config[prop]"></config-item>
+            <config-item v-else-if="configDesc.type === 'item'" v-model="selectedNode.config[prop]" :multiple="configDesc.multiple"></config-item>
             <config-text v-else v-model="selectedNode.config[prop]"></config-text>
           </q-field>
         </div>

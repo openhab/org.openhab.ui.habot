@@ -2,19 +2,19 @@
   <div>
     <div class="row bg-grey-2 shadow-2">
       <q-checkbox class="multiple-toggle" color="secondary" v-model="multiple" unchecked-icon="done" checked-icon="done_all"></q-checkbox>
-      <div :class="['filters', 'row', (multiple) ? 'multiple' : '']">
+      <div :class="['filters', 'row', (multiple) ? 'multiple' : 'single']">
         <q-select :multiple="multiple" filter clearable chips color="secondary" v-model="objects" class="col-sm-6" :options="objectSet" float-label="Objects"></q-select>
         <q-select :multiple="multiple" filter clearable chips color="secondary" v-model="locations" class="col-sm-6" :options="locationSet" float-label="Locations"></q-select>
       </div>
       <!-- <q-search v-model="search" color="none" class="col"></q-search> -->
     </div>
     <div class="row">
-      <div v-if="nofilters" class="fit text-center q-pt-xl text-grey">
+      <div v-if="nofilters" class="fit text-center q-pt-xl q-pl-lg q-pr-lg text-grey">
         <p>Use the filters above to show the relevant cards, or click on the button below to create one.</p>
         <q-btn flat icon="bookmark" @click="$router.push('/cards/bookmarks')" style="margin-top: -1px">Bookmarks</q-btn>
         <q-btn flat icon="star" @click="$router.push('/cards/suggestions')" style="margin-top: -1px">Suggestions</q-btn>
       </div>
-      <div v-if="!nofilters && !cards.length" class="fit text-center q-pt-xl text-grey">
+      <div v-if="!nofilters && !cards.length" class="fit text-center q-pt-xl q-pl-lg q-pr-lg text-grey">
         <h4 class="q-display-1">No cards found</h4>
         <p>Change the filters or click on the button below to create one.</p>
       </div>
@@ -60,17 +60,19 @@
   padding 10px
   width 100%
   margin-right 50px
-  .q-select
-    margin-top 3px
+  &.single .q-if-inner
+    min-height 43px !important
+    // margin-top 2px !important
+    // margin-left 3px !important
     .q-input-target
-      margin-top 3px !important
-      margin-left 3px !important
-      margin-bottom -3px !important
-      min-height 31px
+      margin-top 2px !important
+      margin-left 10px !important
+    // margin-bottom 3px !important  padding 10px
+  .q-select
     .q-if-label
-      top 21px
-      &.q-if-label-above
-        transform scale(0.75) translate(0, -28px)
+        top 21px
+        &.q-if-label-above
+          transform scale(0.75) translate(0, -28px)
 
 .hb-cards
   padding 15px

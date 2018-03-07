@@ -50,6 +50,53 @@
         </q-item-main>
       </q-item>
 
+      <q-list-header v-if="$q.platform.is.chrome">Credential management</q-list-header>
+      <q-item v-if="$q.platform.is.chrome" @click.native="showCredentialsDialog = true">
+        <q-item-main>
+          <q-item-tile label>Store openHAB Cloud credentials</q-item-tile>
+          <q-item-tile sublabel>Save your remote credentials securely in your Chrome browser to log in automatically in the future.</q-item-tile>
+        </q-item-main>
+      </q-item>
+
+      <q-dialog
+        v-model="showCredentialsDialog"
+        prevent-close
+        :ok="true"
+        :cancel="true"
+        @ok="storeCredentials"
+        @cancel="() => {}"
+      >
+        <!-- This or use "title" prop on <q-dialog> -->
+        <span slot="title">Store credentials</span>
+
+        <!-- This or use "message" prop on <q-dialog> -->
+        <span slot="message">Please enter your username and password for myopenhab.org below, click OK, then confirm when your browser offers to save the credentials.</span>
+
+        <div slot="body">
+          <q-field
+            icon="account_circle"
+            label="User ID (your email)"
+            required
+          >
+            <q-input v-model="creds.username" />
+          </q-field>
+        </div>
+        <div slot="body">
+          <q-field
+            label="Password"
+            icon="vpn_key"
+            required
+          >
+            <q-input type="password" v-model="creds.password" />
+          </q-field>
+        </div>
+
+        <!-- <template slot="buttons" slot-scope="props">
+          <q-btn color="primary" label="Set" @click="this(props.ok, 'Superman')" />
+          <q-btn flat label="No thanks" @click="props.cancel" />
+        </template> -->
+      </q-dialog>
+
       <q-list-header>About</q-list-header>
       <q-item disabled>
         <q-item-main>
@@ -89,11 +136,24 @@ export default {
   data () {
     return {
       speechApi: 'google',
-      buildTimestamp: new Date(process.env.BUILD_TIMESTAMP).toString()
+      buildTimestamp: new Date(process.env.BUILD_TIMESTAMP).toString(),
+      creds: {
+        username: null,
+        password: null
+      },
+      showCredentialsDialog: false
     }
   },
   methods: {
-
+    storeCredentials () {
+      if (navigator.credentials && navigator.credentials.preventSilentAccess) {
+        navigator.credentials.store(new PasswordCredential({id: this.creds.username, password: this.creds.password})).then((result) => {
+          this.$q.notify({ type: 'positive', message: 'The credentials were saved successfully!' })
+        }).catch((err) => {
+          this.$q.notify('Error while saving credentials: ' + err)
+        })
+      }
+    },
     setGoogleApiKey () {
       var vm = this
       vm.$q.dialog({
