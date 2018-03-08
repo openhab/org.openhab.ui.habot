@@ -11,9 +11,10 @@
       <q-toolbar-title>
         Analyze
       </q-toolbar-title>
+      <q-btn flat icon="build" @click="showToolbar = !showToolbar"></q-btn>
     </q-toolbar>
 
-    <q-toolbar slot="header">
+    <q-toolbar v-if="showToolbar" slot="header">
     <!-- <q-btn
       color="secondary"
       style="width:200px;"
@@ -49,6 +50,7 @@ export default {
   props: ['model'],
   data () {
     return {
+      showToolbar: true,
       showChart: false
     }
   },

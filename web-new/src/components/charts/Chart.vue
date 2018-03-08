@@ -107,10 +107,10 @@ export default {
           z: 10
         },
         grid: {
-          top: 30,
+          top: 15,
           left: 35,
           right: 35,
-          bottom: 100
+          bottom: 75
           // height: 160
         },
         // dataZoom: [{

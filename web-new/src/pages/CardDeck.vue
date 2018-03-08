@@ -10,7 +10,7 @@
     </div>
     <div class="row">
       <div v-if="nofilters" class="fit text-center q-pt-xl q-pl-lg q-pr-lg text-grey">
-        <p>Use the filters above to show the relevant cards, or click on the button below to create one.</p>
+        <p>Use the filters above to show the corresponding cards, or click on the button below to create one.</p>
         <q-btn flat icon="bookmark" @click="$router.push('/cards/bookmarks')" style="margin-top: -1px">Bookmarks</q-btn>
         <q-btn flat icon="star" @click="$router.push('/cards/suggestions')" style="margin-top: -1px">Suggestions</q-btn>
       </div>

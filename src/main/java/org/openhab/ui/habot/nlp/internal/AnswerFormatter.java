@@ -5,6 +5,8 @@ import java.util.Map;
 import java.util.Random;
 import java.util.ResourceBundle;
 
+import com.google.common.collect.ImmutableMap;
+
 public class AnswerFormatter {
 
     ResourceBundle answers;
@@ -26,10 +28,23 @@ public class AnswerFormatter {
         String[] alternatives = alternativesStr.split("\\|");
 
         Random random = new Random();
-        return alternatives[random.nextInt(alternatives.length)].trim();
+        String answer = alternatives[random.nextInt(alternatives.length)].trim();
+
+        if (placeholderValues != null) {
+            for (String placeholder : placeholderValues.keySet()) {
+                answer = answer.replace("{" + placeholder + "}", placeholderValues.get(placeholder));
+            }
+        }
+
+        return answer;
     }
 
     public String getRandomAnswer(String key) {
         return getRandomAnswer(key, null);
+    }
+
+    public String getStandardTagHint(Map<String, String> entities) {
+        return getRandomAnswer("standard_hint", ImmutableMap.of("tags", String.join(" & ", entities.entrySet().stream()
+                .map(e -> String.format("\"%s:%s\"", e.getKey(), e.getValue())).toArray(String[]::new))));
     }
 }

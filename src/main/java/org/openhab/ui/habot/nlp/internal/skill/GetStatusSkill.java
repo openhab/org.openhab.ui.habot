@@ -28,6 +28,7 @@ public class GetStatusSkill extends AbstractItemIntentInterpreter {
 
         if (matchedItems == null || matchedItems.isEmpty()) {
             interpretation.setAnswer(answerFormatter.getRandomAnswer("answer_nothing_found"));
+            interpretation.setHint(answerFormatter.getStandardTagHint(intent.getEntities()));
         } else {
             interpretation.setMatchedItems(matchedItems);
             interpretation.setCard(cardBuilder.buildCard(intent, matchedItems));

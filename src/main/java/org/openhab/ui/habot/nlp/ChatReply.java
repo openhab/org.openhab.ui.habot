@@ -22,6 +22,11 @@ public class ChatReply {
     String answer;
 
     /**
+     * Some optional additional advice given to the user
+     */
+    String hint;
+
+    /**
      * Interpreted intent and slots
      */
     Intent intent;
@@ -83,4 +88,11 @@ public class ChatReply {
         this.card = card;
     }
 
+    public String getHint() {
+        return hint;
+    }
+
+    public void setHint(String hint) {
+        this.hint = hint;
+    }
 }

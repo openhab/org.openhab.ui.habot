@@ -140,6 +140,9 @@ public class OpenNLPInterpreter implements HumanLanguageInterpreter {
             IntentInterpretation intentInterpretation = skill.interpret(intent, locale.getLanguage());
             if (intentInterpretation != null) {
                 reply.setAnswer(intentInterpretation.getAnswer());
+                if (intentInterpretation.getHint() != null) {
+                    reply.setHint(intentInterpretation.getHint());
+                }
                 if (intentInterpretation.getMatchedItems() != null) {
                     reply.setMatchedItems(intentInterpretation.getMatchedItems().stream().map(i -> i.getName())
                             .collect(Collectors.toList()).toArray(new String[0]));

@@ -8,6 +8,7 @@ import org.openhab.ui.habot.card.Card;
 public class IntentInterpretation {
 
     String answer;
+    String hint;
 
     Collection<Item> matchedItems;
 
@@ -27,6 +28,14 @@ public class IntentInterpretation {
 
     public void setAnswer(String reply) {
         this.answer = reply;
+    }
+
+    public String getHint() {
+        return hint;
+    }
+
+    public void setHint(String hint) {
+        this.hint = hint;
     }
 
     public Card getCard() {

@@ -12,13 +12,13 @@ import org.openhab.ui.habot.nlp.Skill;
 import org.osgi.service.component.annotations.Reference;
 
 @org.osgi.service.component.annotations.Component(service = Skill.class)
-public class HistoryHourlyGraphSkill extends AbstractItemIntentInterpreter {
+public class HistoryMonthlyGraphSkill extends AbstractItemIntentInterpreter {
 
     private CardBuilder cardBuilder;
 
     @Override
     public String getIntentId() {
-        return "get-history-hourly";
+        return "get-history-monthly";
     }
 
     @Override
@@ -32,7 +32,7 @@ public class HistoryHourlyGraphSkill extends AbstractItemIntentInterpreter {
         } else {
             interpretation.setMatchedItems(matchedItems);
 
-            String period = "h";
+            String period = "M";
             if (intent.getEntities().containsKey("period")) {
                 period = intent.getEntities().get("period").concat(period);
             }

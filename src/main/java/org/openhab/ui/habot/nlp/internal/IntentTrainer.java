@@ -5,6 +5,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
+import java.util.SortedMap;
 
 import org.openhab.ui.habot.nlp.AlphaNumericTokenizer;
 import org.openhab.ui.habot.nlp.Intent;
@@ -132,6 +134,9 @@ public class IntentTrainer {
 
     public Intent interpret(String query) {
         String[] tokens = this.tokenizer.tokenize(query.toLowerCase());
+        // remove eventual trailing punctuation
+        tokens[tokens.length - 1] = tokens[tokens.length - 1].replaceAll("\\s*[!?.]+$", "");
+
         double[] outcome = categorizer.categorize(tokens);
         logger.debug(categorizer.getAllResults(outcome));
 
@@ -146,6 +151,11 @@ public class IntentTrainer {
         logger.debug(intent.toString());
 
         return intent;
+    }
+
+    public SortedMap<Double, Set<String>> getScoreMap(String query) {
+        String[] tokens = this.tokenizer.tokenize(query.toLowerCase());
+        return categorizer.sortedScoreMap(tokens);
     }
 
 }

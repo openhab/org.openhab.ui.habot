@@ -1,11 +1,13 @@
 <template>
   <q-page padding class="row justify-center">
-    <q-alert icon="info" v-if="showPWAPrompt" color="info"
-      :actions="[{ label: 'Learn how', handler () {} }, { label: 'Dismiss', handler () { showPWAPrompt = false } }]">
-      Using Chrome on Android? Use a secure origin like myopenhab.org and add HABot to the home screen for the best experience!
-    </q-alert>
+    <q-page-sticky position="top" v-if="showPWAPrompt" style="z-index: 2000">
+      <q-alert icon="info" color="yellow" text-color="grey-9"
+        :actions="[{ label: 'Learn how', handler () {} }, { label: 'Dismiss', handler () { showPWAPrompt = false } }]">
+        Using Chrome on Android? Use a secure origin like myopenhab.org and add HABot to the home screen for the best experience!
+      </q-alert>
+    </q-page-sticky>
 
-    <div style="width: 600px; margin-top: 100px;">
+    <div :style="{ 'width': '100%', 'margin-top': (showPWAPrompt) ? '150px' : '100px' }">
       <div class="chat-area" v-for="chat in chats" :key="chat" ref="chat">
         <q-resize-observable @resize="onChatAreaResized"></q-resize-observable>
         <q-window-resize-observable @resize="scrollToBottom"></q-window-resize-observable>
@@ -79,6 +81,8 @@
   .q-icon
     position absolute
     right 0
+.q-message-avatar
+  min-width 48px !important
 </style>
 
 <script>
@@ -201,7 +205,7 @@ export default {
           currentChat.messages.push({
             id: new Date(),
             name: 'HABot',
-            text: [response.data.answer], // [JSON.stringify(response.data)],
+            text: (response.data.hint) ? [response.data.answer, response.data.hint] : [response.data.answer],
             avatar: 'statics/icons/icon-192x192.png',
             stamp: date.formatDate(new Date(), 'HH:mm')
           })
@@ -225,7 +229,7 @@ export default {
         currentChat.messages.push({
           id: new Date(),
           name: 'HABot',
-          text: [JSON.stringify(error)],
+          text: [(error.data) ? error.data : (error.statusText) ? error.statusText : JSON.stringify(error.data)],
           avatar: 'statics/icons/icon-192x192.png',
           bgColor: 'red',
           stamp: date.formatDate(new Date(), 'HH:mm')

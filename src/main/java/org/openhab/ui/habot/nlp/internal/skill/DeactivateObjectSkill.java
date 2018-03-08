@@ -18,14 +18,14 @@ import org.osgi.service.component.annotations.Reference;
 import com.google.common.collect.ImmutableMap;
 
 @org.osgi.service.component.annotations.Component(service = Skill.class)
-public class ActivateObjectSkill extends AbstractItemIntentInterpreter {
+public class DeactivateObjectSkill extends AbstractItemIntentInterpreter {
 
     private CardBuilder cardBuilder;
     private EventPublisher eventPublisher;
 
     @Override
     public String getIntentId() {
-        return "activate-object";
+        return "deactivate-object";
     }
 
     @Override
@@ -35,33 +35,33 @@ public class ActivateObjectSkill extends AbstractItemIntentInterpreter {
         List<Item> matchedItems = findItems(intent);
 
         if (matchedItems == null || matchedItems.isEmpty()) {
-            interpretation.setAnswer(answerFormatter.getRandomAnswer("nothing_activated"));
+            interpretation.setAnswer(answerFormatter.getRandomAnswer("nothing_deactivated"));
             interpretation.setHint(answerFormatter.getStandardTagHint(intent.getEntities()));
         } else {
             interpretation.setMatchedItems(matchedItems);
 
-            // filter out the items which can't receive an ON command
+            // filter out the items which can't receive an OFF command
             List<Item> filteredItems = matchedItems.stream()
                     .filter(i -> i.getAcceptedCommandTypes().contains(OnOffType.class)).collect(Collectors.toList());
 
             interpretation.setCard(cardBuilder.buildCard(intent, filteredItems));
 
             if (filteredItems.isEmpty()) {
-                interpretation.setAnswer(answerFormatter.getRandomAnswer("nothing_activated"));
+                interpretation.setAnswer(answerFormatter.getRandomAnswer("nothing_deactivated"));
                 interpretation.setHint(answerFormatter.getStandardTagHint(intent.getEntities()));
             } else if (filteredItems.size() == 1) {
-                if (filteredItems.get(0).getState().equals(OnOffType.ON)) {
-                    interpretation.setAnswer(answerFormatter.getRandomAnswer("switch_already_on"));
+                if (filteredItems.get(0).getState().equals(OnOffType.OFF)) {
+                    interpretation.setAnswer(answerFormatter.getRandomAnswer("switch_already_off"));
                 } else {
                     eventPublisher
-                            .post(ItemEventFactory.createCommandEvent(filteredItems.get(0).getName(), OnOffType.ON));
-                    interpretation.setAnswer(answerFormatter.getRandomAnswer("switch_activated"));
+                            .post(ItemEventFactory.createCommandEvent(filteredItems.get(0).getName(), OnOffType.OFF));
+                    interpretation.setAnswer(answerFormatter.getRandomAnswer("switch_deactivated"));
                 }
             } else {
                 for (Item item : filteredItems) {
-                    eventPublisher.post(ItemEventFactory.createCommandEvent(item.getName(), OnOffType.ON));
+                    eventPublisher.post(ItemEventFactory.createCommandEvent(item.getName(), OnOffType.OFF));
                 }
-                interpretation.setAnswer(answerFormatter.getRandomAnswer("switches_activated",
+                interpretation.setAnswer(answerFormatter.getRandomAnswer("switches_deactivated",
                         ImmutableMap.of("count", String.valueOf(filteredItems.size()))));
             }
         }
