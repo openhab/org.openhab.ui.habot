@@ -27,7 +27,7 @@ import HbSwitch from 'components/HbSwitch.vue'
 import HbSlider from 'components/HbSlider.vue'
 
 export default {
-  props: ['model'],
+  props: ['model', 'link'],
   components: {
     HbSwitch,
     HbSlider
@@ -42,7 +42,7 @@ export default {
   computed: {
     tag: {
       get () {
-        return (this.item && this.item.type === 'Switch' ? 'tag' : 'div')
+        return (this.link && this.item && this.item.type === 'Switch' ? 'label' : 'div')
       }
     },
     state: {
