@@ -7,7 +7,9 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ClassPath: .,
  lib/opennlp-tools-1.8.3.jar,
  lib/bcprov-jdk15on-154.jar,
- lib/jose4j-0.6.3.jar
+ lib/jose4j-0.6.3.jar,
+ lib/prettytime-nlp-3.2.6-20141224.001422-2.jar,
+ lib/antlr-runtime-3.5.2.jar
 Import-Package: com.google.common.collect,
  com.google.common.io,
  com.google.gson,
@@ -18,7 +20,6 @@ Import-Package: com.google.common.collect,
  javax.ws.rs,
  javax.ws.rs.client,
  javax.ws.rs.core,
- org.apache.commons.codec,
  org.apache.commons.collections,
  org.apache.commons.io,
  org.apache.http,
