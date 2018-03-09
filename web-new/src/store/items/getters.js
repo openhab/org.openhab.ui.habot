@@ -3,6 +3,7 @@ import { sprintf } from 'sprintf-js'
 const unique = a => [...new Set(a)]
 
 export const objectSet = (state) => {
+  if (!state.items) return []
   const tags = state.items.map((item) => {
     return item.tags || []
   }).reduce((acc, tags) => {
