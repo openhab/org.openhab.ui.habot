@@ -10,13 +10,14 @@
     </div>
     <div class="row">
       <div v-if="nofilters" class="fit text-center q-pt-xl q-pl-lg q-pr-lg text-grey">
-        <p>Use the filters above to show the corresponding cards, or click on the button below to create one.</p>
+        <h4 class="q-display-1">Select tags to show cards</h4>
+        <p>Use the filters above to display the corresponding cards, or create one.</p>
         <q-btn flat icon="bookmark" @click="$router.push('/cards/bookmarks')" style="margin-top: -1px">Bookmarks</q-btn>
         <q-btn flat icon="star" @click="$router.push('/cards/suggestions')" style="margin-top: -1px">Suggestions</q-btn>
       </div>
       <div v-if="!nofilters && !cards.length" class="fit text-center q-pt-xl q-pl-lg q-pr-lg text-grey">
         <h4 class="q-display-1">No cards found</h4>
-        <p>Change the filters or click on the button below to create one.</p>
+        <p>Change the filters or click on the button below to create one with the selected tags.</p>
       </div>
       <div class="hb-cards">
         <component :is="'HbCard'" :model="card" menu="deck" v-for="card in cards" :key="card.uid"></component>

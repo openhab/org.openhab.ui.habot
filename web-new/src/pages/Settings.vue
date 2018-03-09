@@ -35,12 +35,15 @@
       </q-item>
 
       <q-list-header>Item tagging</q-list-header>
-      <q-item disabled>
+      <q-item @click.native="showItemTagger = true">
         <q-item-main>
           <q-item-tile label>View item tags</q-item-tile>
           <q-item-tile sublabel>View and set the tags associated with your items. (todo)</q-item-tile>
         </q-item-main>
       </q-item>
+      <q-modal v-model="showItemTagger" :content-css="{minWidth: '80vw', minHeight: '80vh'}" @show="$refs.itemtable.processItems()">
+        <item-table ref="itemtable"></item-table>
+      </q-modal>
 
       <q-list-header>Notifications</q-list-header>
       <q-item @click.native="enableNotifications()">
@@ -115,6 +118,8 @@
 </template>
 
 <script>
+import ItemTable from 'layouts/itemtable/ItemTable.vue'
+
 /* This function is used to convert the server's public VAPID key for push notifications
    Source: https://github.com/GoogleChromeLabs/web-push-codelab/blob/master/app/scripts/main.js */
 function urlB64ToUint8Array (base64String) {
@@ -133,6 +138,9 @@ function urlB64ToUint8Array (base64String) {
 }
 
 export default {
+  components: {
+    ItemTable
+  },
   data () {
     return {
       speechApi: 'google',
@@ -141,7 +149,8 @@ export default {
         username: null,
         password: null
       },
-      showCredentialsDialog: false
+      showCredentialsDialog: false,
+      showItemTagger: false
     }
   },
   methods: {

@@ -141,7 +141,11 @@ module.exports = function (ctx) {
         'QToggle',
         'QKnob',
         'QSlider',
-        'QTree'
+        'QTree',
+        'QTable',
+        'QTableColumns',
+        'QTd',
+        'QChip'
       ],
       directives: [
         'Ripple',
