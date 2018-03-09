@@ -30,12 +30,16 @@ public class IntentDocumentSampleStream implements ObjectStream<DocumentSample> 
             Vector<String> vector = new Vector<String>(tokens.length);
             boolean skip = false;
             for (String token : tokens) {
-                if (token.startsWith("<")) {
-                    skip = !skip;
-                } else if (!skip) {
+                if (!token.startsWith("<")) {
                     System.out.print(token + " ");
                     vector.add(token);
                 }
+                // if (token.startsWith("<")) {
+                // skip = !skip;
+                // } else if (!skip) {
+                // System.out.print(token + " ");
+                // vector.add(token);
+                // }
             }
             System.out.println();
 

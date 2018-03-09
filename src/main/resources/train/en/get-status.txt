@@ -1,5 +1,5 @@
 give me the status of the <START:object> lighting <END> on the <START:location> first floor <END>
-what's the status of the <START:object> lights <END> in the <START:location> bedroom <END> ?
+what's the status of the <START:object> lights <END> in the <START:location> bedroom <END>
 show me the <START:object> temperatures <END> of the <START:location> second floor <END>
 give me the <START:object> luminosity <END>
 give me the <START:object> humidity <END> in the <START:location> garage <END>
@@ -34,3 +34,30 @@ show the <START:object> temperature <END>
 give the <START:object> temperature <END> in the <START:location> bathroom <END>
 <START:object> light <END> in the <START:location> ground floor <END>
 <START:object> humidity <END> of the <START:location> garden <END>
+what's the <START:object> sun azimuth <END>
+what's the <START:object> moon elevation <END>
+what's the <START:object> temperature <END>
+<START:object> lights <END>
+<START:object> temperature <END>
+<START:object> electricity consumption <END>
+<START:object> heating <END>
+<START:object> shutters <END>
+<START:object> rollershutters <END>
+<START:object> water consumption <END>
+<START:object> power level <END>
+<START:object> wifi level <END>
+<START:object> network speed <END>
+<START:location> living room <END>
+<START:location> kitchen <END>
+<START:location> bedroom <END>
+<START:location> master bedroom <END>
+<START:location> cellar <END>
+<START:location> attic <END>
+<START:location> garage <END>
+<START:location> garden <END>
+<START:location> bathroom <END>
+<START:location> toilet <END>
+<START:location> toilet <END>
+<START:location> man's cave <END>
+<START:location> den <END>
+<START:location> patio <END>

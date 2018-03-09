@@ -1,6 +1,7 @@
 show me the history for the <START:object> temperature <END> in the last hour
 i want a graph of the last hour for the <START:object> power consumption <END>
 hourly graph of the <START:object> temperature <END> in the <START:location> kitchen <END> 
+hourly graph of the <START:object> temperature <END> in the <START:location> living room <END> 
 graph the <START:object> temperature <END> of the <START:location> living room <END> for the last <START:period> 2 <END> hours
 <START:object> temperature <END> in the <START:location> living room <END> in the previous <START:period> 6 <END> hours
 evolution of the <START:object> temperature <END> in the <START:location> bathroom <END> for these <START:period> 2 <END> hours

@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
@@ -120,8 +121,21 @@ public class OpenNLPInterpreter implements HumanLanguageInterpreter {
     public ChatReply reply(Locale locale, String text) throws InterpretationException {
         if (!locale.equals(currentLocale) || intentTrainer == null) {
             try {
-                intentTrainer = new IntentTrainer(locale.getLanguage(), skills.values(),
-                        getNameFinderTrainingDataFromTags(), this.tokenizerId);
+                intentTrainer = new IntentTrainer(locale.getLanguage(),
+                        skills.values().stream().sorted(new Comparator<Skill>() {
+
+                            @Override
+                            public int compare(Skill o1, Skill o2) {
+                                if (o1.getIntentId().equals("get-status")) {
+                                    return -1;
+                                }
+                                if (o2.getIntentId().equals("get-status")) {
+                                    return 1;
+                                }
+                                return o1.getIntentId().compareTo(o2.getIntentId());
+                            }
+
+                        }).collect(Collectors.toList()), getNameFinderTrainingDataFromTags(), this.tokenizerId);
                 currentLocale = locale;
             } catch (Exception e) {
                 InterpretationException fe = new InterpretationException(
