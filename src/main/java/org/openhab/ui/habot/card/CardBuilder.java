@@ -52,7 +52,9 @@ public class CardBuilder {
     public Card buildCard(Intent intent, List<Item> matchedItems) {
         Set<String> tags = intent.getEntities().entrySet().stream().map(e -> e.getKey() + ":" + e.getValue())
                 .collect(Collectors.toSet());
-        Collection<Card> cardsInRegistry = this.cardRegistry.getCardByTags(tags);
+
+        Collection<Card> cardsInRegistry = this.cardRegistry.getCardByTags(tags).stream()
+                .filter(c -> !c.isNotReuseableInChat()).collect(Collectors.toList());
         if (cardsInRegistry.size() > 0) {
             // don't handle multiple cards, just return the first one
             return cardsInRegistry.iterator().next();

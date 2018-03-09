@@ -53,7 +53,7 @@
               <config-expr v-model="selectedNode.config.suggestcriteria" color="secondary"></config-expr>
             </q-field>
             <q-field label="tags" class="config-field" orientation="vertical"
-                    helper="The tags attached to the card - use object:<tag> and location:<tag> to make HABot present this card instead of the default generated one when asked about those tags. At least one object tag or one location tag is required.">
+                    helper="The tags attached to the card - use object:<tag> and location:<tag> to make HABot present this card instead of the default generated one when asked about those tags (unless notReuseableInChat below is set). At least one object tag or one location tag is required.">
               <q-search class="q-body-1 search-tags" color="secondary" v-model="searchTag"
                     :error="!hasValidTags"  placeholder="Search from items">
                   <q-autocomplete :static-data="tagSuggestions" @selected="addTag" />
@@ -61,6 +61,10 @@
               <q-chips-input v-model="selectedNode.component.tags" color="secondary"
                     :error="!hasValidTags" placeholder="Type more">
               </q-chips-input>
+            </q-field>
+            <q-field label="notReuseableInChat" class="config-field" orientation="vertical"
+                    helper="The card will not be considered when chatting with HABot even if the tags match">
+              <config-bool v-model="selectedNode.component.notReuseableInChat" color="secondary"></config-bool>
             </q-field>
           </div>
 

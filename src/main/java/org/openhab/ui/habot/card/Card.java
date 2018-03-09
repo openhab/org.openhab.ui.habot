@@ -13,8 +13,13 @@ public class Card extends Component implements Identifiable<String> {
     String uid;
     String title;
     String subtitle;
+
     Set<String> tags = new HashSet<String>();
+
     boolean bookmarked;
+    boolean notReuseableInChat;
+    boolean addToDeckDenied;
+
     Date timestamp;
 
     String imageUri;
@@ -67,6 +72,22 @@ public class Card extends Component implements Identifiable<String> {
 
     public void setBookmark(boolean bookmarked) {
         this.bookmarked = bookmarked;
+    }
+
+    public boolean isNotReuseableInChat() {
+        return notReuseableInChat;
+    }
+
+    public void setNotReuseableInChat(boolean notReuseableInChat) {
+        this.notReuseableInChat = notReuseableInChat;
+    }
+
+    public boolean isAddToDeckDenied() {
+        return addToDeckDenied;
+    }
+
+    public void setAddToDeckDenied(boolean addToDeckDenied) {
+        this.addToDeckDenied = addToDeckDenied;
     }
 
     public Date getTimestamp() {

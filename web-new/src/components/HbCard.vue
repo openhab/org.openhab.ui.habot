@@ -13,10 +13,10 @@
       <q-btn round flat icon="more_vert" slot="right">
         <q-popover anchor="bottom right" self="top right">
           <q-list link class="no-border">
-            <q-item v-close-overlay v-if="this.menu === 'chat' && !this.model.uid" @click.native="addCardToDeck()">
+            <q-item v-close-overlay v-if="this.menu === 'chat' && !this.model.uid && !this.model.addToDeckDenied" @click.native="addCardToDeck()">
               <q-item-main label="Add to Card deck" />
             </q-item>
-            <q-item v-close-overlay v-if="this.menu === 'chat' && !this.model.uid" @click.native="addCardToDeckAndBookmark()">
+            <q-item v-close-overlay v-if="this.menu === 'chat' && !this.model.uid && !this.model.addToDeckDenied" @click.native="addCardToDeckAndBookmark()">
               <q-item-main label="Add &amp; bookmark" />
             </q-item>
             <q-item v-close-overlay v-if="this.menu === 'deck'" @click.native="editCard()">
