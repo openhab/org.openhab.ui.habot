@@ -18,8 +18,10 @@ export default {
     imageUrl: {
       get () {
         this.working = true
+        let items = this.model.config.items || []
+        let period = this.model.config.period || 'D'
         return new Promise((resolve, reject) => {
-          let request = this.$http.get('/chart?items=' + this.model.config.items.join(',') + '&period=' + this.model.config.period, { responseType: 'blob' })
+          let request = this.$http.get('/chart?items=' + items.join(',') + '&period=' + period, { responseType: 'blob' })
           request.then((resp) => {
             let reader = new FileReader()
             reader.readAsDataURL(resp.data)

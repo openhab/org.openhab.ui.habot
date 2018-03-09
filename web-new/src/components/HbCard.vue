@@ -69,14 +69,8 @@
 <script>
 
 import HbSingleItemValue from 'components/HbSingleItemValue.vue'
-import HbList from 'components/HbList.vue'
-import HbCollapsible from 'components/HbCollapsible.vue'
-import HbTabs from 'components/HbTabs.vue'
-import HbSwitch from 'components/HbSwitch.vue'
-import HbKnob from 'components/HbKnob.vue'
-import HbSlider from 'components/HbSlider.vue'
-import HbChartImage from 'components/HbChartImage.vue'
 import HbAnalyzeActionButton from 'components/HbAnalyzeActionButton.vue'
+import HbComponents from 'components/index'
 
 import { uid, extend } from 'quasar'
 
@@ -84,14 +78,8 @@ export default {
   name: 'HbCard',
   components: {
     HbSingleItemValue,
-    HbList,
-    HbSwitch,
-    HbKnob,
-    HbSlider,
-    HbCollapsible,
-    HbTabs,
-    HbChartImage,
-    HbAnalyzeActionButton
+    HbAnalyzeActionButton,
+    ...HbComponents
   },
   props: ['model', 'menu'],
   data () {

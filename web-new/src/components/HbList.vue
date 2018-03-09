@@ -5,18 +5,18 @@
 </template>
 
 <script>
-import HbListItem from 'components/HbListItem.vue'
-import HbCollapsible from 'components/HbCollapsible.vue'
 
 export default {
-  components: {
-    HbListItem,
-    HbCollapsible
-  },
+  name: 'HbList',
   props: ['model'],
   data () {
     return {
+      link: this.model.link
     }
+  },
+  beforeCreate () {
+    this.$options.components.HbCollapsible = require('./HbCollapsible.vue').default
+    this.$options.components.HbListItem = require('./HbListItem.vue').default
   }
 }
 </script>

@@ -1,6 +1,7 @@
 {
     "HbCard": {
         "description": "The HbCard is the root component of all HABot cards",
+        "availableByDefault": false,
         "configDescriptions": {
             "bigger": {
                 "type": "boolean",
@@ -32,6 +33,10 @@
                 "description": "The area on the right of the card title along the context menu",
                 "allowedComponents": [ "HbSingleItemValue", "HbSwitch" ]
             },
+            "media": {
+                "description": "An optional area above the card's title where images, charts and carousels may be displayed",
+                "allowedComponents": [ "HbChartImage" ]
+            },
             "actions": {
                 "description": "The area on the bottom of the card where action buttons may be added",
                 "allowedComponents": [ "HbCommandActionButton", "HbAnalyzeActionButton" ]
@@ -41,6 +46,7 @@
 
     "HbCommandActionButton": {
         "description": "An action button sending a command to an item",
+        "availableByDefault": false,
         "configDescriptions": {
             "item": {
                 "type": "item",
@@ -55,6 +61,7 @@
 
     "HbAnalyzeActionButton": {
         "description": "An action button opening the analyze window for a set of items",
+        "availableByDefault": false,
         "configDescriptions": {
             "item": {
                 "type": "itemgroup",
@@ -81,6 +88,7 @@
 
     "HbListItem": {
         "description": "A list item",
+        "availableByDefault": false,
         "configDescriptions": {
             "label": {
                 "type": "text",
@@ -185,6 +193,7 @@
 
     "HbTab": {
         "description": "A tab - use in HbTabs and be sure to add a HbTabPane with the same name in the tabpanes slot",
+        "availableByDefault": false,
         "configDescriptions": {
             "name": {
                 "type": "text",
@@ -199,6 +208,7 @@
 
     "HbTabPane": {
         "description": "A tab pane - use in HbTabs's tabpanes slot and be sure to match the name with a HbTab",
+        "availableByDefault": false,
         "configDescriptions": {
             "name": {
                 "type": "text",
@@ -244,6 +254,7 @@
 
     "HbSingleItemValue": {
         "description": "Displays the formatted state of an item. Designed to be placed in the right slot of a HbCard",
+        "availableByDefault": false,
         "configDescriptions": {
             "item": {
                 "type": "item",

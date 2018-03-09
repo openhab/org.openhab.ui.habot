@@ -343,7 +343,7 @@ export default {
       this.buildTree()
     },
     validSubcomponents (slot) {
-      let allcomponents = Object.keys(this.components)
+      let allcomponents = Object.keys(this.components).filter((c) => this.components[c].availableByDefault !== false)
       if (!this.currentComponent || !this.currentComponent.slotDescriptions || !this.currentComponent.slotDescriptions[slot]) return allcomponents
       if (this.currentComponent.slotDescriptions[slot].allowedComponents) {
         return this.currentComponent.slotDescriptions[slot].allowedComponents
