@@ -11,6 +11,7 @@
     "test": "echo \"No test specified\" && exit 0"
   },
   "dependencies": {
+    "@accentdotai/recorderjs": "^0.9.3",
     "axios": "^0.17.1",
     "event-source-polyfill": "0.0.12",
     "jexl": "^1.1.4",

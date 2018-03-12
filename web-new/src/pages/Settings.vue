@@ -3,7 +3,7 @@
     <br />
     <q-list link>
       <q-list-header>Speech recognition API</q-list-header>
-      <q-item tag="label">
+      <q-item tag="label" @click.native="updateSpeechApi">
         <q-item-side>
           <q-radio v-model="speechApi" val="google"></q-radio>
         </q-item-side>
@@ -15,18 +15,18 @@
           <q-btn @click="setGoogleApiKey()" color="primary" flat>Setup</q-btn>
         </q-item-side>
       </q-item>
-      <q-item tag="label" disabled>
+      <q-item tag="label" @click.native="updateSpeechApi" v-if="browserSpeechRecognitionAvailable">
         <q-item-side>
-          <q-radio v-model="speechApi" val="browser" disable></q-radio>
+          <q-radio v-model="speechApi" val="webkitSpeechRecognition"></q-radio>
         </q-item-side>
         <q-item-main>
           <q-item-tile label>Browser built-in recognition</q-item-tile>
-          <q-item-tile sublabel>Uses the browser functionality if supported (not implemented).</q-item-tile>
+          <q-item-tile sublabel>Uses the browser functionality if supported (Chrome only).</q-item-tile>
         </q-item-main>
       </q-item>
       <q-item tag="label" disabled>
         <q-item-side>
-          <q-radio v-model="speechApi" val="browser" disable></q-radio>
+          <q-radio v-model="speechApi" val="openhab"></q-radio>
         </q-item-side>
         <q-item-main>
           <q-item-tile label>Send to openHAB speech-to-text</q-item-tile>
@@ -143,7 +143,8 @@ export default {
   },
   data () {
     return {
-      speechApi: 'google',
+      browserSpeechRecognitionAvailable: false,
+      speechApi: this.$q.localStorage.get.item('habot.speechApi') || 'google',
       buildTimestamp: new Date(process.env.BUILD_TIMESTAMP).toString(),
       creds: {
         username: null,
@@ -162,6 +163,8 @@ export default {
           this.$q.notify('Error while saving credentials: ' + err)
         })
       }
+    },
+    updateSpeechApi (option) {
     },
     setGoogleApiKey () {
       var vm = this
@@ -309,6 +312,17 @@ export default {
       })
     }
 
+  },
+  watch: {
+    speechApi () {
+      console.log('Setting speechApi to ' + this.speechApi)
+      this.$q.localStorage.set('habot.speechApi', this.speechApi)
+    }
+  },
+  created () {
+    this.browserSpeechRecognitionAvailable = this.$q.platform.is.chrome &&
+      'webkitSpeechRecognition' in window &&
+      (window.location.protocol === 'https:' || window.location.hostname === 'localhost')
   }
 }
 </script>

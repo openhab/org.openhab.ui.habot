@@ -1,7 +1,11 @@
-export const setReady = (context) => {
-  context.ready = true
+export const setReady = (state) => {
+  state.ready = true
 }
 
-export const setUsingStoredCredentials = (context) => {
-  context.usingStoredCredentials = true
+export const setUsingStoredCredentials = (state) => {
+  state.usingStoredCredentials = true
+}
+
+export const setLang = (state, payload) => {
+  state.lang = payload
 }

@@ -47,7 +47,7 @@ module.exports = function (ctx) {
         // Adding importScripts to the sw-precache plugin config
         for (let plugin of cfg.plugins) {
           if (plugin.options && plugin.options.cacheId) {
-            console.log('Adding importScripts to ' + JSON.stringify(plugin.options))
+            // console.log('Adding importScripts to ' + JSON.stringify(plugin.options))
             plugin.options.importScripts = ['sw-webpush.js']
             // fix wrong path separator when building on Windows
             plugin.options.stripPrefix = plugin.options.stripPrefix.replace('\\', '/')
@@ -56,25 +56,14 @@ module.exports = function (ctx) {
           if (plugin.definitions && plugin.definitions['process.env']) {
             plugin.definitions['process.env']['BUILD_TIMESTAMP'] = Date.now().toString()
           }
-
-          // console.log(JSON.stringify(plugin))
-          // console.log('----')
         }
 
         cfg.plugins.push(new CopyWebpackPlugin([
           {
             from: path.resolve(__dirname, 'src/sw-webpush.js'),
             to: '.'
-          },
-          {
-            from: path.resolve(__dirname, 'src/recorder.js'),
-            to: '.'
           }
         ]))
-
-        cfg.plugins.push(new webpack.EnvironmentPlugin({
-          BUILD_TIMESTAMP: '123'
-        }))
       }
     },
     devServer: {
@@ -107,6 +96,8 @@ module.exports = function (ctx) {
         'QDialog',
         'QBtnGroup',
         'QBtn',
+        'QSpinnerRadio',
+        'QSpinnerAudio',
         'QIcon',
         'QList',
         'QListHeader',

@@ -50,10 +50,15 @@
 
     <q-page-sticky position="bottom" class="chat-input-sticky">
       <q-toolbar class="chat-input-toolbar bg-grey-3 shadow-up-3">
-        <q-input ref="input" v-model="text" class="full-width" placeholder="Ask me about your home" :after="inputAfter" @keyup="keyUp" />
+        <q-input ref="input" v-model="text" class="full-width" :placeholder="inputPlaceholder" :after="inputAfter" @keyup="keyUp" />
       </q-toolbar>
     </q-page-sticky>
 
+    <speech-button v-on:start="startSpeech"
+                   v-on:end="endSpeech"
+                   v-on:result="speechFinalResult"
+                   v-on:interimresult="speechInterimResult"
+                   v-on:error="resetSpeech"></speech-button>
   </q-page>
 </template>
 
@@ -67,7 +72,7 @@
   padding 15px
 
 .chat-area
-  padding-bottom 40px
+  padding-bottom 64px
   @media (min-width $breakpoint-xs-min)
     .q-card
       width $card-min-width
@@ -88,11 +93,15 @@
 <script>
 import { date } from 'quasar'
 import HbCard from 'components/HbCard.vue'
+import SpeechButton from 'components/speech/SpeechButton.vue'
+
+import '@accentdotai/recorderjs'
 
 export default {
   name: 'PageChat',
   components: {
-    HbCard
+    HbCard,
+    SpeechButton
   },
   data () {
     return {
@@ -109,7 +118,8 @@ export default {
         content: true,
         handler: this.send
       }],
-      showPWAPrompt: false
+      showPWAPrompt: false,
+      inputPlaceholder: 'Ask me about your home'
     }
   },
   created () {
@@ -128,7 +138,7 @@ export default {
     }
 
     this.$http.get('/rest/habot/greet').then(function (response) {
-      vm.language = response.data.language
+      vm.$store.commit('setLang', response.data.language)
       if (!vm.language) {
         vm.language = 'en'
       }
@@ -184,6 +194,7 @@ export default {
         stamp: date.formatDate(new Date(), 'HH:mm')
       })
     },
+
     send () {
       var currentChat = this.chats[this.chats.length - 1]
       currentChat.messages.push({
@@ -216,13 +227,14 @@ export default {
           if (!currentChat.card.uid) {
             currentChat.card.config = { bigger: true }
           }
-          currentChat.finished = true
-          this.chats.push({
-            messages: [],
-            card: null,
-            finished: false
-          })
         }
+
+        currentChat.finished = true
+        this.chats.push({
+          messages: [],
+          card: null,
+          finished: false
+        })
 
         currentChat.intent = response.data.intent
       }).catch(function (error) {
@@ -242,6 +254,7 @@ export default {
         this.$refs.input.blur()
       }
     },
+
     keyUp (event) {
       if (event.keyCode === 13) {
         this.send()
@@ -251,13 +264,35 @@ export default {
         }
       }
     },
+
     onChatAreaResized (size) {
       this.scrollToBottom()
     },
+
     scrollToBottom () {
       var appEl = document.getElementById('q-app')
       appEl.scrollTop = appEl.scrollHeight
       document.body.scrollTop = document.body.scrollHeight
+    },
+
+    startSpeech () {
+      this.inputPlaceholder = 'Speak now...'
+    },
+    endSpeech () {
+      this.resetSpeech()
+    },
+    speechInterimResult (result) {
+      if (result) {
+        this.inputPlaceholder = result
+      }
+    },
+    speechFinalResult (result) {
+      this.text = result
+      this.send()
+      this.resetSpeech()
+    },
+    resetSpeech () {
+      this.inputPlaceholder = 'Ask me about your home'
     }
   },
   beforeDestroyed () {
