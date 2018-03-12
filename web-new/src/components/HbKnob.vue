@@ -1,5 +1,14 @@
 <template>
-  <q-knob v-model="itemState" :color="model.config.color" :size="model.config.size" :min="model.config.min" :max="model.config.max" :step="model.config.step"></q-knob>
+  <q-knob v-model="itemState"
+    :color="model.config.color || undefined"
+    :trackColor="model.config.trackColor || undefined"
+    :size="model.config.size || undefined"
+    :min="model.config.min ? parseFloat(model.config.min) : undefined"
+    :max="model.config.max ? parseFloat(model.config.max) : undefined"
+    :step="model.config.step ? parseFloat(model.config.step) : undefined"
+    :lineWidth="model.config.lineWidth ? parseInt(model.config.lineWidth) : undefined"
+  >
+</q-knob>
 </template>
 
 <style lang="stylus">
@@ -11,7 +20,8 @@ export default {
   props: ['model'],
   data () {
     return {
-      wait: false
+      wait: false,
+      size: (this.model.config.size) ? parseInt(this.model.config.size) : undefined
     }
   },
   computed: {
@@ -29,6 +39,14 @@ export default {
           this.wait = false
           setTimeout(() => { this.$store.dispatch('items/sendCmd', { itemName: this.model.config.item, command: this.next }) })
         }, 500)
+      }
+    }
+  },
+  asyncComputed: {
+    state: {
+      get () {
+        if (!this.model.config.state) return undefined
+        return this.$expr(this.model.config.state)
       }
     }
   }

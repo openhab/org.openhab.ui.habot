@@ -56,11 +56,11 @@
 
 <style lang="stylus">
 @import '~variables'
-.big-value
-  font-weight 300
-  color black
-  font-size 200%
-  vertical-align middle
+// .big-value
+//   font-weight 300
+//   color black
+//   font-size 200%
+//   vertical-align middle
 @media (min-width $breakpoint-sm-min)
   .bigger
     width 400px !important

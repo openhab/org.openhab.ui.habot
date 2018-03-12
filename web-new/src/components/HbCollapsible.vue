@@ -23,21 +23,13 @@
 </style>
 
 <script>
-import HbSwitch from 'components/HbSwitch.vue'
-import HbSlider from 'components/HbSlider.vue'
-import HbKnob from 'components/HbKnob.vue'
-import HbCollapsible from 'components/HbCollapsible.vue'
-import HbTabs from 'components/HbTabs.vue'
+import HbComponents from 'components/index'
 
 export default {
   name: 'HbCollapsible',
   props: ['model'],
   components: {
-    HbSwitch,
-    HbSlider,
-    HbKnob,
-    HbCollapsible,
-    HbTabs
+    ...HbComponents
   },
   data () {
     return {

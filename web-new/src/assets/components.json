@@ -64,8 +64,24 @@
         "availableByDefault": false,
         "configDescriptions": {
             "item": {
-                "type": "itemgroup",
+                "type": "item",
+                "multiple": true,
                 "description": "The items to analyze"
+            }
+        }
+    },
+
+    "HbContainer": {
+        "description": "A generic, flexible container",
+        "configDescriptions": {
+            "classes": {
+                "type": "array",
+                "description": "CSS Classes to apply to the container; see http://quasar-framework.org/components/"
+            }
+        },
+        "slotDescriptions": {
+            "main": {
+                "description": "The contents of the container"
             }
         }
     },
@@ -76,23 +92,59 @@
             "link": {
                 "type": "boolean",
                 "description": "Display the list items in gray when hovering on desktops"
+            },
+            "noseparator": {
+                "type": "boolean",
+                "description": "Don't display a separator between items automatically - you can still add HbListSeparators yourself"
+            },
+            "striped": {
+                "type": "boolean",
+                "description": "Apply highlight to items intermittently"
             }
         },
         "slotDescriptions": {
             "items": {
                 "description": "Contains the list items",
-                "allowedComponents": [ "HbListItem", "HbCollapsible" ]
+                "allowedComponents": [ "HbListItem", "HbCollapsible", "HbListHeader", "HbListSeparator" ]
             }
         }
     },
 
+    "HbListHeader": {
+        "description": "A header between list items",
+        "configDescriptions": {
+            "label": {
+                "type": "text",
+                "description": "Label"
+            },
+            "inset": {
+                "type": "boolean",
+                "description": "Place an inset header - leave a margin on the left"
+            }
+        }
+    },
+
+    "HbListSeparator": {
+        "description": "A separator between list items",
+        "configDescriptions": {
+            "inset": {
+                "type": "boolean",
+                "description": "Place an inset separator - leave a margin on the left"
+            }
+        }
+    },
+    
     "HbListItem": {
         "description": "A list item",
         "availableByDefault": false,
         "configDescriptions": {
             "label": {
                 "type": "text",
-                "description": "The label of the item"
+                "description": "The label of the list item; accepts expressions"
+            },
+            "sublabel": {
+                "type": "text",
+                "description": "The subtitle below; accepts expressions - will contain the name of the item if specified by default; accepts expressions"
             },
             "item": {
                 "type": "item",
@@ -100,7 +152,7 @@
             },
             "state": {
                 "type": "text",
-                "description": "The state to display on the right"
+                "description": "The state to display on the right if no item is specified; accepts expressions"
             },
             "control": {
                 "type": "optiongroup",
@@ -135,8 +187,7 @@
         },
         "slotDescriptions": {
             "main": {
-                "description": "The main area of the collapsible",
-                "deniedComponents": [ "HbCard", "HbList", "HbListItem", "HbListHeader" ]
+                "description": "The main area of the collapsible"
             }
         }
     },
@@ -238,6 +289,38 @@
             "item": {
                 "type": "item",
                 "description": "The item controlled by this list item"
+            },
+            "size": {
+                "type": "text",
+                "description": "The size of the knob, e.g. '100px' or '15rem'"
+            },
+            "min": {
+                "type": "number",
+                "description": "The minimum value, 0 by default"
+            },
+            "max": {
+                "type": "number",
+                "description": "The maximum value, 100 by default"
+            },
+            "step": {
+                "type": "number",
+                "description": "The step between values"
+            },
+            "color": {
+                "type": "color",
+                "description": "One color of the bar"
+            },
+            "trackColor": {
+                "type": "color",
+                "description": "One color of the track"
+            },
+            "lineWidth": {
+                "type": "number",
+                "description": "The thickness of the track, 5 by default"
+            },
+            "state": {
+                "type": "text",
+                "description": "Override the label text; accepts expressions"
             }
         }
     },

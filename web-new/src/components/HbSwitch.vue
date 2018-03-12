@@ -25,6 +25,7 @@ export default {
     },
     itemState: {
       get () {
+        if (!this.model.config.item) return 'OFF'
         let state = this.$store.getters['items/itemState'](this.model.config.item)
         if (state === 'ON' || state === 'OFF') return state
         if (this.item.type === 'Dimmer') {

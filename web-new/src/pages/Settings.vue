@@ -38,7 +38,7 @@
       <q-item @click.native="showItemTagger = true">
         <q-item-main>
           <q-item-tile label>View item tags</q-item-tile>
-          <q-item-tile sublabel>Review and the tags associated with your items.</q-item-tile>
+          <q-item-tile sublabel>Review and set the tags used to identify items in conversations.</q-item-tile>
         </q-item-main>
       </q-item>
       <q-modal v-model="showItemTagger" :content-css="{minWidth: '80vw', minHeight: '80vh'}" @show="$refs.itemtable.processItems()">

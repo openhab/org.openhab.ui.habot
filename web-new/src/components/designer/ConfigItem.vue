@@ -1,5 +1,5 @@
 <template>
-  <q-select :value="value" color="secondary" @input="$emit('input', $event)" :options="items" :multiple="multiple" filter clearable></q-select>
+  <q-select :value="val" color="secondary" @input="$emit('input', $event)" :options="items" :multiple="multiple" filter clearable></q-select>
 </template>
 
 <script>
@@ -16,6 +16,16 @@ export default {
           stamp: item.type
         }
       })
+    }
+  },
+  computed: {
+    val: {
+      get () {
+        return (!this.value && this.multiple) ? [] : this.value
+      },
+      set (val) {
+        this.value = val
+      }
     }
   }
 }

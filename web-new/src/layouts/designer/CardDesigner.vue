@@ -79,6 +79,7 @@
             <config-bool v-if="configDesc.type === 'boolean'" v-model="selectedNode.config[prop]"></config-bool>
             <config-option-group v-else-if="configDesc.type === 'optiongroup'" v-model="selectedNode.config[prop]" :options="configDesc.options"></config-option-group>
             <config-item v-else-if="configDesc.type === 'item'" v-model="selectedNode.config[prop]" :multiple="configDesc.multiple"></config-item>
+            <config-array v-else-if="configDesc.type === 'array'" v-model="selectedNode.config[prop]"></config-array>
             <config-text v-else v-model="selectedNode.config[prop]"></config-text>
           </q-field>
         </div>
@@ -185,6 +186,7 @@ import ConfigBool from 'components/designer/ConfigBool.vue'
 import ConfigOptionGroup from 'components/designer/ConfigOptionGroup.vue'
 import ConfigItem from 'components/designer/ConfigItem.vue'
 import ConfigExpr from 'components/designer/ConfigExpr.vue'
+import ConfigArray from 'components/designer/ConfigArray.vue'
 
 import Vue from 'vue'
 import { extend } from 'quasar'
@@ -244,7 +246,8 @@ export default {
     ConfigBool,
     ConfigOptionGroup,
     ConfigItem,
-    ConfigExpr
+    ConfigExpr,
+    ConfigArray
   },
   data () {
     return {
