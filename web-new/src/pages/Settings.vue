@@ -3,19 +3,31 @@
     <br />
     <q-list link>
       <q-list-header>Speech recognition API</q-list-header>
-      <q-item tag="label" @click.native="updateSpeechApi">
+      <q-item tag="label">
         <q-item-side>
           <q-radio v-model="speechApi" val="google"></q-radio>
         </q-item-side>
         <q-item-main>
           <q-item-tile label>Google Cloud Speech</q-item-tile>
-          <q-item-tile sublabel>Uses Google services, requires an API key.</q-item-tile>
+          <q-item-tile sublabel>Uses Google Cloud Platform, API key required.</q-item-tile>
         </q-item-main>
         <q-item-side right>
           <q-btn @click="setGoogleApiKey()" color="primary" flat>Setup</q-btn>
         </q-item-side>
       </q-item>
-      <q-item tag="label" @click.native="updateSpeechApi" v-if="browserSpeechRecognitionAvailable">
+      <q-item tag="label">
+        <q-item-side>
+          <q-radio v-model="speechApi" val="bing"></q-radio>
+        </q-item-side>
+        <q-item-main>
+          <q-item-tile label>Bing Speech</q-item-tile>
+          <q-item-tile sublabel>Uses Microsoft Cognitive Services, API key required.</q-item-tile>
+        </q-item-main>
+        <q-item-side right>
+          <q-btn @click="setBingApiKey()" color="primary" flat>Setup</q-btn>
+        </q-item-side>
+      </q-item>
+      <q-item tag="label" v-if="browserSpeechRecognitionAvailable">
         <q-item-side>
           <q-radio v-model="speechApi" val="webkitSpeechRecognition"></q-radio>
         </q-item-side>
@@ -26,7 +38,7 @@
       </q-item>
       <q-item tag="label" disabled>
         <q-item-side>
-          <q-radio v-model="speechApi" val="openhab"></q-radio>
+          <q-radio v-model="speechApi" val="openhab" disable></q-radio>
         </q-item-side>
         <q-item-main>
           <q-item-tile label>Send to openHAB speech-to-text</q-item-tile>
@@ -164,15 +176,13 @@ export default {
         })
       }
     },
-    updateSpeechApi (option) {
-    },
     setGoogleApiKey () {
       var vm = this
       vm.$q.dialog({
         title: 'Set the Google Cloud API key',
         message:
-            'You need to subscribe to the (paid) Google Cloud Platform to use this feature. ' +
-            'There is a trial period and a free tier, which might be enough for casual use. ' +
+            'You need to subscribe to the Google Cloud Platform to use this feature.' +
+            '60 min/month free after the trial period. See help for details. ' +
             'Paste the API key below:',
         // '<ul>' +
         // '<li>Go to <a target="_blank" href="https://console.cloud.google.com">console.cloud.google.com</a> and sign up or login</li>' +
@@ -189,7 +199,27 @@ export default {
         cancel: true
       }).then((data) => {
         vm.$q.localStorage.set('habot.googleApiKey', data)
-        vm.$q.notify({ type: 'info', message: 'API Key Set for this device' })
+        vm.$q.notify({ type: 'info', message: 'Google Cloud API Key set for this device' })
+      }).catch(() => {
+
+      })
+    },
+    setBingApiKey () {
+      var vm = this
+      vm.$q.dialog({
+        title: 'Set the Bing Speech API key',
+        message:
+            'Trial keys expire after 30 days, sign up to Azure to get non-expiring keys. ' +
+            '5000 transactions free per month, 20 per minute allowed. See help for details. ' +
+            'Paste one of the two API keys below:',
+        prompt: {
+          model: '',
+          type: 'text'
+        },
+        cancel: true
+      }).then((data) => {
+        vm.$q.localStorage.set('habot.bingApiKey', data)
+        vm.$q.notify({ type: 'info', message: 'Bing Speech API Key set for this device' })
       }).catch(() => {
 
       })

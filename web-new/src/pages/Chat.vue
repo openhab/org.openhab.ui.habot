@@ -95,8 +95,6 @@ import { date } from 'quasar'
 import HbCard from 'components/HbCard.vue'
 import SpeechButton from 'components/speech/SpeechButton.vue'
 
-import '@accentdotai/recorderjs'
-
 export default {
   name: 'PageChat',
   components: {

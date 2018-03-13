@@ -46,6 +46,9 @@ module.exports = function (ctx) {
 
         // Adding importScripts to the sw-precache plugin config
         for (let plugin of cfg.plugins) {
+          if (plugin.options && plugin.options.uglifyOptions) {
+            plugin.options.uglifyOptions.mangle = { reserved: ['self'] }
+          }
           if (plugin.options && plugin.options.cacheId) {
             // console.log('Adding importScripts to ' + JSON.stringify(plugin.options))
             plugin.options.importScripts = ['sw-webpush.js']
