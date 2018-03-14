@@ -1,6 +1,5 @@
 package org.openhab.ui.habot.nlp.internal;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -26,10 +25,8 @@ import opennlp.tools.namefind.TokenNameFinderFactory;
 import opennlp.tools.namefind.TokenNameFinderModel;
 import opennlp.tools.tokenize.Tokenizer;
 import opennlp.tools.tokenize.WhitespaceTokenizer;
-import opennlp.tools.util.InputStreamFactory;
 import opennlp.tools.util.ObjectStream;
 import opennlp.tools.util.ObjectStreamUtils;
-import opennlp.tools.util.PlainTextByLineStream;
 import opennlp.tools.util.Span;
 import opennlp.tools.util.TrainingParameters;
 
@@ -58,13 +55,7 @@ public class IntentTrainer {
 
             try {
                 InputStream trainingData = skill.getTrainingData(language);
-                ObjectStream<String> lineStream = new PlainTextByLineStream(new InputStreamFactory() {
-
-                    @Override
-                    public InputStream createInputStream() throws IOException {
-                        return trainingData;
-                    }
-                }, "UTF-8");
+                ObjectStream<String> lineStream = new LowerCasePlainTextByLineStream(trainingData);
 
                 ObjectStream<DocumentSample> documentSampleStream = new IntentDocumentSampleStream(intent, lineStream);
                 categoryStreams.add(documentSampleStream);
@@ -94,13 +85,7 @@ public class IntentTrainer {
         for (Skill skill : skills) {
             try {
                 InputStream trainingData = skill.getTrainingData(language);
-                ObjectStream<String> lineStream = new PlainTextByLineStream(new InputStreamFactory() {
-
-                    @Override
-                    public InputStream createInputStream() throws IOException {
-                        return trainingData;
-                    }
-                }, "UTF-8");
+                ObjectStream<String> lineStream = new LowerCasePlainTextByLineStream(trainingData);
                 ObjectStream<NameSample> nameSampleStream = new NameSampleDataStream(lineStream);
                 nameStreams.add(nameSampleStream);
             } catch (UnsupportedLanguageException e) {
@@ -111,14 +96,7 @@ public class IntentTrainer {
 
         /* Also use the additional training data for entity extraction (i.e. actual items' tags) if provided */
         if (additionalNameSamples != null) {
-            ObjectStream<String> additionalLineStream = new PlainTextByLineStream(new InputStreamFactory() {
-
-                @Override
-                public InputStream createInputStream() throws IOException {
-                    return additionalNameSamples;
-                }
-
-            }, "UTF-8");
+            ObjectStream<String> additionalLineStream = new LowerCasePlainTextByLineStream(additionalNameSamples);
             ObjectStream<NameSample> additionalNameSamplesStream = new NameSampleDataStream(additionalLineStream);
             nameStreams.add(additionalNameSamplesStream);
         }
