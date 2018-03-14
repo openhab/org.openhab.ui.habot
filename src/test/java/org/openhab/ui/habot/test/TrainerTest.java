@@ -82,7 +82,7 @@ public class TrainerTest {
         assertEquals("temperature", actual.getEntities().get("object"));
 
         
-        interpret("show me the temperature in the kitchen");
+        actual= interpret("show me the temperature in the kitchen");
         assertEquals("get-status", actual.getName());
         assertEquals(2, actual.getEntities().size());
         assertEquals("kitchen", actual.getEntities().get("location"));
