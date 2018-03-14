@@ -1,10 +1,13 @@
 package org.openhab.ui.habot.test;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.openhab.ui.habot.nlp.Intent;
 import org.openhab.ui.habot.nlp.IntentInterpretation;
@@ -43,8 +46,8 @@ public class TrainerTest {
         }
     }
 
-    // @Before
-    protected void initializeMockSkills() {
+    @Before
+    public void initializeMockSkills() {
         skills = new ArrayList<Skill>();
 
         skills.add(new MockSkill("get-status"));
@@ -68,11 +71,23 @@ public class TrainerTest {
 
     @Test
     public void testEN() throws Exception {
-        initializeMockSkills();
+
+    	Intent actual;
         this.trainer = new IntentTrainer("en", skills);
 
-        interpret("Temperature in the bedroom?");
+        actual = interpret("Temperature in the bedroom?");
+        assertEquals("get-status", actual.getName());
+        assertEquals(2, actual.getEntities().size());
+        assertEquals("bedroom", actual.getEntities().get("location"));
+        assertEquals("temperature", actual.getEntities().get("object"));
+
+        
         interpret("show me the temperature in the kitchen");
+        assertEquals("get-status", actual.getName());
+        assertEquals(2, actual.getEntities().size());
+        assertEquals("kitchen", actual.getEntities().get("location"));
+        assertEquals("temperature", actual.getEntities().get("object"));        
+        
         interpret("what's the temperature in the garage?");
 
         interpret("start the heating in the garage");
@@ -107,10 +122,18 @@ public class TrainerTest {
 
     @Test
     public void testDE() throws Exception {
-    	initializeMockSkills();
+
+    	Intent actual;
         this.trainer = new IntentTrainer("de", skills);
 
-        interpret("mach den Fernseher an");
-
+        actual = interpret("mach den Fernseher an");
+        assertEquals("activate-object", actual.getName());
+        assertEquals(1, actual.getEntities().size());
+        assertEquals("fernseher", actual.getEntities().get("object"));   
+        
+        actual = interpret("bitte mache das Licht an");
+        assertEquals("activate-object", actual.getName());
+        assertEquals(1, actual.getEntities().size());
+        assertEquals("Licht", actual.getEntities().get("object"));
     }    
 }
