@@ -73,8 +73,14 @@ public abstract class AbstractItemIntentInterpreter implements Skill {
     public InputStream getTrainingData(String language) throws UnsupportedLanguageException {
         answerFormatter = new AnswerFormatter(language);
 
-        return Skill.class.getClassLoader()
+        InputStream trainingData = Skill.class.getClassLoader()
                 .getResourceAsStream("train/" + language + "/" + this.getIntentId() + ".txt");
+
+        if (trainingData == null) {
+            throw new UnsupportedLanguageException(language);
+        }
+
+        return trainingData;
     }
 
 }

@@ -236,12 +236,16 @@ export default {
 
         currentChat.intent = response.data.intent
       }).catch(function (error) {
+        let errormessage = (error.response && error.response.data && error.response.data.error && error.response.data.error.message) ? error.response.data.error.message
+          : (error.response && error.response.statusText) ? error.response.statusText : error.message
+
         currentChat.messages.push({
           id: new Date(),
           name: 'HABot',
-          text: [(error.data) ? error.data : (error.statusText) ? error.statusText : JSON.stringify(error.data)],
+          text: [errormessage],
           avatar: 'statics/icons/icon-192x192.png',
-          bgColor: 'red',
+          bgColor: 'negative',
+          textColor: 'white',
           stamp: date.formatDate(new Date(), 'HH:mm')
         })
       })

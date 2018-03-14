@@ -81,6 +81,10 @@ public class IntentTrainer {
             }
         }
 
+        if (categoryStreams.isEmpty()) {
+            throw new UnsupportedLanguageException(language);
+        }
+
         /* concatenate the document samples object streams into one to feed to the trainer */
         ObjectStream<DocumentSample> combinedDocumentSampleStream = ObjectStreamUtils
                 .concatenateObjectStream(categoryStreams);
