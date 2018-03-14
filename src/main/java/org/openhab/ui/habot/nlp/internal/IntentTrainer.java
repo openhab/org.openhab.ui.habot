@@ -15,6 +15,8 @@ import org.openhab.ui.habot.nlp.UnsupportedLanguageException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sun.xml.internal.ws.util.StreamUtils;
+
 import opennlp.tools.doccat.DoccatFactory;
 import opennlp.tools.doccat.DoccatModel;
 import opennlp.tools.doccat.DocumentCategorizerME;
@@ -58,16 +60,21 @@ public class IntentTrainer {
 
             try {
                 InputStream trainingData = skill.getTrainingData(language);
-                ObjectStream<String> lineStream = new PlainTextByLineStream(new InputStreamFactory() {
-
-                    @Override
-                    public InputStream createInputStream() throws IOException {
-                        return trainingData;
-                    }
-                }, "UTF-8");
-
-                ObjectStream<DocumentSample> documentSampleStream = new IntentDocumentSampleStream(intent, lineStream);
-                categoryStreams.add(documentSampleStream);
+                if(null != trainingData) {
+	                ObjectStream<String> lineStream = new PlainTextByLineStream(new InputStreamFactory() {
+	
+	                    @Override
+	                    public InputStream createInputStream() throws IOException {
+	                        return trainingData;
+	                    }
+	                }, "UTF-8");
+	
+	                ObjectStream<DocumentSample> documentSampleStream = new IntentDocumentSampleStream(intent, lineStream);
+	                categoryStreams.add(documentSampleStream);
+                } else {
+                    logger.warn("Ignoring intent {} because no training data for language {}", skill.getIntentId(),
+                            language);
+                }
             } catch (UnsupportedLanguageException e) {
                 logger.warn("Ignoring intent {} because no training data for language {}", skill.getIntentId(),
                         language);
@@ -88,21 +95,27 @@ public class IntentTrainer {
         /* Use the skill's training data again, to train the entity extractor (token name finder) this time */
         List<ObjectStream<NameSample>> nameStreams = new ArrayList<ObjectStream<NameSample>>();
         for (Skill skill : skills) {
+        	InputStream trainingData;
             try {
-                InputStream trainingData = skill.getTrainingData(language);
-                ObjectStream<String> lineStream = new PlainTextByLineStream(new InputStreamFactory() {
-
-                    @Override
-                    public InputStream createInputStream() throws IOException {
-                        return trainingData;
-                    }
-                }, "UTF-8");
-                ObjectStream<NameSample> nameSampleStream = new NameSampleDataStream(lineStream);
-                nameStreams.add(nameSampleStream);
+                trainingData = skill.getTrainingData(language);
+                if(null != trainingData) {
+	                ObjectStream<String> lineStream = new PlainTextByLineStream(new InputStreamFactory() {
+	
+	                    @Override
+	                    public InputStream createInputStream() throws IOException {
+	                        return trainingData;
+	                    }
+	                }, "UTF-8");
+	                ObjectStream<NameSample> nameSampleStream = new NameSampleDataStream(lineStream);
+	                nameStreams.add(nameSampleStream);
+                } else {
+                	logger.warn("Ignoring intent {} because no training data for language {}", skill.getIntentId(),
+                            language);
+                }
             } catch (UnsupportedLanguageException e) {
                 logger.warn("Ignoring intent {} because no training data for language {}", skill.getIntentId(),
                         language);
-            }
+            } 
         }
 
         /* Also use the additional training data for entity extraction (i.e. actual items' tags) if provided */
