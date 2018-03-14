@@ -38,7 +38,7 @@ import org.osgi.service.component.annotations.ReferencePolicy;
 public class OpenNLPInterpreter implements HumanLanguageInterpreter {
 
     private static final Set<Locale> supportedLocales = Collections
-            .unmodifiableSet(new HashSet<>(Arrays.asList(Locale.ENGLISH, Locale.FRENCH)));
+            .unmodifiableSet(new HashSet<>(Arrays.asList(Locale.ENGLISH, Locale.FRENCH, Locale.GERMAN)));
 
     private IntentTrainer intentTrainer = null;
     private Locale currentLocale = null;

@@ -105,4 +105,12 @@ public class TrainerTest {
         interpret("montre le graphique de la consommation électrique pour les 2 derniers jours");
     }
 
+    @Test
+    public void testDE() throws Exception {
+    	initializeMockSkills();
+        this.trainer = new IntentTrainer("de", skills);
+
+        interpret("mach den Fernseher an");
+
+    }    
 }
