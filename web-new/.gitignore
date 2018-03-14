@@ -3,7 +3,7 @@
 .thumbs.db
 node_modules
 node
-# /dist
+/dist
 /src-cordova/platforms
 /src-cordova/plugins
 /src-cordova/www

@@ -1,7 +1,0 @@
-.DS_Store
-.thumbs.db
-node_modules/
-# dist/ include it for now
-npm-debug.log*
-cordova/platforms
-cordova/plugins
