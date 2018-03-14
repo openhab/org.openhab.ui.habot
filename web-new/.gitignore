@@ -2,6 +2,7 @@
 .DS_Store
 .thumbs.db
 node_modules
+node
 # /dist
 /src-cordova/platforms
 /src-cordova/plugins
