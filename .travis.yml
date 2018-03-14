@@ -1,6 +1,10 @@
 language: java
 script: mvn clean package -Dcheckstyle.skip=true
 install: true
+branches:
+  only:
+  - master
+  - /^release-.*$/
 before_deploy:
 - git config --local user.name "Yannick Schaus"
 - git config --local user.email "habpanel@schaus.net"
