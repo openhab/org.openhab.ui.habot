@@ -1,2 +1,3 @@
 language: java
 script: mvn clean package -Dcheckstyle.skip=true
+install: true
