@@ -4,8 +4,8 @@ install: true
 before_deploy:
 - git config --local user.name "Yannick Schaus"
 - git config --local user.email "habpanel@schaus.net"
-- export BUNDLE_VERSION=`sed -n 's/Bundle-Version. \([[:digit:]]\.[[:digit:]]\.[[:digit:]]*\)/\1/p' target/MANIFEST.MF`
-- git tag $BUNDLE_VERSION
+- export BUNDLE_VERSION=`sed -n 's/Bundle-Version. \([[:digit:]]\.[[:digit:]]\.[[:digit:]]*\)/\1/p' target/MANIFEST.MF | head -c -2`
+- git tag "$BUNDLE_VERSION"
 deploy:
   provider: releases
   api_key:
