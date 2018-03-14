@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>org.openhab</groupId>
@@ -11,125 +12,201 @@
 	<packaging>eclipse-plugin</packaging>
 	<name>HABot Interactive Bot</name>
 	<description>HABot Interactive Bot for openHAB</description>
-	 
-    <properties>
-        <ohc.version>${project.version}</ohc.version>
-    </properties>
-  
-     <build>
-        <plugins>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>1.2.1</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>java</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <mainClass>org.openhab.ui.habot.internal.hli.IntentTrainer</mainClass>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+
+	<properties>
+		<ohc.version>${project.version}</ohc.version>
+	</properties>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>1.2.1</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>java</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<mainClass>org.openhab.ui.habot.internal.hli.IntentTrainer</mainClass>
+				</configuration>
+			</plugin>
+
+			<!-- clean plugin -->
+			<plugin>
+				<artifactId>maven-clean-plugin</artifactId>
+				<version>2.4.1</version>
+				<configuration>
+					<filesets>
+						<fileset>
+							<directory>src/main/java/org/openhab/ui/habot/nlp/internal/natty/generated</directory>
+							<includes>
+								<include>**/*.java</include>
+							</includes>
+							<followSymlinks>false</followSymlinks>
+						</fileset>
+					</filesets>
+				</configuration>
+			</plugin>
+
+			<!-- ANTLR code generation plugin -->
+			<plugin>
+				<groupId>org.antlr</groupId>
+				<artifactId>antlr3-maven-plugin</artifactId>
+				<version>3.5.2</version>
+
+				<executions>
+					<execution>
+						<id>debug</id>
+						<goals>
+							<goal>antlr</goal>
+						</goals>
+						<configuration>
+							<debug>true</debug>
+							<libDirectory>src/main/antlr3/org/openhab/ui/habot/nlp/internal/natty/generated/imports</libDirectory>
+							<outputDirectory>src/main/java</outputDirectory>
+							<includes>
+								<include>org/openhab/ui/habot/nlp/internal/natty/generated/en/DateLexer.g</include>
+								<include>org/openhab/ui/habot/nlp/internal/natty/generated/en/DateParser.g</include>
+                                <include>org/openhab/ui/habot/nlp/internal/natty/generated/fr/DateLexerFR.g</include>
+                                <include>org/openhab/ui/habot/nlp/internal/natty/generated/fr/DateParserFR.g</include>
+							</includes>
+							<excludes>
+								<exclude>org/openhab/ui/habot/nlp/internal/natty/generated/imports/NumericRules.g</exclude>
+                                <exclude>org/openhab/ui/habot/nlp/internal/natty/generated/imports/NumericRulesFR.g</exclude>
+							</excludes>
+						</configuration>
+					</execution>
+
+					<execution>
+						<id>non-debug</id>
+						<goals>
+							<goal>antlr</goal>
+						</goals>
+						<configuration>
+							<debug>false</debug>
+							<outputDirectory>src/main/java</outputDirectory>
+							<libDirectory>src/main/antlr3/org/openhab/ui/habot/nlp/internal/natty/generated/imports</libDirectory>
+							<excludes>
+								<exclude>org/openhab/ui/habot/nlp/internal/natty/generated/en/DateLexer.g</exclude>
+								<exclude>org/openhab/ui/habot/nlp/internal/natty/generated/en/DateParser.g</exclude>
+                                <exclude>org/openhab/ui/habot/nlp/internal/natty/generated/fr/DateLexerFR.g</exclude>
+                                <exclude>org/openhab/ui/habot/nlp/internal/natty/generated/fr/DateParserFR.g</exclude>
+								<exclude>org/openhab/ui/habot/nlp/internal/natty/generated/imports/NumericRules.g</exclude>
+                                <exclude>org/openhab/ui/habot/nlp/internal/natty/generated/imports/NumericRulesFR.g</exclude>
+							</excludes>
+						</configuration>
+					</execution>
+
+				</executions>
+			</plugin>
+		</plugins>
+
+	</build>
 	<dependencies>
-	  <dependency>
-	      <groupId>org.openhab.core</groupId>
-	      <artifactId>org.openhab.core</artifactId>
-	      <version>${ohc.version}</version>
-	  </dependency>
-	  <dependency>
-	      <groupId>org.openhab.core</groupId>
-	      <artifactId>org.openhab.ui.dashboard</artifactId>
-	      <version>${ohc.version}</version>
-	  </dependency>
+		<dependency>
+			<groupId>org.openhab.core</groupId>
+			<artifactId>org.openhab.core</artifactId>
+			<version>${ohc.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.openhab.core</groupId>
+			<artifactId>org.openhab.ui.dashboard</artifactId>
+			<version>${ohc.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.antlr</groupId>
+			<artifactId>antlr-runtime</artifactId>
+			<version>3.5.2</version>
+		</dependency>
 	</dependencies>
 
-  
-    <pluginRepositories>
-        <pluginRepository>
-            <id>jcenter</id>
-            <name>JCenter Repository</name>
-            <url>https://jcenter.bintray.com/</url>
-            <releases>
-                <enabled>true</enabled>
-                <updatePolicy>never</updatePolicy>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </pluginRepository>
-        <pluginRepository>
-            <id>artifactory</id>
-            <name>JFrog Artifactory Repository</name>
-            <url>https://openhab.jfrog.io/openhab/libs-release</url>
-            <releases>
-                <enabled>true</enabled>
-                <updatePolicy>never</updatePolicy>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </pluginRepository>
-    </pluginRepositories>
 
-    <repositories>
+	<pluginRepositories>
+		<pluginRepository>
+			<id>jcenter</id>
+			<name>JCenter Repository</name>
+			<url>https://jcenter.bintray.com/</url>
+			<releases>
+				<enabled>true</enabled>
+				<updatePolicy>never</updatePolicy>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</pluginRepository>
+		<pluginRepository>
+			<id>artifactory</id>
+			<name>JFrog Artifactory Repository</name>
+			<url>https://openhab.jfrog.io/openhab/libs-release</url>
+			<releases>
+				<enabled>true</enabled>
+				<updatePolicy>never</updatePolicy>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</pluginRepository>
+	</pluginRepositories>
 
-        <!-- releases -->
-        <repository>
-            <id>jcenter</id>
-            <name>JCenter Repository</name>
-            <url>https://jcenter.bintray.com/</url>
-            <releases>
-                <enabled>true</enabled>
-                <updatePolicy>never</updatePolicy>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>openhab-artifactory-release</id>
-            <name>JFrog Artifactory Repository</name>
-            <url>https://openhab.jfrog.io/openhab/libs-release</url>
-            <releases>
-                <enabled>true</enabled>
-                <updatePolicy>never</updatePolicy>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
+	<repositories>
 
-        <!-- snapshots -->
-        <repository>
-            <id>openhab-artifactory-snapshot</id>
-            <name>JFrog Artifactory Repository</name>
-            <url>https://openhab.jfrog.io/openhab/libs-snapshot</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
-            </snapshots>
-        </repository>
+		<!-- releases -->
+		<repository>
+			<id>jcenter</id>
+			<name>JCenter Repository</name>
+			<url>https://jcenter.bintray.com/</url>
+			<releases>
+				<enabled>true</enabled>
+				<updatePolicy>never</updatePolicy>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>openhab-artifactory-release</id>
+			<name>JFrog Artifactory Repository</name>
+			<url>https://openhab.jfrog.io/openhab/libs-release</url>
+			<releases>
+				<enabled>true</enabled>
+				<updatePolicy>never</updatePolicy>
+			</releases>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
 
-        <!-- SmartHome p2 repository -->
-        <repository>
-            <id>p2-smarthome</id>
-            <url>https://openhab.jfrog.io/openhab/eclipse-smarthome-stable</url>
-            <layout>p2</layout>
-        </repository>
+		<!-- snapshots -->
+		<repository>
+			<id>openhab-artifactory-snapshot</id>
+			<name>JFrog Artifactory Repository</name>
+			<url>https://openhab.jfrog.io/openhab/libs-snapshot</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>always</updatePolicy>
+			</snapshots>
+		</repository>
 
-        <!-- openHAB dependencies p2 repository -->
-        <repository>
-            <id>p2-openhab-deps-repo</id>
-            <url>https://dl.bintray.com/openhab/p2/openhab-deps-repo/${ohdr.version}</url>
-            <layout>p2</layout>
-        </repository>
-    </repositories>
+		<!-- SmartHome p2 repository -->
+		<repository>
+			<id>p2-smarthome</id>
+			<url>https://openhab.jfrog.io/openhab/eclipse-smarthome-stable</url>
+			<layout>p2</layout>
+		</repository>
+
+		<!-- openHAB dependencies p2 repository -->
+		<repository>
+			<id>p2-openhab-deps-repo</id>
+			<url>https://dl.bintray.com/openhab/p2/openhab-deps-repo/${ohdr.version}</url>
+			<layout>p2</layout>
+		</repository>
+	</repositories>
+
 </project>
