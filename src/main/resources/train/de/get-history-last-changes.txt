@@ -1,0 +1,1 @@
+wann hat sich die <START:object> Temperatur <END> das letze mal geändert?

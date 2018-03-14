@@ -1,0 +1,1 @@
+schalte das <START:object> Licht <END> im <START:location> Wohnzimmer <END> aus

@@ -1,0 +1,1 @@
+Gib mir den Status der <START:Objektes> Beleuchtung <END> auf dem <START:Location> Erdgeschoss <END>.

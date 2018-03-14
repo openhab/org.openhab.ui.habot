@@ -1,0 +1,1 @@
+zeig mir den Verlauf der <START:object> Temperatur <END> für die letzte Woche
