@@ -1,5 +1,5 @@
 <template>
-<q-card inline v-if="model" :class="{ bigger: model.config && model.config.bigger }" :color="model.config.color" :text-color="model.config.textcolor">
+<q-card inline v-if="model" :class="{ bigger: model.config && model.config.bigger }" :color="color" :text-color="textColor">
   <q-card-media v-if="model.slots && model.slots.media">
     <component v-for="(component, idx) in model.slots.media" :key="'card-media-' + idx" :is="component.component" :model="component"></component>
   </q-card-media>
@@ -70,6 +70,7 @@
 
 import HbSingleItemValue from 'components/HbSingleItemValue.vue'
 import HbAnalyzeActionButton from 'components/HbAnalyzeActionButton.vue'
+import HbCommandActionButton from 'components/HbCommandActionButton.vue'
 import HbComponents from 'components/index'
 
 import { uid, extend } from 'quasar'
@@ -79,6 +80,7 @@ export default {
   components: {
     HbSingleItemValue,
     HbAnalyzeActionButton,
+    HbCommandActionButton,
     ...HbComponents
   },
   props: ['model', 'menu'],
@@ -143,15 +145,17 @@ export default {
     }
   },
   asyncComputed: {
-    title: {
-      get () {
-        return this.$expr(this.model.title)
-      }
+    title () {
+      return this.$expr(this.model.title)
     },
-    subtitle: {
-      get () {
-        return this.$expr(this.model.subtitle)
-      }
+    subtitle () {
+      return this.$expr(this.model.subtitle)
+    },
+    color () {
+      return this.$expr(this.model.config.color)
+    },
+    textColor () {
+      return this.$expr(this.model.config.textColor)
     }
   }
 }

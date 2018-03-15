@@ -99,6 +99,7 @@ module.exports = function (ctx) {
         'QDialog',
         'QBtnGroup',
         'QBtn',
+        'QBtnDropdown',
         'QSpinnerRadio',
         'QSpinnerAudio',
         'QIcon',

@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import org.eclipse.smarthome.core.items.Item;
 import org.eclipse.smarthome.core.items.ItemRegistry;
+import org.eclipse.smarthome.core.library.CoreItemFactory;
 import org.openhab.ui.habot.card.internal.CardRegistry;
 import org.openhab.ui.habot.nlp.Intent;
 import org.osgi.service.component.annotations.Reference;
@@ -69,11 +70,51 @@ public class CardBuilder {
             card.setTitle(item.getLabel());
             card.setSubtitle(item.getName());
 
-            Component component = new Component("HbSingleItemValue");
-            component.addConfig("item", item.getName());
-            component.addConfig("type", item.getType());
+            switch (item.getType()) {
+                case CoreItemFactory.SWITCH:
+                    Component switchComponent = new Component("HbSwitch");
+                    switchComponent.addConfig("item", item.getName());
+                    card.addComponent("right", switchComponent);
+                    break;
+                case CoreItemFactory.DIMMER:
+                    // Component dimmerValueComponent = new Component("HbSingleItemValue");
+                    // dimmerValueComponent.addConfig("item", item.getName());
+                    // card.addComponent("right", dimmerValueComponent);
+                    Component dimmerSwitchComponent = new Component("HbSwitch");
+                    dimmerSwitchComponent.addConfig("item", item.getName());
+                    card.addComponent("right", dimmerSwitchComponent);
+                    Component dimmerContainerComponent = new Component("HbContainer");
+                    dimmerContainerComponent.addConfig("classes", new String[] { "full-width", "text-center" });
+                    Component sliderComponent = new Component("HbSlider");
+                    sliderComponent.addConfig("item", item.getName());
+                    dimmerContainerComponent.addComponent("main", sliderComponent);
+                    card.addComponent("main", dimmerContainerComponent);
+                    break;
+                case CoreItemFactory.ROLLERSHUTTER:
+                    Component shutterValueComponent = new Component("HbSingleItemValue");
+                    shutterValueComponent.addConfig("item", item.getName());
+                    card.addComponent("right", shutterValueComponent);
+                    Component shutterContainerComponent = new Component("HbContainer");
+                    shutterContainerComponent.addConfig("classes", new String[] { "full-width", "text-center" });
+                    Component shutterControlComponent = new Component("HbShutterControl");
+                    shutterControlComponent.addConfig("item", item.getName());
+                    shutterControlComponent.addConfig("size", "lg");
+                    shutterControlComponent.addConfig("rounded", true);
+                    shutterControlComponent.addConfig("glossy", true);
+                    shutterControlComponent.addConfig("push", true);
+                    shutterControlComponent.addConfig("stopIcon", "close");
+                    shutterContainerComponent.addComponent("main", shutterControlComponent);
+                    card.addComponent("main", shutterContainerComponent);
+                    break;
+                default:
+                    // TODO: display in the main slot instead, depending on the width of the (transformed) state
+                    Component singleItemComponent = new Component("HbSingleItemValue");
+                    singleItemComponent.addConfig("item", item.getName());
+                    card.addComponent("right", singleItemComponent);
+                    break;
 
-            card.addComponent("right", component);
+            }
+
         } else {
             card.setTitle(getCardTitleFromGroupLabels(tags));
             card.setSubtitle(matchedItems.size() + " items"); // TODO: i18n
@@ -83,7 +124,6 @@ public class CardBuilder {
                 Component listItem = new Component("HbListItem");
                 listItem.addConfig("item", item.getName());
                 listItem.addConfig("label", item.getLabel());
-                listItem.addConfig("type", item.getType());
 
                 list.addComponent("items", listItem);
             }

@@ -7,6 +7,8 @@
   </q-item-main>
   <q-item-side right>
     <hb-switch :model="{ config: { item: item.name } }" v-if="item && (item.type === 'Switch' || item.type === 'Dimmer')"></hb-switch>
+    <hb-shutter-control v-else-if="item && item.type === 'Rollershutter'" class="text-black" style="margin-top: -2px; margin-bottom: -2px"
+        :model="{ config: { item: item.name, rounded: true, dense: true, push: true, size: 'lg', stopIcon: 'close', glossy: true } }"></hb-shutter-control>
     <big v-else class="big-value">{{state}}</big>
   </q-item-side>
 </q-item>
@@ -27,12 +29,14 @@
 <script>
 import HbSwitch from 'components/HbSwitch.vue'
 import HbSlider from 'components/HbSlider.vue'
+import HbShutterControl from 'components/HbShutterControl.vue'
 
 export default {
   props: ['model', 'link'],
   components: {
     HbSwitch,
-    HbSlider
+    HbSlider,
+    HbShutterControl
   },
   data () {
     return {
