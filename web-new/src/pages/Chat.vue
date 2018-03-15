@@ -45,6 +45,11 @@
           </q-list>
 
         </q-card>
+
+        <div v-if="chat.greetingSuggestions">
+          <q-btn outline rounded no-caps color="secondary" style="opacity: 0.6" icon="bookmark" @click="$router.push('/cards/bookmarks')">Bookmarks</q-btn>
+          <q-btn outline rounded no-caps color="secondary" style="opacity: 0.6" icon="star" @click="$router.push('/cards/suggestions')">Suggestions</q-btn>
+        </div>
       </div>
     </div>
 
@@ -147,11 +152,14 @@ export default {
         avatar: 'statics/icons/icon-192x192.png',
         stamp: date.formatDate(new Date(), 'HH:mm')
       })
+      vm.chats[0].greetingSuggestions = true
     }).catch(function (error) {
+      let errormessage = (error.response && error.response.data && error.response.data.error && error.response.data.error.message) ? error.response.data.error.message
+        : (error.response && error.response.statusText) ? error.response.statusText : error.message
       vm.chats[0].messages.push({
         id: new Date(),
         name: 'HABot',
-        text: [JSON.stringify(error)],
+        text: [errormessage],
         avatar: 'statics/icons/icon-192x192.png',
         bgColor: 'red',
         stamp: date.formatDate(new Date(), 'HH:mm')
@@ -195,6 +203,7 @@ export default {
 
     send () {
       var currentChat = this.chats[this.chats.length - 1]
+      if (currentChat.greetingSuggestions) delete currentChat.greetingSuggestions
       currentChat.messages.push({
         id: new Date(),
         name: 'You',

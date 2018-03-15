@@ -123,6 +123,7 @@ module.exports = function (ctx) {
         'QChatMessage',
         'QResizeObservable',
         'QWindowResizeObservable',
+        'QPullToRefresh',
         'QInnerLoading',
         'QPopover',
         'QCard',
@@ -139,7 +140,9 @@ module.exports = function (ctx) {
         'QTable',
         'QTableColumns',
         'QTd',
-        'QChip'
+        'QChip',
+        'QTimeline',
+        'QTimelineEntry'
       ],
       directives: [
         'Ripple',

@@ -19,6 +19,7 @@ public class Card extends Component implements Identifiable<String> {
     boolean bookmarked;
     boolean notReuseableInChat;
     boolean addToDeckDenied;
+    boolean ephemeral;
 
     Date timestamp;
 
@@ -88,6 +89,14 @@ public class Card extends Component implements Identifiable<String> {
 
     public void setAddToDeckDenied(boolean addToDeckDenied) {
         this.addToDeckDenied = addToDeckDenied;
+    }
+
+    public boolean isEphemeral() {
+        return ephemeral;
+    }
+
+    public void setEphemeral(boolean ephemeral) {
+        this.ephemeral = ephemeral;
     }
 
     public Date getTimestamp() {
