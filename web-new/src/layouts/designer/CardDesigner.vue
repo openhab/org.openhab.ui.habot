@@ -98,7 +98,7 @@
         </q-item>
       </q-list>
 
-      <q-list v-if="selectedNode && selectedNode.type === 'component' && currentComponent && currentComponent.slotDescriptions" no-border>
+      <q-list v-if="selectedNode && selectedNode.type === 'component' && currentComponent && currentComponent.slotDescriptions && selectedNode.component.slots" no-border>
         <q-list-header>Slots</q-list-header>
         <q-item v-for="(slotDescription, slotName) in currentComponent.slotDescriptions" :key="slotName" inset-separator>
           <q-item-side>
@@ -350,7 +350,7 @@ export default {
       this.buildTree()
     },
     validSubcomponents (slot) {
-      let allcomponents = Object.keys(this.components).filter((c) => this.components[c].availableByDefault !== false)
+      let allcomponents = Object.keys(this.components).filter((c) => this.components[c].availableByDefault !== false).sort()
       if (!this.currentComponent || !this.currentComponent.slotDescriptions || !this.currentComponent.slotDescriptions[slot]) return allcomponents
       if (this.currentComponent.slotDescriptions[slot].allowedComponents) {
         return this.currentComponent.slotDescriptions[slot].allowedComponents

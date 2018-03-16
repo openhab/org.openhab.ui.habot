@@ -1,4 +1,5 @@
 <template>
+  <q-pull-to-refresh :handler="computeSuggestions">
     <div class="row">
       <div class="hb-cards">
         <component :is="'HbCard'" :model="card" menu="deck" v-for="card in cards" :key="card.uid"></component>
@@ -9,10 +10,11 @@
         <q-btn flat icon="dashboard" @click="$router.push('/cards/deck')" style="margin-top: -1px">Card deck</q-btn>
         and add criteria in the designer to make them appear here when relevant.</p>
       </div>
-      <div class="full-width q-mt-lg text-center">
+      <div class="full-width q-ma-lg text-center">
         <q-btn outline color="secondary" @click="computeSuggestions()" icon="refresh">Refresh suggestions</q-btn>
       </div>
     </div>
+  </q-pull-to-refresh>
 </template>
 
 <style lang="stylus">
@@ -45,17 +47,23 @@ export default {
     }
   },
   methods: {
-    computeSuggestions () {
+    computeSuggestions (done) {
       this.cards = []
       let candidates = this.$store.getters['cards/suggestioncandidates']
 
+      let promises = []
+
       for (let card of candidates) {
-        this.$expr('=' + card.config.suggestcriteria).then((result) => {
+        promises.push(this.$expr('=' + card.config.suggestcriteria).then((result) => {
           if (result === true) {
             this.cards.push(card)
           }
-        })
+        }))
       }
+
+      Promise.all(promises).then(() => {
+        if (done) done()
+      })
     }
   },
   mounted () {

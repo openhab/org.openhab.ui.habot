@@ -1,15 +1,12 @@
 <template>
-  <q-btn flat icon="timeline" label="Analyze" @click="sendCmd()">
+  <q-btn flat :label="label" :icon="this.model.config.icon" :disabled="disabled" :text-color="textColor" @click="sendCmd()">
   </q-btn>
 </template>
 
 <script>
-import Analyze from 'layouts/analyze/Analyze.vue'
-
 export default {
-  components: {
-    Analyze
-  },
+  name: 'HbCommandActionButton',
+  props: ['model'],
   data () {
     return {
       showAnalyzer: false
@@ -17,7 +14,21 @@ export default {
   },
   methods: {
     sendCmd () {
-      this.$store.dispatch('items/sendCmd')(this.model.config.item, this.model.config.command)
+      this.$store.dispatch('items/sendCmd')(this.model.config.item, this.command)
+    }
+  },
+  asyncComputed: {
+    label () {
+      return this.$expr(this.model.config.label)
+    },
+    disabled () {
+      return (this.model.config.disabled) ? this.$expr('=' + this.model.config.disabled) : false
+    },
+    textColor () {
+      return this.$expr(this.model.config.textColor)
+    },
+    command () {
+      return this.$expr(this.model.config.textColor)
     }
   }
 }

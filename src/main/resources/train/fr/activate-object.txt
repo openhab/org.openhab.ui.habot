@@ -17,3 +17,10 @@ allume le <START:object> radiateur <END> au <START:location> 1er étage <END>
 allume le <START:object> radiateur <END> au <START:location> premier étage <END>
 allume le <START:object> radiateur <END> au <START:location> deuxième étage <END>
 allume le <START:object> radiateur <END> au <START:location> rez-de-chaussée <END>
+mets en marche l <START:object> arrosage <END> du <START:location> jardin <END>
+mets en route l <START:object> air conditionné <END>
+active le <START:object> thermostat <END> dans le <START:location> garage <END>
+mets de la <START:object> musique <END>
+mets moi de la <START:object> musique <END>
+active le <START:object> chauffage <END> dans le <START:location> salon <END>
+active le <START:object> thermostat <END> dans le <START:location> garage <END>

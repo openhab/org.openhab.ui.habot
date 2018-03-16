@@ -9,11 +9,11 @@
             },
             "color": {
                 "type": "color",
-                "description": "The background color of the card"
+                "description": "The background color of the card (expressions accepted)"
             },
-            "textcolor": {
+            "textColor": {
                 "type": "color",
-                "description": "The color of the text in the card"
+                "description": "The color of the text in the card (expressions accepted)"
             }
         },
         "slotDescriptions": {
@@ -48,13 +48,29 @@
         "description": "An action button sending a command to an item",
         "availableByDefault": false,
         "configDescriptions": {
+            "label": {
+                "type": "text",
+                "description": "The label of the button (expressions accepted)"
+            },
+            "icon": {
+                "type": "icon",
+                "description": "The icon to display alongside the label"
+            },
+            "textColor": {
+                "type": "text",
+                "description": "The color of the button (expressions accepted)"
+            },
+            "disabled": {
+                "type": "expr",
+                "description": "The button will be disabled when this expression evaluates to true"
+            },
             "item": {
                 "type": "item",
                 "description": "The item to send the command to"
             },
             "command": {
                 "type": "text",
-                "description": "The command to send"
+                "description": "The command to send (expressions accepted)"
             }
         }
     },
@@ -85,7 +101,7 @@
             }
         }
     },
-    
+
     "HbList": {
         "description": "Container for a list of HbListItems",
         "configDescriptions": {
@@ -112,6 +128,7 @@
 
     "HbListHeader": {
         "description": "A header between list items",
+        "availableByDefault": false,
         "configDescriptions": {
             "label": {
                 "type": "text",
@@ -126,6 +143,7 @@
 
     "HbListSeparator": {
         "description": "A separator between list items",
+        "availableByDefault": false,
         "configDescriptions": {
             "inset": {
                 "type": "boolean",
@@ -133,7 +151,7 @@
             }
         }
     },
-    
+
     "HbListItem": {
         "description": "A list item",
         "availableByDefault": false,
@@ -375,6 +393,281 @@
                     { "value": "2M", "label": "2M" },
                     { "value": "Y", "label": "Y" }
                 ]
+            }
+        }
+    },
+
+    "HbBtn": {
+        "description": "Displays a button which may be used to send commands, open a modal or an action sheet",
+        "configDescriptions": {
+            "label": {
+                "type": "text",
+                "description": "Label of the button (expressions allowed)"
+            },
+            "size": {
+                "type": "optiongroup",
+                "description": "Size of the button",
+                "options": [
+                    { "value": "", "label": "Default" },
+                    { "value": "xs", "label": "xs" },
+                    { "value": "sm", "label": "sm" },
+                    { "value": "md", "label": "md" },
+                    { "value": "lg", "label": "lg" },
+                    { "value": "xl", "label": "xl" }
+                ]
+            },
+            "icon": {
+                "type": "icon",
+                "description": "Primary icon"
+            },
+            "iconRight": {
+                "type": "icon",
+                "description": "Icon to the right"
+            },
+            "disabled": {
+                "type": "expr",
+                "description": "The button is disabled when this expression is true"
+            },
+            "color": {
+                "type": "color",
+                "description": "Color of the button (expressions allowed)"
+            },
+            "textColor": {
+                "type": "color",
+                "description": "Text color of the button (expressions allowed)"
+            },
+            "flat": {
+                "type": "boolean",
+                "description": "Button has a flat look"
+            },
+            "outline": {
+                "type": "boolean",
+                "description": "Button has an outlined look"
+            },
+            "rounded": {
+                "type": "boolean",
+                "description": "Button has a rounded look"
+            },
+            "round": {
+                "type": "boolean",
+                "description": "Button is round (displays only the icon)"
+            },
+            "dense": {
+                "type": "boolean",
+                "description": "Button has a dense look"
+            },
+            "push": {
+                "type": "boolean",
+                "description": "Button has a push effect"
+            },
+            "glossy": {
+                "type": "boolean",
+                "description": "Button has a glossy look"
+            },
+            "noCaps": {
+                "type": "boolean",
+                "description": "Don't put the label in all caps"
+            },
+            "noRipple": {
+                "type": "boolean",
+                "description": "Disable the ripple effect"
+            }
+        },
+        "slotDescriptions": {
+            "modal": {
+                "description": "Accepts a HbModal which will be displayed when clicking on the button",
+                "allowedComponents": [ "HbModal" ]
+            },
+            "popover": {
+                "description": "Accepts a HbPopover which will be displayed when clicking on the button"
+            }
+        }
+    },
+
+    "HbPopover": {
+        "description": "Container for a popover - use for menus and other elements displayed as a popup",
+        "availableByDefault": false,
+        "configDescriptions": {
+            "fit": {
+                "type": "boolean",
+                "description": "Fit the popover width to the parent component"
+            },
+            "anchor": {
+                "type": "text",
+                "description": "Where to place the anchor"
+            },
+            "self": {
+                "type": "text",
+                "description": "Where to place the popover itself"
+            }
+        },
+        "slotDescriptions": {
+            "main": {
+                "description": "The contents of the popover",
+                "allowedComponents": [ "HbContainer", "HbList" ]
+            }
+        }
+    },
+
+    "HbBtnGroup": {
+        "description": "A group of several HbBtn components",
+        "configDescriptions": {
+            "flat": {
+                "type": "boolean",
+                "description": "Button has a flat look"
+            },
+            "outline": {
+                "type": "boolean",
+                "description": "Button has an outlined look"
+            },
+            "rounded": {
+                "type": "boolean",
+                "description": "Button has a rounded look"
+            },
+            "push": {
+                "type": "boolean",
+                "description": "Button has a push effect"
+            }
+        },
+        "slotDescriptions": {
+            "buttons": {
+                "description": "The buttons in the button group",
+                "allowedComponents": [ "HbBtn" ]
+            }
+        }
+    },
+
+    "HbShutterControl": {
+        "description": "A group of three buttons to control a rollershutter item",
+        "configDescriptions": {
+            "item": {
+                "type": "item",
+                "description": "The Rollershutter item to control"
+            },
+            "flat": {
+                "type": "boolean",
+                "description": "Buttons have a flat look"
+            },
+            "outline": {
+                "type": "boolean",
+                "description": "Buttons have an outlined look"
+            },
+            "rounded": {
+                "type": "boolean",
+                "description": "Buttons have a rounded look"
+            },
+            "dense": {
+                "type": "boolean",
+                "description": "Button has a dense look"
+            },
+            "push": {
+                "type": "boolean",
+                "description": "Buttons have a push effect"
+            },
+            "glossy": {
+                "type": "boolean",
+                "description": "Button has a glossy look"
+            },
+            "noRipple": {
+                "type": "boolean",
+                "description": "Disable the ripple effect"
+            },
+            "upDownIcons": {
+                "type": "optiongroup",
+                "description": "The Material icons for the up/down buttons",
+                "options": [
+                    { "value": "keyboard_arrow", "label": "keyboard_arrow_down / keyboard_arrow_up" },
+                    { "value": "arrow", "label": "arrow_downward / arrow_upward" },
+                    { "value": "arrow_drop", "label": "arrow_dropup / arrow_dropdown" }
+                ]
+            },
+            "stopIcon": {
+                "type": "optiongroup",
+                "description": "The Material icons for the stop button",
+                "options": [
+                    { "value": "stop", "label": "stop" },
+                    { "value": "report", "label": "report" },
+                    { "value": "cancel", "label": "cancel" },
+                    { "value": "close", "label": "close" }
+                ]
+            },
+            "size": {
+                "type": "optiongroup",
+                "description": "Size of the buttons",
+                "options": [
+                    { "value": "", "label": "Default" },
+                    { "value": "xs", "label": "xs" },
+                    { "value": "sm", "label": "sm" },
+                    { "value": "md", "label": "md" },
+                    { "value": "lg", "label": "lg" },
+                    { "value": "xl", "label": "xl" }
+                ]
+            }
+        },
+        "slotDescriptions": {
+            "buttons": {
+                "description": "The buttons in the button group",
+                "allowedComponents": [ "HbBtn" ]
+            }
+        }
+    },
+
+    "HbModal": {
+        "description": "Container for a modal - use for displaying more information in a separate screen",
+        "availableByDefault": false,
+        "configDescriptions": {
+            "minimized": {
+                "type": "boolean",
+                "description": "Modal is never fullscreen, even on small screens, and has no toolbar"
+            },
+            "maximized": {
+                "type": "boolean",
+                "description": "Modal is always fullscreen, even on big screens"
+            },
+            "position": {
+                "type": "optiongroup",
+                "description": "Where to position the modal, if not maximized",
+                "options": [
+                    { "value": "", "label": "Default" },
+                    { "value": "left", "label": "Left" },
+                    { "value": "top", "label": "Top" },
+                    { "value": "right", "label": "Right" },
+                    { "value": "bottom", "label": "Bottom" }
+                ]
+            },
+            "contentClasses": {
+                "type": "array",
+                "description": "CSS Classes to apply to the content area; see http://quasar-framework.org/components/"
+            },
+            "toolbarTitle": {
+                "type": "text",
+                "description": "Title of the toolbar"
+            },
+            "toolbarSubtitle": {
+                "type": "text",
+                "description": "Subtitle of the toolbar"
+            },
+            "toolbarColor": {
+                "type": "color",
+                "description": "Background color of the toolbar"
+            },
+            "toolbarTextColor": {
+                "type": "color",
+                "description": "Text color of the toolbar"
+            },
+            "toolbarInverted": {
+                "type": "boolean",
+                "description": "Toolbar is inverted"
+            },
+            "toolbarGlossy": {
+                "type": "boolean",
+                "description": "Toolbar is glossy"
+            }
+        },
+        "slotDescriptions": {
+            "main": {
+                "description": "The contents of the popover",
+                "allowedComponents": [ "HbContainer", "HbList" ]
             }
         }
     }
