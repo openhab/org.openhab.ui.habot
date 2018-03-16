@@ -81,8 +81,7 @@ public class TrainerTest {
         assertEquals("bedroom", actual.getEntities().get("location"));
         assertEquals("temperature", actual.getEntities().get("object"));
 
-        
-        actual= interpret("show me the temperature in the kitchen");
+        actual = interpret("show me the temperature in the kitchen");
         assertEquals("get-status", actual.getName());
         assertEquals(2, actual.getEntities().size());
         assertEquals("kitchen", actual.getEntities().get("location"));
@@ -110,8 +109,7 @@ public class TrainerTest {
 
     @Test
     public void testFR() throws Exception {
-    	
-    	Intent actual;
+        Intent actual;
         this.trainer = new IntentTrainer("fr", skills);
 
         actual = interpret("donne-moi un graphique de la température du salon pour les dernières heures");
@@ -134,64 +132,64 @@ public class TrainerTest {
     @Test
     public void testDE_activateObjects() throws Exception {
 
-    	Intent actual;
+        Intent actual;
         this.trainer = new IntentTrainer("de", skills);
 
         actual = interpret("mach den Fernseher an");
         assertEquals("activate-object", actual.getName());
         assertEquals(1, actual.getEntities().size());
-        assertEquals("fernseher", actual.getEntities().get("object"));   
-        
+        assertEquals("fernseher", actual.getEntities().get("object"));
+
         actual = interpret("bitte mache das Licht an");
         assertEquals("activate-object", actual.getName());
         assertEquals(1, actual.getEntities().size());
-        assertEquals("Licht", actual.getEntities().get("object"));
-    }  
+         assertEquals("licht", actual.getEntities().get("object"));
+    }
 
     @Test
     public void testDE_deactivateObjects() throws Exception {
 
-    	Intent actual;
+        Intent actual;
         this.trainer = new IntentTrainer("de", skills);
 
         actual = interpret("Licht aus");
         assertEquals("deactivate-object", actual.getName());
         assertEquals(1, actual.getEntities().size());
-        assertEquals("Licht", actual.getEntities().get("object"));
-        
+        assertEquals("licht", actual.getEntities().get("object"));
+
         actual = interpret("mach den Fernseher aus");
         assertEquals("deactivate-object", actual.getName());
         assertEquals(1, actual.getEntities().size());
-        assertEquals("fernseher", actual.getEntities().get("object"));   
-        
+        assertEquals("fernseher", actual.getEntities().get("object"));
+
         actual = interpret("bitte mache das Licht aus");
         assertEquals("deactivate-object", actual.getName());
         assertEquals(1, actual.getEntities().size());
-        assertEquals("Licht", actual.getEntities().get("object"));
-    }  
-    
+        assertEquals("licht", actual.getEntities().get("object"));
+    }
+
     @Test
     public void testDE_getStatus() throws Exception {
 
-    	Intent actual;
+        Intent actual;
         this.trainer = new IntentTrainer("de", skills);
 
         actual = interpret("Heizung in der Küche");
         assertEquals("get-status", actual.getName());
         assertEquals(2, actual.getEntities().size());
-        assertEquals("Heizung", actual.getEntities().get("object"));   
-        assertEquals("Küche", actual.getEntities().get("location")); 
-        
+        assertEquals("heizung", actual.getEntities().get("object"));
+        assertEquals("küche", actual.getEntities().get("location"));
+
         actual = interpret("wie hoch ist die Temperatur im Wohnzimmer");
         assertEquals("get-status", actual.getName());
         assertEquals(2, actual.getEntities().size());
-        assertEquals("Temperatur", actual.getEntities().get("object"));   
-        assertEquals("Wohnzimmer", actual.getEntities().get("location")); 
- 
+        assertEquals("temperatur", actual.getEntities().get("object"));
+        assertEquals("wohnzimmer", actual.getEntities().get("location"));
+
         actual = interpret("wie hoch ist die Temperatur im Keller");
         assertEquals("get-status", actual.getName());
         assertEquals(2, actual.getEntities().size());
-        assertEquals("Temperatur", actual.getEntities().get("object"));   
-        assertEquals("Keller", actual.getEntities().get("location"));         
-    }      
+        assertEquals("temperatur", actual.getEntities().get("object"));
+        assertEquals("keller", actual.getEntities().get("location"));
+    }
 }
