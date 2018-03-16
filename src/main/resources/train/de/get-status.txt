@@ -2,19 +2,30 @@ gib mir den Status der <START:Objektes> Beleuchtung <END> im <START:Location> Er
 <START:object> Temperatur <END> im <START:location> Wohnzimmer <END>
 Wie ist die <START:object> Temperatur <END> im <START:location> Wohnzimmer <END>
 Wie hoch ist die <START:object> Temperatur <END> im <START:location> Wohnzimmer <END>
-Wie hoch ist die <START:object> Temperatur <END> im <START:location> Keller <END>
-Wie hoch ist die <START:object> Temperatur <END> im <START:location> Bad <END>
-Wie hoch ist die <START:object> Temperatur <END> im <START:location> Pool <END>
-Wie hoch ist die <START:object> Temperatur <END> im <START:location> Büro <END>
 Wie hoch ist die <START:object> Temperatur <END> im <START:location> Kinderzimmer <END>
 Wie hoch ist die <START:object> Temperatur <END> auf der <START:location> Toilette <END>
 Wie hoch ist die <START:object> Temperatur <END> in der <START:location> Küche <END>
 Wie hoch ist die <START:object> Temperatur <END> im <START:location> Obergeschoss <END>
-Wie hoch ist die <START:object> Temperatur <END> im <START:location> Kellergeschoss <END>
-Wie hoch ist die <START:object> Temperatur <END> im <START:location> Erdgeschoss <END>
 Wie <START:object> warm <END> ist es im <START:location> Wohnzimmer <END>
 <START:object> Heizung <END> in der <START:location> Küche <END>
-<START:object> Heizung <END> im <START:location> Bad <END>
-<START:object> Heizung <END> im <START:location> Wohnzimmer <END>
-<START:object> Heizung <END> im <START:location> Keller <END>
-<START:object> Heizung <END> im <START:location> Kinderzimmer <END>
+<START:object> Heizung <END> im <START:location> Büro <END>
+<START:object> Heizung <END> auf dem  <START:location> WC <END>
+<START:object> Temperatur <END> in der <START:location> Küche <END>
+<START:object> Temperatur <END> im <START:location> Bad <END>
+<START:object> Temperatur <END> auf dem  <START:location> WC <END>
+Ist das <START:object> Licht <END> in der <START:location> Küche <END> an?
+Ist das <START:object> Licht <END> im <START:location> Bad <END> an?
+Ist das <START:object> Licht <END> im <START:location> Wohnzimmer <END> an?
+Ist das <START:object> Licht <END> im <START:location> Keller <END> an?
+Ist das <START:object> Licht <END> im <START:location> Kinderzimmer <END> an?
+Ist das <START:object> Licht <END> im <START:location> Schlafzimmer <END> an?
+Ist das <START:object> Licht <END> im <START:location> Büro <END> an?
+Ist das <START:object> Licht <END> auf dem  <START:location> WC <END> an?
+<START:object> Licht <END> in der <START:location> Küche <END>
+<START:object> Licht <END> im <START:location> Bad <END>
+<START:object> Licht <END> im <START:location> Wohnzimmer <END>
+<START:object> Licht <END> im <START:location> Keller <END>
+<START:object> Licht <END> im <START:location> Kinderzimmer <END>
+<START:object> Licht <END> im <START:location> Schlafzimmer <END>
+<START:object> Licht <END> im <START:location> Büro <END>
+<START:object> Licht <END> auf dem  <START:location> WC <END>

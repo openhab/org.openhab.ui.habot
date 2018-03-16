@@ -17,179 +17,283 @@ import org.openhab.ui.habot.nlp.internal.IntentTrainer;
 
 public class TrainerTest {
 
-    IntentTrainer trainer = null;
+	IntentTrainer trainer = null;
 
-    List<Skill> skills;
+	List<Skill> skills;
 
-    public class MockSkill implements Skill {
+	public class MockSkill implements Skill {
 
-        private String intent;
+		private String intent;
 
-        public MockSkill(String intent) {
-            this.intent = intent;
-        }
+		public MockSkill(String intent) {
+			this.intent = intent;
+		}
 
-        @Override
-        public String getIntentId() {
-            return intent;
-        }
+		@Override
+		public String getIntentId() {
+			return intent;
+		}
 
-        @Override
-        public InputStream getTrainingData(String language) throws UnsupportedLanguageException {
-            return MockSkill.class.getClassLoader().getResourceAsStream("train/" + language + "/" + intent + ".txt");
-        }
+		@Override
+		public InputStream getTrainingData(String language) throws UnsupportedLanguageException {
+			return MockSkill.class.getClassLoader().getResourceAsStream("train/" + language + "/" + intent + ".txt");
+		}
 
-        @Override
-        public IntentInterpretation interpret(Intent intent, String language) {
-            // TODO Auto-generated method stub
-            return null;
-        }
-    }
+		@Override
+		public IntentInterpretation interpret(Intent intent, String language) {
+			// TODO Auto-generated method stub
+			return null;
+		}
+	}
 
-    @Before
-    public void initializeMockSkills() {
-        skills = new ArrayList<Skill>();
+	@Before
+	public void initializeMockSkills() {
+		skills = new ArrayList<Skill>();
 
-        skills.add(new MockSkill("get-status"));
-        skills.add(new MockSkill("activate-object"));
-        skills.add(new MockSkill("deactivate-object"));
-        skills.add(new MockSkill("get-history-daily"));
-        skills.add(new MockSkill("get-history-hourly"));
-        skills.add(new MockSkill("get-history-weekly"));
-        skills.add(new MockSkill("get-history-monthly"));
-        skills.add(new MockSkill("get-history-last-changes"));
-    }
+		skills.add(new MockSkill("get-status"));
+		skills.add(new MockSkill("activate-object"));
+		skills.add(new MockSkill("deactivate-object"));
+		skills.add(new MockSkill("get-history-daily"));
+		skills.add(new MockSkill("get-history-hourly"));
+		skills.add(new MockSkill("get-history-weekly"));
+		skills.add(new MockSkill("get-history-monthly"));
+		skills.add(new MockSkill("get-history-last-changes"));
+	}
 
-    protected Intent interpret(String query) {
-        System.out.println("----");
-        System.out.println("\"" + query + "\"");
-        System.out.println(new TreeMap<>(this.trainer.getScoreMap(query)).descendingMap().toString());
-        Intent intent = this.trainer.interpret(query);
-        System.out.println(intent.toString());
-        return intent;
-    }
+	protected Intent interpret(String query) {
+		System.out.println("----");
+		System.out.println("\"" + query + "\"");
+		System.out.println(new TreeMap<>(this.trainer.getScoreMap(query)).descendingMap().toString());
+		Intent intent = this.trainer.interpret(query);
+		System.out.println(intent.toString());
+		return intent;
+	}
+
+	@Test
+	public void testEN() throws Exception {
+
+		Intent actual;
+		this.trainer = new IntentTrainer("en", skills);
+
+		actual = interpret("Temperature in the bedroom?");
+		assertEquals("get-status", actual.getName());
+		assertEquals(2, actual.getEntities().size());
+		assertEquals("bedroom", actual.getEntities().get("location"));
+		assertEquals("temperature", actual.getEntities().get("object"));
+
+		actual = interpret("show me the temperature in the kitchen");
+		assertEquals("get-status", actual.getName());
+		assertEquals(2, actual.getEntities().size());
+		assertEquals("kitchen", actual.getEntities().get("location"));
+		assertEquals("temperature", actual.getEntities().get("object"));
+
+		actual = interpret("what's the temperature in the garage?");
+
+		actual = interpret("start the heating in the garage");
+		actual = interpret("start the ac please!");
+		actual = interpret("turn on the lights in the kitchen");
+		actual = interpret("please switch the lights in the kitchen on");
+		actual = interpret("please turn off the radiators");
+		actual = interpret("deactivate the alarm");
+		actual = interpret("stop the music in the living room");
+
+		actual = interpret("show me a graph of the temperature in the living room for the last 3 hours");
+		actual = interpret("graph the water consumption for the last 2 days");
+		actual = interpret("i'd like a chart of the humidity over 2 weeks");
+		actual = interpret("temperature in the downstairs corridor for the last month");
+		actual = interpret("luminosity in the living room over 6 months");
+
+		actual = interpret("when was the alarm turned on for the last time?");
+		actual = interpret("show me the last state changes of the window in the bedroom");
+	}
+
+	@Test
+	public void testFR() throws Exception {
+		Intent actual;
+		this.trainer = new IntentTrainer("fr", skills);
+
+		actual = interpret("donne-moi un graphique de la température du salon pour les dernières heures");
+		actual = interpret("montre-moi la température du salon");
+		actual = interpret("Température du salon ?");
+		actual = interpret("active le thermostat dans le garage");
+
+		actual = interpret("mets en route la climatisation");
+		assertEquals("activate-object", actual.getName());
+		assertEquals(1, actual.getEntities().size());
+		assertEquals("climatisation", actual.getEntities().get("object"));
+
+		actual = interpret("montre le graphique de la consommation électrique pour les 2 derniers jours");
+		assertEquals("get-history-daily", actual.getName());
+		assertEquals(2, actual.getEntities().size());
+		assertEquals("2", actual.getEntities().get("period"));
+		assertEquals("consommation électrique", actual.getEntities().get("object"));
+	}
+
+	@Test
+	public void testDE_activateObjects() throws Exception {
+
+		Intent actual;
+		this.trainer = new IntentTrainer("de", skills);
+
+		actual = interpret("mach den Fernseher an");
+		assertEquals("activate-object", actual.getName());
+		assertEquals(1, actual.getEntities().size());
+		assertEquals("fernseher", actual.getEntities().get("object"));
+
+		actual = interpret("bitte mache das Licht an");
+		assertEquals("activate-object", actual.getName());
+		assertEquals(1, actual.getEntities().size());
+		assertEquals("licht", actual.getEntities().get("object"));
+	}
+
+	@Test
+	public void testDE_deactivateObjects() throws Exception {
+
+		Intent actual;
+		this.trainer = new IntentTrainer("de", skills);
+
+		actual = interpret("Licht aus");
+		assertEquals("deactivate-object", actual.getName());
+		assertEquals(1, actual.getEntities().size());
+		assertEquals("licht", actual.getEntities().get("object"));
+
+		actual = interpret("mach den Fernseher aus");
+		assertEquals("deactivate-object", actual.getName());
+		assertEquals(1, actual.getEntities().size());
+		assertEquals("fernseher", actual.getEntities().get("object"));
+
+		actual = interpret("bitte mache das Licht aus");
+		assertEquals("deactivate-object", actual.getName());
+		assertEquals(1, actual.getEntities().size());
+		assertEquals("licht", actual.getEntities().get("object"));
+	}
+
+	@Test
+	public void testDE_getStatus() throws Exception {
+
+		Intent actual;
+		this.trainer = new IntentTrainer("de", skills);
+
+		actual = interpret("Heizung in der Küche");
+		assertEquals("get-status", actual.getName());
+		assertEquals(2, actual.getEntities().size());
+		assertEquals("heizung", actual.getEntities().get("object"));
+		assertEquals("küche", actual.getEntities().get("location"));
+
+		actual = interpret("wie hoch ist die Temperatur im Wohnzimmer");
+		assertEquals("get-status", actual.getName());
+		assertEquals(2, actual.getEntities().size());
+		assertEquals("temperatur", actual.getEntities().get("object"));
+		assertEquals("wohnzimmer", actual.getEntities().get("location"));
+
+		actual = interpret("wie hoch ist die Temperatur im Keller");
+		assertEquals("get-status", actual.getName());
+		assertEquals(2, actual.getEntities().size());
+		assertEquals("temperatur", actual.getEntities().get("object"));
+		assertEquals("keller", actual.getEntities().get("location"));
+	}
+
+	@Test
+	public void testDE_historyHourly() throws Exception {
+
+		Intent actual;
+		this.trainer = new IntentTrainer("de", skills);
+
+		actual = interpret("wie ist der Verlauf der Temperatur der letzten Stunde?");
+		assertEquals("get-history-hourly", actual.getName());
+		assertEquals(1, actual.getEntities().size());
+		assertEquals("temperatur", actual.getEntities().get("object"));
+
+		actual = interpret("Verlauf der Temperatur der letzten Stunde");
+		assertEquals("get-history-hourly", actual.getName());
+		assertEquals(1, actual.getEntities().size());
+		assertEquals("temperatur", actual.getEntities().get("object"));
+	}
+
+	@Test
+	public void testDE_historyDaily() throws Exception {
+
+		Intent actual;
+		this.trainer = new IntentTrainer("de", skills);
+
+		actual = interpret("Verlauf der Temperatur der letzten 24 Stunden");
+		assertEquals("get-history-daily", actual.getName());
+		assertEquals(1, actual.getEntities().size());
+		assertEquals("temperatur", actual.getEntities().get("object"));
+
+		actual = interpret("Verlauf der Luftfeuchtigkeit der letzten 24 Stunden");
+		assertEquals("get-history-daily", actual.getName());
+		assertEquals(1, actual.getEntities().size());
+		assertEquals("luftfeuchtigkeit", actual.getEntities().get("object"));
+
+	}
+
+	@Test
+	public void testDE_historyWeekly() throws Exception {
+
+		Intent actual;
+		this.trainer = new IntentTrainer("de", skills);
+
+		actual = interpret("Verlauf der Temperatur der letzten Woche");
+		assertEquals("get-history-weekly", actual.getName());
+		assertEquals(1, actual.getEntities().size());
+		assertEquals("temperatur", actual.getEntities().get("object"));
+
+		actual = interpret("Verlauf der Luftfeuchtigkeit der letzten Woche");
+		assertEquals("get-history-weekly", actual.getName());
+		assertEquals(1, actual.getEntities().size());
+		assertEquals("luftfeuchtigkeit", actual.getEntities().get("object"));
+
+		actual = interpret("zeige die Wochenübersicht der Temperatur für die Küche");
+		assertEquals("get-history-weekly", actual.getName());
+		assertEquals(2, actual.getEntities().size());
+		assertEquals("temperatur", actual.getEntities().get("object"));
+		assertEquals("küche", actual.getEntities().get("location"));
+	}
+
+	@Test
+	public void testDE_historyMonthly() throws Exception {
+
+		Intent actual;
+		this.trainer = new IntentTrainer("de", skills);
+
+		actual = interpret("Verlauf der Temperatur des letzten Monats");
+		assertEquals("get-history-monthly", actual.getName());
+		assertEquals(1, actual.getEntities().size());
+		assertEquals("temperatur", actual.getEntities().get("object"));
+
+		actual = interpret("Verlauf der Luftfeuchtigkeit des letzten Monats");
+		assertEquals("get-history-monthly", actual.getName());
+		assertEquals(1, actual.getEntities().size());
+		assertEquals("luftfeuchtigkeit", actual.getEntities().get("object"));
+
+		actual = interpret("Monatsübersicht der Temperatur für die Küche");
+		assertEquals("get-history-monthly", actual.getName());
+		assertEquals(2, actual.getEntities().size());
+		assertEquals("temperatur", actual.getEntities().get("object"));
+		assertEquals("küche", actual.getEntities().get("location"));
+	}
 
     @Test
-    public void testEN() throws Exception {
-
-    	Intent actual;
-        this.trainer = new IntentTrainer("en", skills);
-
-        actual = interpret("Temperature in the bedroom?");
-        assertEquals("get-status", actual.getName());
-        assertEquals(2, actual.getEntities().size());
-        assertEquals("bedroom", actual.getEntities().get("location"));
-        assertEquals("temperature", actual.getEntities().get("object"));
-
-        actual = interpret("show me the temperature in the kitchen");
-        assertEquals("get-status", actual.getName());
-        assertEquals(2, actual.getEntities().size());
-        assertEquals("kitchen", actual.getEntities().get("location"));
-        assertEquals("temperature", actual.getEntities().get("object"));        
-        
-        actual = interpret("what's the temperature in the garage?");
-
-        actual = interpret("start the heating in the garage");
-        actual = interpret("start the ac please!");
-        actual = interpret("turn on the lights in the kitchen");
-        actual = interpret("please switch the lights in the kitchen on");
-        actual = interpret("please turn off the radiators");
-        actual = interpret("deactivate the alarm");
-        actual = interpret("stop the music in the living room");
-
-        actual = interpret("show me a graph of the temperature in the living room for the last 3 hours");
-        actual = interpret("graph the water consumption for the last 2 days");
-        actual = interpret("i'd like a chart of the humidity over 2 weeks");
-        actual = interpret("temperature in the downstairs corridor for the last month");
-        actual = interpret("luminosity in the living room over 6 months");
-
-        actual = interpret("when was the alarm turned on for the last time?");
-        actual = interpret("show me the last state changes of the window in the bedroom");
-    }
-
-    @Test
-    public void testFR() throws Exception {
-        Intent actual;
-        this.trainer = new IntentTrainer("fr", skills);
-
-        actual = interpret("donne-moi un graphique de la température du salon pour les dernières heures");
-        actual = interpret("montre-moi la température du salon");
-        actual = interpret("Température du salon ?");
-        actual = interpret("active le thermostat dans le garage");
-        
-        actual = interpret("mets en route la climatisation");
-        assertEquals("activate-object", actual.getName());
-        assertEquals(1, actual.getEntities().size());
-        assertEquals("climatisation", actual.getEntities().get("object"));       
-        
-        actual = interpret("montre le graphique de la consommation électrique pour les 2 derniers jours");
-        assertEquals("get-history-daily", actual.getName());
-        assertEquals(2, actual.getEntities().size());
-        assertEquals("2", actual.getEntities().get("period"));
-        assertEquals("consommation électrique", actual.getEntities().get("object"));
-    }
-
-    @Test
-    public void testDE_activateObjects() throws Exception {
+    public void testDE_historyLastChanges() throws Exception {
 
         Intent actual;
         this.trainer = new IntentTrainer("de", skills);
 
-        actual = interpret("mach den Fernseher an");
-        assertEquals("activate-object", actual.getName());
+        actual = interpret("wann hat sich die Temperatur das letzte mal geändert?");
+        assertEquals("get-history-last-changes", actual.getName());
         assertEquals(1, actual.getEntities().size());
-        assertEquals("fernseher", actual.getEntities().get("object"));
-
-        actual = interpret("bitte mache das Licht an");
-        assertEquals("activate-object", actual.getName());
-        assertEquals(1, actual.getEntities().size());
-         assertEquals("licht", actual.getEntities().get("object"));
-    }
-
-    @Test
-    public void testDE_deactivateObjects() throws Exception {
-
-        Intent actual;
-        this.trainer = new IntentTrainer("de", skills);
-
-        actual = interpret("Licht aus");
-        assertEquals("deactivate-object", actual.getName());
-        assertEquals(1, actual.getEntities().size());
-        assertEquals("licht", actual.getEntities().get("object"));
-
-        actual = interpret("mach den Fernseher aus");
-        assertEquals("deactivate-object", actual.getName());
-        assertEquals(1, actual.getEntities().size());
-        assertEquals("fernseher", actual.getEntities().get("object"));
-
-        actual = interpret("bitte mache das Licht aus");
-        assertEquals("deactivate-object", actual.getName());
-        assertEquals(1, actual.getEntities().size());
-        assertEquals("licht", actual.getEntities().get("object"));
-    }
-
-    @Test
-    public void testDE_getStatus() throws Exception {
-
-        Intent actual;
-        this.trainer = new IntentTrainer("de", skills);
-
-        actual = interpret("Heizung in der Küche");
-        assertEquals("get-status", actual.getName());
-        assertEquals(2, actual.getEntities().size());
-        assertEquals("heizung", actual.getEntities().get("object"));
-        assertEquals("küche", actual.getEntities().get("location"));
-
-        actual = interpret("wie hoch ist die Temperatur im Wohnzimmer");
-        assertEquals("get-status", actual.getName());
-        assertEquals(2, actual.getEntities().size());
         assertEquals("temperatur", actual.getEntities().get("object"));
+        
+        actual = interpret("wann wurde der letzte Alarm ausgelöst?");
+        assertEquals("get-history-last-changes", actual.getName());
+        assertEquals(1, actual.getEntities().size());
+        assertEquals("alarm", actual.getEntities().get("object"));        
+              
+        actual = interpret("wann wurde der Status vom Licht im Wohnzimmer zuletzt geändert?");
+        assertEquals("get-history-last-changes", actual.getName());
+        assertEquals(2, actual.getEntities().size());
         assertEquals("wohnzimmer", actual.getEntities().get("location"));
-
-        actual = interpret("wie hoch ist die Temperatur im Keller");
-        assertEquals("get-status", actual.getName());
-        assertEquals(2, actual.getEntities().size());
-        assertEquals("temperatur", actual.getEntities().get("object"));
-        assertEquals("keller", actual.getEntities().get("location"));
-    }
+        assertEquals("licht", actual.getEntities().get("object"));
+    }    
 }
