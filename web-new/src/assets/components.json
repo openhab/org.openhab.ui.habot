@@ -79,8 +79,8 @@
         "description": "An action button opening the analyze window for a set of items",
         "availableByDefault": false,
         "configDescriptions": {
-            "item": {
-                "type": "items",
+            "items": {
+                "type": "item",
                 "multiple": true,
                 "description": "The items to analyze"
             }
