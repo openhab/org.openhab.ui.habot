@@ -80,7 +80,7 @@
         "availableByDefault": false,
         "configDescriptions": {
             "item": {
-                "type": "item",
+                "type": "items",
                 "multiple": true,
                 "description": "The items to analyze"
             }

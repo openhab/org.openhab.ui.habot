@@ -144,7 +144,8 @@ module.exports = function (ctx) {
         'QChip',
         'QTimeline',
         'QTimelineEntry',
-        'QColorPicker'
+        'QColorPicker',
+        'QDatetime'
       ],
       directives: [
         'Ripple',

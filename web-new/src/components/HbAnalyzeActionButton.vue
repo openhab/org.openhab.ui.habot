@@ -1,7 +1,7 @@
 <template>
   <q-btn flat icon="timeline" label="Analyze" @click="showAnalyzer = true">
     <q-modal v-model="showAnalyzer" :content-css="{minWidth: '80vw', minHeight: '80vh'}" @show="opened()" maximized>
-      <analyze ref="analyzer"></analyze>
+      <analyze ref="analyzer" :model="model"></analyze>
     </q-modal>
   </q-btn>
 </template>
@@ -10,6 +10,7 @@
 import Analyze from 'layouts/analyze/Analyze.vue'
 
 export default {
+  props: ['model'],
   components: {
     Analyze
   },
