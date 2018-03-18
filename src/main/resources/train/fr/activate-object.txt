@@ -19,8 +19,25 @@ allume le <START:object> radiateur <END> au <START:location> deuxième étage <E
 allume le <START:object> radiateur <END> au <START:location> rez-de-chaussée <END>
 mets en marche l <START:object> arrosage <END> du <START:location> jardin <END>
 mets en route l <START:object> air conditionné <END>
+mets en route la <START:object> climatisation <END>
+mets en route la <START:object> clim <END> dans le <START:location> salon <END> merci
+mets en route le <START:object> chauffage <END>
 active le <START:object> thermostat <END> dans le <START:location> garage <END>
 mets de la <START:object> musique <END>
+mets du <START:object> chauffage <END> au <START:location> premier étage <END>
 mets moi de la <START:object> musique <END>
+mets du chauffage au <START:object> rez de chaussée <END>
 active le <START:object> chauffage <END> dans le <START:location> salon <END>
 active le <START:object> thermostat <END> dans le <START:location> garage <END>
+allume la <START:object> lampe <END> de la <START:location> cage d escalier <END>
+allume la <START:object> lumière <END> du <START:location> couloir <END>
+allume le <START:object> lecteur dvd <END>
+mets en route le <START:object> lecteur bluray <END>
+veux-tu bien allumer le <START:object> lecteur dvd <END>
+allume le <START:object> chauffage <END> au <START:location> rez de chaussée <END>
+allume les <START:object> lumières <END> au <START:location> rez de chaussée <END>
+je veux de la <START:object> musique <END> dans le <START:location> salon <END>
+je veux du <START:object> chauffage <END> au <START:location> premier étage <END>
+je veux de la <START:object> lumière <END> dans la <START:location> salle de bain <END>
+je veux un peu de <START:object> lumière <END> dans la <START:location> cuisine <END>
+je voudrais un peu de <START:object> musique <END>

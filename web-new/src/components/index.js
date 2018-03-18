@@ -9,6 +9,7 @@ import HbCollapsible from './HbCollapsible.vue'
 import HbSlider from './HbSlider.vue'
 import HbKnob from './HbKnob.vue'
 import HbSwitch from './HbSwitch.vue'
+import HbColorPicker from './HbColorPicker.vue'
 import HbChartImage from './HbChartImage.vue'
 import HbTimeline from './HbTimeline.vue'
 import HbShutterControl from './HbShutterControl.vue'
@@ -22,6 +23,7 @@ Vue.component('HbList', HbList)
 Vue.component('HbTabs', HbTabs)
 Vue.component('HbSlider', HbSlider)
 Vue.component('HbSwitch', HbSwitch)
+Vue.component('HbColorPicker', HbColorPicker)
 Vue.component('HbTimeline', HbTimeline)
 Vue.component('HbShutterControl', HbShutterControl)
 
@@ -35,6 +37,7 @@ export default {
   HbSlider,
   HbKnob,
   HbSwitch,
+  HbColorPicker,
   HbChartImage,
   HbTimeline,
   HbShutterControl

@@ -1,8 +1,8 @@
 // Configuration for your app
 var
   path = require('path'),
-  CopyWebpackPlugin = require('copy-webpack-plugin'),
-  webpack = require('webpack')
+  CopyWebpackPlugin = require('copy-webpack-plugin')
+  // webpack = require('webpack')
 
 module.exports = function (ctx) {
   return {
@@ -143,7 +143,8 @@ module.exports = function (ctx) {
         'QTd',
         'QChip',
         'QTimeline',
-        'QTimelineEntry'
+        'QTimelineEntry',
+        'QColorPicker'
       ],
       directives: [
         'Ripple',

@@ -32,10 +32,28 @@ montre le <START:object> chauffage <END> du <START:location> 2ème étage <END>
 <START:object> ventilation <END> dans la <START:location> chambre <END>
 <START:object> température <END> dans la <START:location> chambre d'amis <END>
 <START:object> lumière <END> dans la <START:location> salle de jeux <END>
+<START:object> lumières <END> du <START:location> couloir <END>
+<START:object> lumière <END> du <START:location> salon <END>
+<START:object> lumière <END> de la <START:location> cuisine <END>
+<START:object> lampes <END> du <START:location> bureau <END>
+<START:object> chauffage <END> au <START:location> premier étage <END>
+<START:object> chauffage <END> au <START:location> rez de chaussée <END>
 <START:object> chauffage <END> dans la <START:location> buanderie <END>
+<START:object> chauffage <END> de la <START:location> piscine <END>
+<START:object> lumière <END> de la <START:location> terrasse <END>
 <START:object> lampe <END> dans la <START:location> cage d escalier <END>
+<START:object> lampe <END> de la <START:location> cage d escalier <END>
+<START:object> volet <END> de la <START:location> cage d escalier <END>
+<START:object> volets <END> de la <START:location> cuisine <END>
+<START:object> volet <END> du <START:location> séjour <END>
+<START:object> stores <END> au <START:location> premier étage <END>
+<START:object> lampe <END> du <START:location> salon <END>
 <START:object> volets <END> dans la <START:location> cage d escalier <END>
 <START:object> arrosage <END> dans le <START:location> jardin <END>
+<START:object> température <END> au <START:location> rez de chaussée <END>
+<START:object> mouvement <END> au <START:location> rez de chaussée <END>
+<START:object> vmc <END> dans la <START:location> salle de bain <END>
+montre le <START:location> rez-de-chaussée <END>
 montre moi l état des <START:object> lumières <END>
 montre moi l état du <START:object> thermostat <END>
 montre moi un peu le <START:object> thermostat <END>
@@ -44,7 +62,7 @@ montre moi le statut des <START:object> lampes <END>
 montre moi le <START:object> projecteur <END>
 montre moi la <START:object> lecteur dvd <END>
 montre moi les <START:object> chauffage <END>
-montre moi l <START:object> thermostat <END>
+montre moi l <START:object> électricité <END>
 montre moi l état actuel des <START:object> volet <END> du <START:location> salon <END>
 montre moi la <START:object> température <END> de la <START:location> cuisine <END>
 montre moi le <START:object> volet <END>

@@ -30,7 +30,7 @@ export const watchEvents = async (context, credential) => {
   eventSource.onmessage = (event) => {
     let evt = JSON.parse(event.data)
 
-    if (evt.type.indexOf('ItemStateEvent') >= 0) {
+    if (evt.type.indexOf('ItemStateChangedEvent') >= 0) {
       let payload = JSON.parse(evt.payload)
       let itemName = evt.topic.split('/')[2]
       let item = context.getters.name(itemName)

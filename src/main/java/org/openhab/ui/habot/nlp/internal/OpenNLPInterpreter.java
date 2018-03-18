@@ -146,7 +146,25 @@ public class OpenNLPInterpreter implements HumanLanguageInterpreter {
         }
 
         ChatReply reply = new ChatReply(locale, text);
-        Intent intent = intentTrainer.interpret(text);
+
+        Intent intent;
+
+        // Shortcut: if there are any items whose object: or location: tags match the query (case insensitive), consider
+        // it a "get-status" intent with this tags as the corresponding entity.
+        // This allows the user to query a tag quickly by simply stating it - and avoid a misinterpretation by the
+        // categorizer.
+        if (!this.itemRegistry.getItemsByTag("object:" + text.toLowerCase()).isEmpty()) {
+            intent = new Intent("get-status");
+            intent.setEntities(new HashMap<String, String>());
+            intent.getEntities().put("object", text.toLowerCase());
+        } else if (!this.itemRegistry.getItemsByTag("location:" + text.toLowerCase()).isEmpty()) {
+            intent = new Intent("get-status");
+            intent.setEntities(new HashMap<String, String>());
+            intent.getEntities().put("location", text.toLowerCase());
+        } else {
+            // Else, run it through the IntentTrainer
+            intent = intentTrainer.interpret(text);
+        }
         reply.setIntent(intent);
         Skill skill = skills.get(intent.getName());
 

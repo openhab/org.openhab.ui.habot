@@ -55,8 +55,11 @@ public class IntentTrainer {
 
             try {
                 InputStream trainingData = skill.getTrainingData(language);
-                ObjectStream<String> lineStream = new LowerCasePlainTextByLineStream(trainingData);
+                if (trainingData == null) {
+                    throw new UnsupportedLanguageException(language);
+                }
 
+                ObjectStream<String> lineStream = new LowerCasePlainTextByLineStream(trainingData);
                 ObjectStream<DocumentSample> documentSampleStream = new IntentDocumentSampleStream(intent, lineStream);
                 categoryStreams.add(documentSampleStream);
             } catch (UnsupportedLanguageException e) {
@@ -85,6 +88,10 @@ public class IntentTrainer {
         for (Skill skill : skills) {
             try {
                 InputStream trainingData = skill.getTrainingData(language);
+                if (trainingData == null) {
+                    throw new UnsupportedLanguageException(language);
+                }
+
                 ObjectStream<String> lineStream = new LowerCasePlainTextByLineStream(trainingData);
                 ObjectStream<NameSample> nameSampleStream = new NameSampleDataStream(lineStream);
                 nameStreams.add(nameSampleStream);

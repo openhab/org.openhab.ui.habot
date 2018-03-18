@@ -28,11 +28,12 @@ export default {
         if (!this.model.config.item) return 'OFF'
         let state = this.$store.getters['items/itemState'](this.model.config.item)
         if (state === 'ON' || state === 'OFF') return state
-        if (this.item.type === 'Dimmer') {
+        if (this.item.type === 'Dimmer' || (this.item.type === 'Color' && state.split(',').length === 1)) {
           return (parseFloat(state) > 0) ? 'ON' : 'OFF'
-        } else {
-          return state
+        } else if (this.item.type === 'Color' && state.split(',').length === 3) {
+          return (parseFloat(state.split(',')[2]) > 0) ? 'ON' : 'OFF'
         }
+        return state
       }
       // set (val) {
       //   console.log('Updating switch')

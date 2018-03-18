@@ -9,6 +9,19 @@ current <START:object> power consumption <END>
 <START:object> temperature <END> of the <START:location> living room <END>
 <START:object> heating <END> in the <START:location> kitchen <END>
 <START:object> fan <END> in the <START:location> patio <END>
+<START:object> temperature <END> in the <START:location> corridor <END>
+<START:object> temperature <END> on the <START:location> ground floor <END>
+<START:object> temperature <END> on the <START:location> first floor <END>
+<START:object> fan <END> in the <START:location> patio <END>
+<START:object> lights <END> in the <START:location> basement <END>
+<START:object> lights <END> in the <START:location> attic <END>
+<START:object> lights <END> in the <START:location> guest house <END>
+<START:object> wifi <END> in the <START:location> guest house <END>
+<START:object> fan <END> in the <START:location> patio <END>
+<START:location> kitchen <END> <START:object> lights <END>
+<START:location> outside <END> <START:object> lights <END>
+<START:location> living room <END> <START:object> lights <END>
+<START:location> bedroom <END> <START:object> lights <END>
 <START:object> air conditioning <END> in the <START:location> bedroom <END>
 <START:object> temperature <END> on the <START:location> ground floor <END>
 show the <START:object> lights <END> of the <START:location> first floor <END>
