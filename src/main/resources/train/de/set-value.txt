@@ -1,0 +1,5 @@
+stell den <START:object> Thermostat <END> auf <START:value> 23 <END> °C.
+stell den <START:object> Thermostat <END> auf <START:value> 23 <END> Grad.
+regle die <START:object> Temperatur <END> auf <START:value> 21 <END> Grad.
+<START:object> Temperatur <END> auf <START:value> 21 <END> Grad erhöhen.
+<START:object> Temperatur <END> auf <START:value> 10 <END> Grad.
