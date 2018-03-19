@@ -10,7 +10,7 @@ public class TrainerDeTest extends AbstractTrainerTest {
 
 
 	@Test
-	public void testDE_activateObjects() throws Exception {
+	public void testActivateObjects() throws Exception {
 
 		Intent actual;
         this.trainer = new IntentTrainer("de", skills);
@@ -27,7 +27,7 @@ public class TrainerDeTest extends AbstractTrainerTest {
 	}
 
 	@Test
-	public void testDE_deactivateObjects() throws Exception {
+	public void testDeactivateObjects() throws Exception {
 
 		Intent actual;
         this.trainer = new IntentTrainer("de", skills);
@@ -49,7 +49,7 @@ public class TrainerDeTest extends AbstractTrainerTest {
 	}
 
 	@Test
-	public void testDE_getStatus() throws Exception {
+	public void testGetStatus() throws Exception {
 
 		Intent actual;
         this.trainer = new IntentTrainer("de", skills);
@@ -74,7 +74,7 @@ public class TrainerDeTest extends AbstractTrainerTest {
 	}
 
 	@Test
-	public void testDE_historyHourly() throws Exception {
+	public void testHistoryHourly() throws Exception {
 
 		Intent actual;
 		this.trainer = new IntentTrainer("de", skills, null, "alphanumeric");
@@ -91,7 +91,7 @@ public class TrainerDeTest extends AbstractTrainerTest {
 	}
 
 	@Test
-	public void testDE_historyDaily() throws Exception {
+	public void testHistoryDaily() throws Exception {
 
 		Intent actual;
 		this.trainer = new IntentTrainer("de", skills, null, "alphanumeric");
@@ -109,7 +109,7 @@ public class TrainerDeTest extends AbstractTrainerTest {
 	}
 
 	@Test
-	public void testDE_historyWeekly() throws Exception {
+	public void testHistoryWeekly() throws Exception {
 
 		Intent actual;
 		this.trainer = new IntentTrainer("de", skills, null, "alphanumeric");
@@ -132,7 +132,7 @@ public class TrainerDeTest extends AbstractTrainerTest {
 	}
 
 	@Test
-	public void testDE_historyMonthly() throws Exception {
+	public void testHistoryMonthly() throws Exception {
 
 		Intent actual;
 		this.trainer = new IntentTrainer("de", skills, null, "alphanumeric");
@@ -155,7 +155,7 @@ public class TrainerDeTest extends AbstractTrainerTest {
 	}
 
     @Test
-    public void testDE_historyLastChanges() throws Exception {
+    public void testHistoryLastChanges() throws Exception {
 
         Intent actual;
         this.trainer = new IntentTrainer("de", skills, null, "alphanumeric");
@@ -178,7 +178,7 @@ public class TrainerDeTest extends AbstractTrainerTest {
     } 
     
     @Test
-    public void testDE_setValue() throws Exception {
+    public void testSetValue() throws Exception {
         Intent actual;
         this.trainer = new IntentTrainer("de", skills, null, "alphanumeric");
         
