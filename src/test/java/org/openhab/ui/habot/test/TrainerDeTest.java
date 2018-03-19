@@ -180,6 +180,18 @@ public class TrainerDeTest extends AbstractTrainerTest {
     @Test
     public void testDE_setValue() throws Exception {
         Intent actual;
-        this.trainer = new IntentTrainer("de", skills, null, "alphanumeric");  	
+        this.trainer = new IntentTrainer("de", skills, null, "alphanumeric");
+        
+        actual = interpret("stell den Thermostat auf 21 Grad.");
+        assertEquals(Skills.SET_VALUE, actual.getName());
+        assertEquals(2, actual.getEntities().size());
+        assertEquals("thermostat", actual.getEntities().get("object"));
+        assertEquals("21", actual.getEntities().get("value"));
+        
+        actual = interpret("Temperatur auf 21 Grad erhöhen.");
+        assertEquals(Skills.SET_VALUE, actual.getName());
+        assertEquals(2, actual.getEntities().size());
+        assertEquals("temperatur", actual.getEntities().get("object"));
+        assertEquals("21", actual.getEntities().get("value"));            
     }
 }
