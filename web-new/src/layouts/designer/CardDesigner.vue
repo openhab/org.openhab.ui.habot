@@ -156,7 +156,7 @@
   padding 1rem
   .node-header
     margin -15px -15px 10px -15px
-    background $white
+    background white
     padding 15px
     border-bottom 1px solid $grey-5
 .actions

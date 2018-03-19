@@ -82,7 +82,26 @@
             "items": {
                 "type": "item",
                 "multiple": true,
-                "description": "The items to analyze"
+                "description": "The initial list of items to analyze"
+            },
+            "period": {
+                "type": "optiongroup",
+                "description": "The initial period to analyze",
+                "options": [
+                    { "value": "h", "label": "h" },
+                    { "value": "4h", "label": "4h" },
+                    { "value": "8h", "label": "8h" },
+                    { "value": "12h", "label": "12h" },
+                    { "value": "D", "label": "D" },
+                    { "value": "2D", "label": "2D" },
+                    { "value": "3D", "label": "3D" },
+                    { "value": "W", "label": "W" },
+                    { "value": "2W", "label": "2W" },
+                    { "value": "M", "label": "M" },
+                    { "value": "2M", "label": "2M" },
+                    { "value": "4M", "label": "4M" },
+                    { "value": "Y", "label": "Y" }
+                ]
             }
         }
     },
@@ -421,6 +440,7 @@
                     { "value": "2W", "label": "2W" },
                     { "value": "M", "label": "M" },
                     { "value": "2M", "label": "2M" },
+                    { "value": "4M", "label": "4M" },
                     { "value": "Y", "label": "Y" }
                 ]
             }

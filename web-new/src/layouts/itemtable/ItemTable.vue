@@ -64,11 +64,6 @@
 import { extend } from 'quasar'
 
 export default {
-  components: {
-    'chart': () => import(
-      /* webpackChunkName: 'chart' */
-      'components/charts/Chart.vue') // lazy load the component with its dependencies (echart)
-  },
   props: ['model'],
   data () {
     return {
