@@ -106,6 +106,21 @@ public class CardBuilder {
                     shutterContainerComponent.addComponent("main", shutterControlComponent);
                     card.addComponent("main", shutterContainerComponent);
                     break;
+                case CoreItemFactory.COLOR:
+                    Component colorPickerComponent = new Component("HbColorPicker");
+                    colorPickerComponent.addConfig("item", item.getName());
+                    card.addComponent("right", colorPickerComponent);
+                    Component brightnessDimmerComponent = new Component("HbSwitch");
+                    brightnessDimmerComponent.addConfig("item", item.getName());
+                    card.addComponent("right", brightnessDimmerComponent);
+                    Component brightnessDimmerContainerComponent = new Component("HbContainer");
+                    brightnessDimmerContainerComponent.addConfig("classes",
+                            new String[] { "full-width", "text-center" });
+                    Component brightnessSliderComponent = new Component("HbSlider");
+                    brightnessSliderComponent.addConfig("item", item.getName());
+                    brightnessDimmerContainerComponent.addComponent("main", brightnessSliderComponent);
+                    card.addComponent("main", brightnessDimmerContainerComponent);
+                    break;
                 default:
                     // TODO: display in the main slot instead, depending on the width of the (transformed) state
                     Component singleItemComponent = new Component("HbSingleItemValue");

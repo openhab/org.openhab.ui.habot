@@ -1,12 +1,20 @@
 <template>
-  <chart :options="option" auto-resize></chart>
+  <chart :options="options" auto-resize></chart>
 </template>
 
-<style>
-.echarts {
-  width: 100%;
-  height: 100%;
-}
+<style lang="stylus">
+.echarts
+  width 100%
+  height 100%
+
+.chart-tooltip-date
+  font-weight bold
+
+.chart-tooltip-dot
+  display inline
+  width 40px
+  height 8px
+  border-radius 4px
 </style>
 
 <script>
@@ -19,9 +27,95 @@ import 'echarts/lib/component/dataZoom'
 
 import ECharts from 'vue-echarts/components/ECharts'
 
+import { sprintf } from 'sprintf-js'
+
 export default {
+  props: ['items', 'period', 'startTime', 'endTime'],
   components: {
     'chart': ECharts
+  },
+  methods: {
+    formatTooltip (params) {
+      let tooltip = `<div class="chart-tooltip-date">${params[0].axisValueLabel}</div>`
+      for (let serie of params) {
+        let pattern = this.itemFormats[serie.seriesIndex]
+        let label = (pattern) ? sprintf(pattern, serie.value[1]) : Math.round(parseFloat(serie.value[1])).toString
+        tooltip += `<div class="chart-tooltip-series"><span class="chart-tooltip-dot" style="background-color: ${serie.color}">&nbsp;</span> ${serie.seriesName}: ${label}</div>`
+      }
+      // debugger
+      return tooltip
+    }
+  },
+  computed: {
+    itemFormats () {
+      return this.items.map((itemName) => {
+        let item = this.$store.getters['items/name'](itemName)
+        if (item.stateDescription.pattern) {
+          return item.stateDescription.pattern
+        }
+      })
+    },
+    options () {
+      return {
+        startDate: this.startTime,
+        animation: false,
+        grid: this.defaultOptions.grid,
+        xAxis: this.defaultOptions.xAxis,
+        yAxis: this.defaultOptions.yAxis,
+        dataZoom: this.defaultOptions.dataZoom,
+        legend: {},
+        tooltip: {
+          formatter: this.formatTooltip,
+          textStyle: {
+            fontSize: 11
+          }
+        },
+        series: this.series || []
+      }
+    }
+  },
+  asyncComputed: {
+    series: {
+      get () {
+        // let vm = this
+        let series = []
+
+        let promises = []
+        for (let item of this.items) {
+          promises.push(this.$http.get('/rest/persistence/items/' + item, {
+            params: {
+              starttime: new Date(this.startTime).toISOString()
+              // endtime: new Date(this.endTime).toISOString()
+            }
+          }).then((resp) => {
+            return resp.data
+          }))
+        }
+
+        return Promise.all(promises).then((data) => {
+          for (let serie of data) {
+            series.push({
+              name: serie.name,
+              type: 'line',
+              // smooth: true,
+              showSymbol: false,
+              symbol: 'circle',
+              symbolSize: 5,
+              // sampling: 'average',
+              stack: 'a',
+              data: serie.data.map((datapoint) => {
+                return [
+                  new Date(datapoint.time),
+                  datapoint.state
+                ]
+              })
+            })
+          }
+
+          return series
+        })
+      }
+    }
   },
   data () {
     var base = +new Date(2016, 9, 3)
@@ -45,12 +139,9 @@ export default {
     }
 
     return {
-      option: {
-        animation: false,
-        legend: {
-          top: 'bottom',
-          data: ['意向']
-        },
+      itemNames: null,
+      defaultOptions: {
+        animation: true,
         tooltip: {
           // triggerOn: 'none'
         },
@@ -69,23 +160,23 @@ export default {
           type: 'time',
           // boundaryGap: [0, 0],
           axisPointer: {
-            value: '2016-10-7',
+            show: true,
             snap: true,
             lineStyle: {
-              color: '#004E52',
+              color: '#4c9ffb',
               opacity: 0.5,
               width: 2
             },
             label: {
               show: true,
               formatter: function (params) {
-                return echarts.format.formatTime('yyyy-MM-dd', params.value)
+                return echarts.format.formatTime('dd.MM.yyyy hh:mm', params.value)
               },
-              backgroundColor: '#004E52'
+              backgroundColor: '#4c9ffb'
             },
             handle: {
-              show: true,
-              color: '#004E52'
+              show: this.$q.platform.is.mobile,
+              color: '#4c9ffb'
             }
           },
           splitLine: {
@@ -102,21 +193,34 @@ export default {
           },
           axisLabel: {
             inside: false,
-            formatter: '{value}\n'
-          },
-          z: 10
+            formatter: '{value} °C\n'
+          }
+          // z: 10
         },
         grid: {
           top: 15,
-          left: 35,
+          left: 40,
           right: 35,
           bottom: 75
           // height: 160
         },
         // dataZoom: [{
-        //   type: 'inside',
+        //   type: 'slider',
         //   throttle: 50
         // }],
+        dataZoom: [{
+          type: 'inside'
+        }, {
+          handleIcon: 'M10.7,11.9v-1.3H9.3v1.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4v1.3h1.3v-1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7V23h6.6V24.4z M13.3,19.6H6.7v-1.4h6.6V19.6z',
+          handleSize: '80%',
+          handleStyle: {
+            color: '#fff',
+            shadowBlur: 3,
+            shadowColor: 'rgba(0, 0, 0, 0.6)',
+            shadowOffsetX: 2,
+            shadowOffsetY: 2
+          }
+        }],
         series: [
           {
             name: 'series1',
@@ -125,23 +229,23 @@ export default {
             symbol: 'circle',
             symbolSize: 5,
             sampling: 'average',
-            itemStyle: {
-              normal: {
-                color: '#8ec6ad'
-              }
-            },
+            // itemStyle: {
+            //   normal: {
+            //     color: '#8ec6ad'
+            //   }
+            // },
             stack: 'a',
-            areaStyle: {
-              normal: {
-                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
-                  offset: 0,
-                  color: '#8ec6ad'
-                }, {
-                  offset: 1,
-                  color: '#ffe'
-                }])
-              }
-            },
+            // areaStyle: {
+            //   normal: {
+            //     color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+            //       offset: 0,
+            //       color: '#8ec6ad'
+            //     }, {
+            //       offset: 1,
+            //       color: '#ffe'
+            //     }])
+            //   }
+            // },
             data: data1
           },
           {
@@ -152,22 +256,22 @@ export default {
             symbol: 'circle',
             symbolSize: 5,
             sampling: 'average',
-            itemStyle: {
-              normal: {
-                color: '#d68262'
-              }
-            },
-            areaStyle: {
-              normal: {
-                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
-                  offset: 0,
-                  color: '#d68262'
-                }, {
-                  offset: 1,
-                  color: '#ffe'
-                }])
-              }
-            },
+            // itemStyle: {
+            //   normal: {
+            //     color: '#d68262'
+            //   }
+            // },
+            // areaStyle: {
+            //   normal: {
+            //     color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+            //       offset: 0,
+            //       color: '#d68262'
+            //     }, {
+            //       offset: 1,
+            //       color: '#ffe'
+            //     }])
+            //   }
+            // },
             data: data2
           }
 

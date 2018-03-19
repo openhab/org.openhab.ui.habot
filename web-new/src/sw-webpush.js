@@ -4,6 +4,7 @@
 
 // Determines whether a client is currently focused
 // Source: https://web-push-book.gauntface.com/chapter-05/04-common-notification-patterns/
+// Modified to check whether the url contains /chat.
 function isClientFocused () {
   return clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
     let clientIsFocused = false
@@ -38,17 +39,16 @@ self.addEventListener('push', function (event) {
     isClientFocused().then(function (focused) {
       // add the message to the chat list of clients to handle
       return self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function (clientList) {
+        // post messages to all matching clients in case they're on the "Chat with HABot" page - the message would simply be
+        // added to the current chat
         for (let client of clientList) {
           client.postMessage(notificationOptions.body)
         }
 
-        if (focused) {
-          // No need to display a notification
-          return
+        if (!focused) {
+          // display the notification, but only if the client isn't focused and on the chat page (see isClientFocused)
+          return self.registration.showNotification(notificationTitle, notificationOptions)
         }
-
-        // then display the notification
-        self.registration.showNotification(notificationTitle, notificationOptions)
       })
     })
   )

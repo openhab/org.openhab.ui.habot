@@ -9,6 +9,7 @@ stoppe le <START:object> lave-vaisselle <END>
 éteindre la <START:object> lumière <END>
 éteins l' <START:object> éclairage <END>
 éteins le <START:object> chauffage <END>
+éteins les <START:object> lumières <END> dans la <START:location> cuisine <END>
 arrête le <START:object> chauffage <END> du <START:location> salon <END>
 stopper le <START:object> chauffage <END> de la <START:location> chambre <END>
 stoppe le <START:object> chauffage <END> dans le <START:location> sous-sol <END>
@@ -28,4 +29,7 @@ stoppe la <START:object> ventilation <END>
 stoppe la <START:object> chaudière <END>
 je ne veux plus de <START:object> chauffage <END> dans le <START:location> salon <END>
 je ne veux plus de <START:object> musique <END> dans la <START:location> cuisine <END>
+je ne veux plus de <START:object> musique <END>
+je ne veux plus de <START:object> lumière <END>
 arrête le <START:object> chauffage <END> dans le <START:location> salon <END>
+arrête la <START:object> musique <END>

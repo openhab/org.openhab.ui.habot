@@ -31,7 +31,7 @@
             },
             "right": {
                 "description": "The area on the right of the card title along the context menu",
-                "allowedComponents": [ "HbSingleItemValue", "HbSwitch" ]
+                "allowedComponents": [ "HbSingleItemValue", "HbSwitch", "HbColorPicker" ]
             },
             "media": {
                 "description": "An optional area above the card's title where images, charts and carousels may be displayed",
@@ -79,7 +79,7 @@
         "description": "An action button opening the analyze window for a set of items",
         "availableByDefault": false,
         "configDescriptions": {
-            "item": {
+            "items": {
                 "type": "item",
                 "multiple": true,
                 "description": "The items to analyze"
@@ -172,13 +172,25 @@
                 "type": "text",
                 "description": "The state to display on the right if no item is specified; accepts expressions"
             },
-            "control": {
-                "type": "optiongroup",
-                "description": "The type of control displayed on the right",
-                "options": [
-                    {"value": "", "label": "Default"},
-                    {"value": "Switch", "label": "Switch"}
-                ]
+            "leftIcon": {
+                "type": "icon",
+                "description": "The icon to display on left"
+            },
+            "leftLetter": {
+                "type": "text",
+                "description": "The letter to display on left"
+            },
+            "leftAvatar": {
+                "type": "text",
+                "description": "The avatar (image) to display on left"
+            },
+            "leftColor": {
+                "type": "color",
+                "description": "The color for the icon or letter on the left"
+            },
+            "leftInverted": {
+                "type": "boolean",
+                "description": "Invert the colors of the icon or letter on the left"
             }
         }
     },
@@ -348,7 +360,25 @@
         "configDescriptions": {
             "item": {
                 "type": "item",
-                "description": "The item controlled by this list item"
+                "description": "The item controlled by this switch"
+            }
+        }
+    },
+
+    "HbColorPicker": {
+        "description": "A color picker operating an item",
+        "configDescriptions": {
+            "item": {
+                "type": "item",
+                "description": "The item controlled by this color picker"
+            },
+            "inline": {
+                "type": "boolean",
+                "description": "Displays the color picker itself inline in the parent component, instead of the swatch"
+            },
+            "brightnessSlider": {
+                "type": "boolean",
+                "description": "Display a slider for brightness underneath and center (inline mode only)"
             }
         }
     },

@@ -18,6 +18,9 @@ export default {
     }
   },
   computed: {
+    item () {
+      return this.$store.getters['items/name'](this.model.config.item)
+    },
     min () {
       return (this.model.config.min || 0)
     },
@@ -36,6 +39,9 @@ export default {
         let state = this.$store.getters['items/itemState'](this.model.config.item)
         if (state === 'OFF') return this.min
         if (state === 'ON') return this.max
+        if (this.item.type === 'Color' && state.split(',').length === 3) {
+          return parseFloat(state.split(',')[2])
+        }
         return parseFloat(state)
       },
       set (val) {

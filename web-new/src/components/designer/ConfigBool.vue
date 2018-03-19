@@ -1,5 +1,5 @@
 <template>
-  <q-toggle :value="value" @input="$emit('input', $event)" color="secondary"></q-toggle>
+  <q-checkbox :value="value" @input="$emit('input', $event)" color="secondary"></q-checkbox>
 </template>
 
 <script>

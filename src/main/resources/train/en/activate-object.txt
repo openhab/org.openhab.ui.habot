@@ -1,6 +1,7 @@
 can you switch the <START:object> lights <END> in the <START:location> bedroom <END> on?
 please switch on the <START:object> lights <END>
 switch the <START:object> tv <END> on 
+start the <START:object> ac <END> please
 can you please turn on the <START:object> dishwasher <END> 
 turn on the <START:object> radiator <END> in the <START:location> kitchen <END>
 switch on the <START:location> living room <END> <START:object> fan <END>
