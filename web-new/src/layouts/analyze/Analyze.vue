@@ -85,6 +85,13 @@
                 <q-toggle color="secondary" v-model="chartOptions.calendar.showVisualMap" />
               </q-item-side>
             </q-item>
+            <q-item tag="label" v-close-overlay v-if="chartType === 'calendar'" @click.native="calendarColorPaletteConfig()">
+              <q-item-main label="Color palette..." />
+            </q-item>
+            <q-item tag="label" v-close-overlay v-if="chartType === 'line'" @click.native="lineMarkerConfig()">
+              <q-item-main label="Marker options..." />
+            </q-item>
+
           </q-list>
         </q-popover>
       </q-btn>
@@ -112,7 +119,7 @@
 </style>
 
 <script>
-import { date } from 'quasar'
+import { date, extend } from 'quasar'
 const { subtractFromDate } = date
 const today = new Date()
 
@@ -145,6 +152,9 @@ export default {
         calendar: {
           vertical: true,
           showVisualMap: true
+        },
+        line: {
+          markers: {}
         }
       }
     }
@@ -160,7 +170,7 @@ export default {
 
       this.$q.dialog({
         title: 'Predefined period',
-        message: 'Select the period',
+        message: 'Select the period to reset the date range',
         color: 'secondary',
         ok: true,
         cancel: true,
@@ -220,6 +230,57 @@ export default {
           this.startTime = subtractFromDate(this.startTime, { days: 1 })
           break
       }
+    },
+    lineMarkerConfig () {
+      let model = []
+      if (this.chartOptions.line.markers.averageLine) model.push('averageLine')
+      if (this.chartOptions.line.markers.minMaxLines) model.push('minMaxLines')
+      if (this.chartOptions.line.markers.minMaxPoints) model.push('minMaxPoints')
+      this.$q.dialog({
+        title: 'Markers',
+        message: 'Choose markers to display',
+        color: 'secondary',
+        ok: true,
+        cancel: true,
+        options: {
+          type: 'toggle',
+          model: model,
+          items: [
+            { label: 'Show average line', value: 'averageLine' },
+            { label: 'Show min/max lines', value: 'minMaxLines' },
+            { label: 'Show min/max points', value: 'minMaxPoints' }
+          ]
+        }
+      }).then((val) => {
+        this.chartOptions.line.markers = extend({}, {
+          averageLine: (val.indexOf('averageLine') >= 0),
+          minMaxLines: (val.indexOf('minMaxLines') >= 0),
+          minMaxPoints: (val.indexOf('minMaxPoints') >= 0)
+        })
+      })
+    },
+    calendarColorPaletteConfig () {
+      this.$q.dialog({
+        title: 'Color palette',
+        message: 'Color range of colors',
+        color: 'secondary',
+        ok: true,
+        cancel: true,
+        options: {
+          type: 'radio',
+          model: this.chartOptions.calendar.colorPalette,
+          items: [
+            { label: 'yellow/red (default)', value: null },
+            { label: 'green/yellow/red', value: 'greenred' },
+            { label: 'blue/yellow/red', value: 'bluered' },
+            { label: 'white/blue', value: 'whiteblue' }
+          ]
+        }
+      }).then((val) => {
+        this.chartOptions.calendar = extend({}, this.chartOptions.calendar, {
+          colorPalette: val
+        })
+      })
     }
   },
   created () {

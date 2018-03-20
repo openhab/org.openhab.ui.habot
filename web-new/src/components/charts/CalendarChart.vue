@@ -40,6 +40,14 @@ export default {
     minValue () {
       return (this.series) ? Math.min(...this.series[0].data.map(d => d[1])) : null
     },
+    colorPalette () {
+      switch (this.options.colorPalette) {
+        case 'greenred': return ['#50a3ba', '#eac736', '#d94e5d']
+        case 'whiteblue': return ['#ffffff', '#4c9ffb']
+        case 'bluered': return ['#313695', '#4575b4', '#74add1', '#abd9e9', '#e0f3f8', '#fee090', '#fdae61', '#f46d43', '#d73027', '#a50026']
+        default: return null
+      }
+    },
     finalOptions () {
       return {
         tooltip: {
@@ -60,7 +68,8 @@ export default {
           calculable: true,
           textStyle: {
             color: '#000'
-          }
+          },
+          inRange: (this.colorPalette) ? { color: this.colorPalette } : undefined
         },
         calendar: {
           top: (this.options.showVisualMap) ? 80 : 30,
@@ -115,11 +124,18 @@ export default {
             series.push({
               type: 'heatmap',
               coordinateSystem: 'calendar',
-              data: serie.data.map((datapoint) => {
-                return [
-                  new Date(datapoint.time),
-                  parseFloat(datapoint.state)
-                ]
+              // Make sure to average the data points over the day if there are more than one
+              data: serie.data.reduce((acc, point) => {
+                let date = echarts.format.formatTime('yyyy-MM-dd', point.time)
+                if (acc.length && acc[acc.length - 1][0] === date) {
+                  acc[acc.length - 1][1].push(parseFloat(point.state))
+                } else {
+                  acc.push([date, [parseFloat(point.state)]])
+                }
+                return acc
+              }, []).map((arr) => {
+                let avg = arr[1].reduce((sum, state) => sum + state, 0) / arr[1].length
+                return [new Date(arr[0]), avg]
               })
             })
           }

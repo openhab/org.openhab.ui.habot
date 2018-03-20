@@ -1,5 +1,5 @@
 <template>
-  <chart :options="options" auto-resize></chart>
+  <chart :options="finalOptions" auto-resize></chart>
 </template>
 
 <script>
@@ -9,6 +9,8 @@ import echarts from 'echarts/lib/echarts'
 import 'echarts/lib/chart/line'
 import 'echarts/lib/component/tooltip'
 import 'echarts/lib/component/dataZoom'
+import 'echarts/lib/component/markLine'
+import 'echarts/lib/component/markPoint'
 
 import ECharts from 'vue-echarts/components/ECharts'
 
@@ -17,7 +19,7 @@ import mixin from './index'
 import { sprintf } from 'sprintf-js'
 
 export default {
-  props: ['items', 'type', 'startTime', 'endTime'],
+  props: ['items', 'type', 'startTime', 'endTime', 'options'],
   mixins: [mixin],
   components: {
     'chart': ECharts
@@ -35,10 +37,10 @@ export default {
     }
   },
   computed: {
-    options () {
+    finalOptions () {
+      if (!this.data) return null
       return {
         startDate: this.startTime,
-        animation: true,
         grid: this.defaultOptions.grid,
         xAxis: this.defaultOptions.xAxis,
         yAxis: this.defaultOptions.yAxis,
@@ -50,15 +52,63 @@ export default {
             fontSize: 11
           }
         },
-        series: this.series || []
+        series: this.items.map((item, idx) => {
+          let seriesOptions = {
+            name: item.name,
+            type: 'line',
+            // smooth: true,
+            showSymbol: false,
+            symbol: 'circle',
+            symbolSize: 5,
+            // sampling: 'average',
+            stack: 'a',
+            data: this.data[idx]
+          }
+          if (this.options.markers.averageLine || this.options.markers.minMaxLines) {
+            seriesOptions.markLine = {
+              data: []
+            }
+            if (this.options.markers.averageLine) {
+              seriesOptions.markLine.data.push({type: 'average', name: 'avg'})
+            }
+            if (this.options.markers.minMaxLines) {
+              seriesOptions.markLine.data.push({type: 'min', name: 'min'})
+              seriesOptions.markLine.data.push({type: 'max', name: 'max'})
+            }
+          }
+          if (this.options.markers.minMaxPoints) {
+            seriesOptions.markPoint = {
+              symbol: 'diamond',
+              symbolSize: 15,
+              label: {
+                show: !this.options.markers.minMaxLines,
+                position: 'right',
+                color: 'auto',
+                formatter: (params) => {
+                  let pattern = this.itemFormats[params.seriesIndex]
+                  return (pattern) ? sprintf(pattern, params.value) : params.value
+                },
+                textStyle: {
+                  fontSize: 11
+                }
+              },
+              data: [
+                {type: 'max', name: 'min', symbolRotate: 180},
+                {type: 'min', name: 'max'}
+              ]
+            }
+          }
+
+          return seriesOptions
+        })
       }
     }
   },
   asyncComputed: {
-    series: {
+    data: {
       get () {
         // let vm = this
-        let series = []
+        let formattedData = []
 
         let promises = []
         for (let item of this.items) {
@@ -74,25 +124,15 @@ export default {
 
         return Promise.all(promises).then((data) => {
           for (let serie of data) {
-            series.push({
-              name: serie.name,
-              type: 'line',
-              // smooth: true,
-              showSymbol: false,
-              symbol: 'circle',
-              symbolSize: 5,
-              // sampling: 'average',
-              stack: 'a',
-              data: serie.data.map((datapoint) => {
-                return [
-                  new Date(datapoint.time),
-                  datapoint.state
-                ]
-              })
-            })
+            formattedData.push(serie.data.map((datapoint) => {
+              return [
+                new Date(datapoint.time),
+                datapoint.state
+              ]
+            }))
           }
 
-          return series
+          return formattedData
         })
       }
     }
@@ -144,6 +184,7 @@ export default {
         },
         yAxis: {
           type: 'value',
+          scale: true,
           axisTick: {
             inside: false
           },

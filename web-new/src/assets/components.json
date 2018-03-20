@@ -454,6 +454,14 @@
                 "type": "text",
                 "description": "Label of the button (expressions allowed)"
             },
+            "item": {
+                "type": "item",
+                "description": "Item to send the command to (optional if slots defined)"
+            },
+            "command": {
+                "type": "text",
+                "description": "Command to send (optional if slots defined, expressions accepted)"
+            },
             "size": {
                 "type": "optiongroup",
                 "description": "Size of the button",

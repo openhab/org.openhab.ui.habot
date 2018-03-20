@@ -57,11 +57,11 @@
 
     <q-page-sticky position="bottom" class="chat-input-sticky">
       <q-toolbar class="chat-input-toolbar bg-grey-3 shadow-up-3">
-        <q-input ref="input" v-model="text" class="full-width" :placeholder="inputPlaceholder" :after="inputAfter" @keyup="keyUp" />
+        <q-input :disabled="busy" ref="input" v-model="text" class="full-width" :placeholder="inputPlaceholder" :autofocus="$q.platform.is.desktop" :after="inputAfter" @keyup="keyUp" />
       </q-toolbar>
     </q-page-sticky>
 
-    <speech-button v-on:start="startSpeech"
+    <speech-button v-if="!$q.platform.is.mobile || !busy" v-on:start="startSpeech"
                    v-on:end="endSpeech"
                    v-on:result="speechFinalResult"
                    v-on:interimresult="speechInterimResult"
@@ -80,6 +80,8 @@
 
 .chat-area
   padding-bottom 64px
+  padding-left 10px
+  padding-right 10px
   .q-message-avatar
     min-width 48px !important
   .q-message-sent .q-message-avatar
@@ -95,7 +97,7 @@
       width $card-min-width
   @media (max-width $breakpoint-xs-max)
     .q-card
-      width calc(100% - 20px)
+      width calc(100%)
 
 .chat-input-toolbar
   input
@@ -119,6 +121,7 @@ export default {
   },
   data () {
     return {
+      busy: false,
       text: '',
       chats: [
         {
@@ -234,6 +237,8 @@ export default {
         stamp: date.formatDate(new Date(), 'HH:mm')
       })
 
+      this.busy = true
+
       this.$http.post('/rest/habot/chat', this.text, {
         headers: {
           'Content-Type': 'text/plain',
@@ -256,6 +261,8 @@ export default {
             currentChat.card.config = { bigger: true }
           }
         }
+
+        this.busy = false
 
         currentChat.finished = true
         this.chats.push({
