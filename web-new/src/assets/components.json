@@ -112,6 +112,10 @@
             "classes": {
                 "type": "array",
                 "description": "CSS Classes to apply to the container; see http://quasar-framework.org/components/"
+            },
+            "text": {
+                "type": "text",
+                "description": "A text to display in the container (expressions accepted)"
             }
         },
         "slotDescriptions": {
@@ -328,6 +332,50 @@
             "item": {
                 "type": "item",
                 "description": "The item controlled by this list item"
+            },
+            "min": {
+                "type": "number",
+                "description": "The minimum value, 0 by default"
+            },
+            "max": {
+                "type": "number",
+                "description": "The maximum value, 100 by default"
+            },
+            "step": {
+                "type": "number",
+                "description": "The step between values"
+            },
+            "color": {
+                "type": "color",
+                "description": "One color of the bar (accepts expressions)"
+            },
+            "label": {
+                "type": "boolean",
+                "description": "Display a label when dragging the slider"
+            },
+            "labelAlways": {
+                "type": "boolean",
+                "description": "Display the label even when not dragging the slider"
+            },
+            "labelValue": {
+                "type": "text",
+                "description": "Override the default label value (expressions accepted, with pre-defined 'state' variable)"
+            },
+            "square": {
+                "type": "boolean",
+                "description": "Displays a squared slider button instead of round"
+            },
+            "snap": {
+                "type": "boolean",
+                "description": "Snap the handler on step values"
+            },
+            "markers": {
+                "type": "boolean",
+                "description": "Display markers representing step values"
+            },
+            "fillHandleAlways": {
+                "type": "boolean",
+                "description": "Fill the handle with color even if it's at the minimum value"
             }
         }
     },
@@ -357,19 +405,31 @@
             },
             "color": {
                 "type": "color",
-                "description": "One color of the bar"
+                "description": "One color of the bar (accepts expressions)"
             },
             "trackColor": {
                 "type": "color",
-                "description": "One color of the track"
+                "description": "One color of the track (accepts expressions)"
             },
             "lineWidth": {
                 "type": "number",
                 "description": "The thickness of the track, 5 by default"
             },
-            "state": {
+            "textSize": {
                 "type": "text",
-                "description": "Override the label text; accepts expressions"
+                "description": "Size of the text (examples: 24px, 36pt, 5rem...)"
+            },
+            "label": {
+                "type": "text",
+                "description": "Override the default label (accepts expressions with pre-defined 'state' variable)"
+            },
+            "iconLeft": {
+                "type": "icon",
+                "description": "Optional icon to display left of the label"
+            },
+            "iconRight": {
+                "type": "icon",
+                "description": "Optional icon to display right of the label"
             }
         }
     },
@@ -398,6 +458,28 @@
             "brightnessSlider": {
                 "type": "boolean",
                 "description": "Display a slider for brightness underneath and center (inline mode only)"
+            }
+        }
+    },
+
+    "HbPlayer": {
+        "description": "A set of three buttons controlling a Player item",
+        "configDescriptions": {
+            "item": {
+                "type": "item",
+                "description": "The item controlled by this player control"
+            },
+            "size": {
+                "type": "optiongroup",
+                "description": "Size of the button",
+                "options": [
+                    { "value": "", "label": "Default" },
+                    { "value": "xs", "label": "xs" },
+                    { "value": "sm", "label": "sm" },
+                    { "value": "md", "label": "md" },
+                    { "value": "lg", "label": "lg" },
+                    { "value": "xl", "label": "xl" }
+                ]
             }
         }
     },

@@ -141,18 +141,25 @@ export default {
       this.$router.push('/designer/' + this.model.uid)
     },
     deleteCard () {
-      this.$store.dispatch('cards/remove', this.model).then((deletedCard) => {
-        this.$q.notify({
-          type: 'warning',
-          message: 'Deleted',
-          actions: [
-            {
-              label: 'Undo',
-              handler: () => {
-                this.$store.dispatch('cards/create', deletedCard)
+      this.$q.dialog({
+        title: 'Delete card',
+        message: `Are you sure you want to delete ${this.model.title}?`,
+        ok: true,
+        cancel: true
+      }).then(() => {
+        this.$store.dispatch('cards/remove', this.model).then((deletedCard) => {
+          this.$q.notify({
+            type: 'warning',
+            message: 'Card deleted',
+            actions: [
+              {
+                label: 'Undo',
+                handler: () => {
+                  this.$store.dispatch('cards/create', deletedCard)
+                }
               }
-            }
-          ]
+            ]
+          })
         })
       })
     },

@@ -51,8 +51,9 @@ public class CardBuilder {
     }
 
     public Card buildCard(Intent intent, List<Item> matchedItems) {
-        Set<String> tags = intent.getEntities().entrySet().stream().map(e -> e.getKey() + ":" + e.getValue())
-                .collect(Collectors.toSet());
+        Set<String> tags = intent.getEntities().entrySet().stream()
+                .filter(e -> e.getKey().equals("object") || e.getKey().equals("location"))
+                .map(e -> e.getKey() + ":" + e.getValue()).collect(Collectors.toSet());
 
         Collection<Card> cardsInRegistry = this.cardRegistry.getCardByTags(tags).stream()
                 .filter(c -> !c.isNotReuseableInChat()).collect(Collectors.toList());
@@ -77,17 +78,31 @@ public class CardBuilder {
                     card.addComponent("right", switchComponent);
                     break;
                 case CoreItemFactory.DIMMER:
-                    // Component dimmerValueComponent = new Component("HbSingleItemValue");
-                    // dimmerValueComponent.addConfig("item", item.getName());
-                    // card.addComponent("right", dimmerValueComponent);
-                    Component dimmerSwitchComponent = new Component("HbSwitch");
-                    dimmerSwitchComponent.addConfig("item", item.getName());
-                    card.addComponent("right", dimmerSwitchComponent);
+                    if (item.hasTag("habot:switchable")) {
+                        Component dimmerSwitchComponent = new Component("HbSwitch");
+                        dimmerSwitchComponent.addConfig("item", item.getName());
+                        card.addComponent("right", dimmerSwitchComponent);
+                    } else if (!item.hasTag("habot:control:knob")) {
+                        Component dimmerValueComponent = new Component("HbSingleItemValue");
+                        dimmerValueComponent.addConfig("item", item.getName());
+                        card.addComponent("right", dimmerValueComponent);
+                    }
+
                     Component dimmerContainerComponent = new Component("HbContainer");
                     dimmerContainerComponent.addConfig("classes", new String[] { "full-width", "text-center" });
-                    Component sliderComponent = new Component("HbSlider");
-                    sliderComponent.addConfig("item", item.getName());
-                    dimmerContainerComponent.addComponent("main", sliderComponent);
+                    if (item.hasTag("habot:control:knob")) {
+                        Component knobComponent = new Component("HbKnob");
+                        knobComponent.addConfig("item", item.getName());
+                        knobComponent.addConfig("size", "200px");
+                        knobComponent.addConfig("textSize", "2rem");
+                        knobComponent.addConfig("color", "primary");
+                        dimmerContainerComponent.addComponent("main", knobComponent);
+                    } else {
+                        Component sliderComponent = new Component("HbSlider");
+                        sliderComponent.addConfig("item", item.getName());
+                        dimmerContainerComponent.addComponent("main", sliderComponent);
+                    }
+
                     card.addComponent("main", dimmerContainerComponent);
                     break;
                 case CoreItemFactory.ROLLERSHUTTER:
@@ -105,6 +120,15 @@ public class CardBuilder {
                     shutterControlComponent.addConfig("stopIcon", "close");
                     shutterContainerComponent.addComponent("main", shutterControlComponent);
                     card.addComponent("main", shutterContainerComponent);
+                    break;
+                case CoreItemFactory.PLAYER:
+                    Component playerContainerComponent = new Component("HbContainer");
+                    playerContainerComponent.addConfig("classes", new String[] { "full-width", "text-center" });
+                    Component playerComponent = new Component("HbPlayer");
+                    playerComponent.addConfig("item", item.getName());
+                    playerComponent.addConfig("size", "lg");
+                    playerContainerComponent.addComponent("main", playerComponent);
+                    card.addComponent("main", playerContainerComponent);
                     break;
                 case CoreItemFactory.COLOR:
                     Component colorPickerComponent = new Component("HbColorPicker");
@@ -127,7 +151,6 @@ public class CardBuilder {
                     singleItemComponent.addConfig("item", item.getName());
                     card.addComponent("right", singleItemComponent);
                     break;
-
             }
 
         } else {

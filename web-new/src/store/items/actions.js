@@ -48,7 +48,7 @@ export const watchEvents = async (context, credential) => {
 
 export const sendCmd = (context, payload) => {
   if (payload.updateState) {
-    let currentState = context.getters.itemState(payload.itemName)
+    let currentState = context.getters.itemState(payload.itemName, true)
     if (currentState && currentState === payload.command) return
     context.commit('updateOne', { itemName: payload.itemName, newState: payload.command.toString() })
   }
