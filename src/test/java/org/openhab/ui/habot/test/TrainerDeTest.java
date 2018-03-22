@@ -192,6 +192,34 @@ public class TrainerDeTest extends AbstractTrainerTest {
         assertEquals(Skills.SET_VALUE, actual.getName());
         assertEquals(2, actual.getEntities().size());
         assertEquals("temperatur", actual.getEntities().get("object"));
-        assertEquals("21", actual.getEntities().get("value"));            
+        assertEquals("21", actual.getEntities().get("value")); 
+        
+        actual = interpret("Dimme das Licht auf 70%");
+        assertEquals(Skills.SET_VALUE, actual.getName());
+        assertEquals(2, actual.getEntities().size());
+        assertEquals("licht", actual.getEntities().get("object"));
+        assertEquals("70", actual.getEntities().get("value"));  
+        
+        actual = interpret("Dimme das Licht im Wohnzimmer auf 70%");
+        assertEquals(Skills.SET_VALUE, actual.getName());
+        assertEquals(3, actual.getEntities().size());
+        assertEquals("licht", actual.getEntities().get("object"));
+        assertEquals("wohnzimmer", actual.getEntities().get("location"));
+        assertEquals("70", actual.getEntities().get("value")); 
+        
+        actual = interpret("Regle im Wohnzimmer die Lautstärke auf 50");
+        assertEquals(Skills.SET_VALUE, actual.getName());
+        assertEquals(3, actual.getEntities().size());
+        assertEquals("lautstärke", actual.getEntities().get("object"));
+        assertEquals("wohnzimmer", actual.getEntities().get("location"));
+        assertEquals("50", actual.getEntities().get("value")); 
+ 
+
+        actual = interpret("Färbe das Licht grün");
+        assertEquals(Skills.SET_VALUE, actual.getName());
+        assertEquals(2, actual.getEntities().size());
+        assertEquals("licht", actual.getEntities().get("object"));
+        assertEquals("grün", actual.getEntities().get("value"));  
+     
     }
 }
