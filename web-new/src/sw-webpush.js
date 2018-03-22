@@ -41,8 +41,16 @@ self.addEventListener('push', function (event) {
       return self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function (clientList) {
         // post messages to all matching clients in case they're on the "Chat with HABot" page - the message would simply be
         // added to the current chat
+
+        let payload = JSON.stringify({
+          title: notificationTitle,
+          body: notificationOptions.body,
+          data: notificationOptions.data,
+          actions: notificationOptions.actions
+        })
+
         for (let client of clientList) {
-          client.postMessage(notificationOptions.body)
+          client.postMessage(payload)
         }
 
         if (!focused) {
@@ -59,14 +67,21 @@ self.addEventListener('notificationclick', function (event) {
 
   event.waitUntil(
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function (clientList) {
+      let payload = JSON.stringify({
+        title: event.notification.title,
+        body: event.notification.body,
+        data: event.notification.data,
+        actions: event.notification.actions
+      })
+      let url = 'index.html#/notification#' + btoa(encodeURIComponent(payload))
       if (clientList.length > 0) {
         for (let client of clientList) {
-          client.navigate('index.html#/notification#' + event.notification.body)
+          client.navigate(url)
         }
         return clientList[0].focus()
       }
 
-      return self.clients.openWindow('index.html#/notification#' + event.notification.body)
+      return self.clients.openWindow(url)
     })
   )
 })

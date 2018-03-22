@@ -88,7 +88,7 @@ export default {
       }
     },
     sendCmd () {
-      this.$store.dispatch('items/sendCmd')(this.model.config.item, this.model.config.command)
+      this.$store.dispatch('items/sendCmd', { itemName: this.model.config.item, command: this.model.config.command })
     }
   },
   computed: {

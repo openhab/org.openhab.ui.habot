@@ -21,7 +21,7 @@
 @import '~variables'
 
 .hb-cards
-  padding 15px
+  padding 10px
   width 100%
   @media (min-width $breakpoint-xs-min)
     .q-card
@@ -49,21 +49,25 @@ export default {
   methods: {
     computeSuggestions (done) {
       this.cards = []
-      let candidates = this.$store.getters['cards/suggestioncandidates']
-
-      let promises = []
-
-      for (let card of candidates) {
-        promises.push(this.$expr('=' + card.config.suggestcriteria).then((result) => {
-          if (result === true) {
-            this.cards.push(card)
-          }
-        }))
-      }
-
-      Promise.all(promises).then(() => {
+      this.$store.dispatch('cards/computeSuggestions').then((cards) => {
+        this.cards = cards
         if (done) done()
       })
+    //   let candidates = this.$store.getters['cards/suggestioncandidates']
+
+    //   let promises = []
+
+    //   for (let card of candidates) {
+    //     promises.push(this.$expr('=' + card.config.suggestcriteria).then((result) => {
+    //       if (result === true) {
+    //         this.cards.push(card)
+    //       }
+    //     }))
+    //   }
+
+    //   Promise.all(promises).then(() => {
+    //     if (done) done()
+    //   })
     }
   },
   mounted () {

@@ -156,7 +156,7 @@
   padding 1rem
   .node-header
     margin -15px -15px 10px -15px
-    background $white
+    background white
     padding 15px
     border-bottom 1px solid $grey-5
 .actions
@@ -269,7 +269,8 @@ export default {
   },
   methods: {
     goBack () {
-      this.$router.push('/cards/deck')
+      // this.$router.push('/cards/deck')
+      this.$router.back()
     },
     save () {
       if (!this.hasValidTags) {
@@ -280,7 +281,13 @@ export default {
       // let request = (this.newCard) ? this.$http.post('/rest/habot/cards/', this.card) : this.$http.put('/rest/habot/cards/' + this.uid, this.card)
       let action = (this.newCard) ? this.$store.dispatch('cards/create', this.card) : this.$store.dispatch('cards/update', this.card)
       action.then(() => {
-        this.$q.notify({ type: 'positive', message: 'Card saved' })
+        this.originalCard = JSON.stringify(this.card)
+        if (this.newCard) {
+          this.$q.notify({ type: 'positive', message: 'Card created' })
+          this.newCard = false
+        } else {
+          this.$q.notify({ type: 'positive', message: 'Card saved' })
+        }
       }).catch((err) => {
         this.$q.notify(err.message)
       })
@@ -493,6 +500,20 @@ export default {
       }
 
       vm.buildTree()
+    }
+
+    vm.originalCard = JSON.stringify(vm.card)
+  },
+  beforeRouteLeave (to, from, next) {
+    if (JSON.stringify(this.cardModel) === this.originalCard) {
+      next()
+    } else {
+      const answer = window.confirm('Do you really want to leave the Card Designer? You have unsaved changes!')
+      if (answer) {
+        next()
+      } else {
+        next(false)
+      }
     }
   }
 }

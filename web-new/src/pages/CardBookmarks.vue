@@ -16,7 +16,7 @@
 @import '~variables'
 
 .hb-cards
-  padding 15px
+  padding 10px
   width 100%
   @media (min-width $breakpoint-xs-min)
     .q-card

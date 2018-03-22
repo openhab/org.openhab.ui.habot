@@ -46,20 +46,22 @@
 
         </q-card>
 
-        <div v-if="chat.greetingSuggestions">
-          <q-btn outline rounded no-caps color="secondary" style="opacity: 0.6" icon="bookmark" @click="$router.push('/cards/bookmarks')">Bookmarks</q-btn>
-          <q-btn outline rounded no-caps color="secondary" style="opacity: 0.6" icon="star" @click="$router.push('/cards/suggestions')">Suggestions</q-btn>
+        <div v-if="chat.greetingSuggestions" class="suggestion-chips">
+          <q-btn rounded outline no-caps v-if="bookmarksCount" color="secondary" icon="bookmark" @click="$router.push('/cards/bookmarks')">Bookmarks</q-btn>
+          <q-btn rounded outline no-caps v-if="suggestionsCount" color="secondary" icon="star" @click="$router.push('/cards/suggestions')">Suggestions
+            <q-chip floating small dense color="red">{{suggestionsCount}}</q-chip>
+          </q-btn>
         </div>
       </div>
     </div>
 
     <q-page-sticky position="bottom" class="chat-input-sticky">
       <q-toolbar class="chat-input-toolbar bg-grey-3 shadow-up-3">
-        <q-input ref="input" v-model="text" class="full-width" :placeholder="inputPlaceholder" :after="inputAfter" @keyup="keyUp" />
+        <q-input :disabled="busy" ref="input" v-model="text" class="full-width" :placeholder="inputPlaceholder" :autofocus="$q.platform.is.desktop" :after="inputAfter" @keyup="keyUp" />
       </q-toolbar>
     </q-page-sticky>
 
-    <speech-button v-on:start="startSpeech"
+    <speech-button v-if="!$q.platform.is.mobile || !busy" v-on:start="startSpeech"
                    v-on:end="endSpeech"
                    v-on:result="speechFinalResult"
                    v-on:interimresult="speechInterimResult"
@@ -78,12 +80,25 @@
 
 .chat-area
   padding-bottom 64px
+  padding-left 10px
+  padding-right 10px
+  .q-message-avatar
+    min-width 48px !important
+  .q-message-sent .q-message-avatar
+    display none
+  .suggestion-chips
+    text-align center
   @media (min-width $breakpoint-xs-min)
+    position relative
+    max-width 600px
+    left 50%
+    transform translateX(-50%)
     .q-card
       width $card-min-width
   @media (max-width $breakpoint-xs-max)
     .q-card
-      width calc(100% - 20px)
+      width calc(100%)
+
 .chat-input-toolbar
   input
     margin-right 34px
@@ -91,8 +106,6 @@
   .q-icon
     position absolute
     right 0
-.q-message-avatar
-  min-width 48px !important
 </style>
 
 <script>
@@ -108,6 +121,7 @@ export default {
   },
   data () {
     return {
+      busy: false,
       text: '',
       chats: [
         {
@@ -122,7 +136,9 @@ export default {
         handler: this.send
       }],
       showPWAPrompt: false,
-      inputPlaceholder: 'Ask me about your home'
+      inputPlaceholder: 'Ask me about your home',
+      suggestionsCount: 0,
+      bookmarksCount: 0
     }
   },
   created () {
@@ -136,7 +152,8 @@ export default {
 
     if (this.$route.redirectedFrom && this.$route.redirectedFrom.indexOf('/notification#') === 0) {
       var notificationData = this.$route.redirectedFrom.replace('/notification#', '')
-      this.pushNotificationReceived({ data: notificationData })
+      let notification = decodeURIComponent(atob(notificationData))
+      this.pushNotificationReceived({ data: notification })
       return
     }
 
@@ -147,7 +164,7 @@ export default {
       }
       vm.chats[0].messages.push({
         id: new Date(),
-        name: 'HABot',
+        name: '', // 'HABot',
         text: [response.data.answer],
         avatar: 'statics/icons/icon-192x192.png',
         stamp: date.formatDate(new Date(), 'HH:mm')
@@ -158,7 +175,7 @@ export default {
         : (error.response && error.response.statusText) ? error.response.statusText : error.message
       vm.chats[0].messages.push({
         id: new Date(),
-        name: 'HABot',
+        name: '', // 'HABot',
         text: [errormessage],
         avatar: 'statics/icons/icon-192x192.png',
         bgColor: 'red',
@@ -170,6 +187,11 @@ export default {
         window.matchMedia && !window.matchMedia('(display-mode: standalone)').matches) {
       this.showPWAPrompt = true
     }
+
+    this.$store.dispatch('cards/computeSuggestions').then((cards) => {
+      this.suggestionsCount = cards.length
+    })
+    this.bookmarksCount = this.$store.getters['cards/bookmarked'].length
   },
   mounted () {
     // if (this.$q.platform.is.iphone) {
@@ -192,10 +214,12 @@ export default {
         currentChat = this.chats[this.chats.length - 1]
       }
 
+      let notification = JSON.parse(ev.data)
+
       currentChat.messages.push({
         id: new Date(),
-        name: 'HABot',
-        text: [ev.data],
+        name: 'Notification', // 'HABot',
+        text: [notification.body],
         avatar: 'statics/icons/icon-192x192.png',
         stamp: date.formatDate(new Date(), 'HH:mm')
       })
@@ -206,12 +230,14 @@ export default {
       if (currentChat.greetingSuggestions) delete currentChat.greetingSuggestions
       currentChat.messages.push({
         id: new Date(),
-        name: 'You',
+        name: '', // 'You',
         text: [this.text],
         avatar: 'statics/avatar.png',
         sent: true,
         stamp: date.formatDate(new Date(), 'HH:mm')
       })
+
+      this.busy = true
 
       this.$http.post('/rest/habot/chat', this.text, {
         headers: {
@@ -222,7 +248,7 @@ export default {
         if (response.data.answer) {
           currentChat.messages.push({
             id: new Date(),
-            name: 'HABot',
+            name: '', // 'HABot',
             text: (response.data.hint) ? [response.data.answer, response.data.hint] : [response.data.answer],
             avatar: 'statics/icons/icon-192x192.png',
             stamp: date.formatDate(new Date(), 'HH:mm')
@@ -235,6 +261,8 @@ export default {
             currentChat.card.config = { bigger: true }
           }
         }
+
+        this.busy = false
 
         currentChat.finished = true
         this.chats.push({
@@ -250,7 +278,7 @@ export default {
 
         currentChat.messages.push({
           id: new Date(),
-          name: 'HABot',
+          name: '', // 'HABot',
           text: [errormessage],
           avatar: 'statics/icons/icon-192x192.png',
           bgColor: 'negative',

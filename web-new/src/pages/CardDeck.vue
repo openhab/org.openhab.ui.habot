@@ -76,7 +76,7 @@
           transform scale(0.75) translate(0, -28px)
 
 .hb-cards
-  padding 15px
+  padding 10px
   width 100%
   @media (min-width $breakpoint-xs-min)
     .q-card

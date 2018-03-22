@@ -19,6 +19,15 @@
             <q-item v-close-overlay v-if="this.menu === 'chat' && !this.model.uid && !this.model.addToDeckDenied" @click.native="addCardToDeckAndBookmark()">
               <q-item-main label="Add &amp; bookmark" />
             </q-item>
+            <q-item v-close-overlay v-if="this.menu === 'chat' && this.model.uid" @click.native="editCard()">
+              <q-item-main label="Edit" />
+            </q-item>
+            <q-item v-close-overlay v-if="this.menu === 'chat' && this.model.uid && !this.model.bookmarked" @click.native="bookmarkCard()">
+              <q-item-main label="Bookmark" />
+            </q-item>
+            <q-item v-close-overlay v-if="this.menu === 'chat' && this.model.uid && this.model.bookmarked" @click.native="unbookmarkCard()">
+              <q-item-main label="Remove bookmark" />
+            </q-item>
             <q-item v-close-overlay v-if="this.menu === 'deck'" @click.native="editCard()">
               <q-item-main label="Edit" />
             </q-item>
@@ -39,6 +48,7 @@
             </q-item>
           </q-list>
         </q-popover>
+        <q-icon name="bookmark" class="corner-bookmark" v-if="this.model.bookmarked" />
       </q-btn>
     </div>
   </q-card-title>
@@ -61,9 +71,13 @@
 //   color black
 //   font-size 200%
 //   vertical-align middle
+.corner-bookmark
+  position absolute
+  top: -24px
+  opacity 0.2
 @media (min-width $breakpoint-sm-min)
   .bigger
-    width 400px !important
+    width 384px !important
 </style>
 
 <script>
@@ -113,11 +127,13 @@ export default {
     bookmarkCard () {
       this.$store.dispatch('cards/bookmark', this.model).then(() => {
         this.$q.notify({ type: 'info', message: 'Added to bookmarks' })
+        this.model.bookmarked = true
       })
     },
     unbookmarkCard () {
       this.$store.dispatch('cards/unbookmark', this.model).then(() => {
         this.$q.notify({ type: 'info', message: 'Removed from bookmarks' })
+        this.model.bookmarked = false
       })
     },
     editCard () {
@@ -125,18 +141,25 @@ export default {
       this.$router.push('/designer/' + this.model.uid)
     },
     deleteCard () {
-      this.$store.dispatch('cards/remove', this.model).then((deletedCard) => {
-        this.$q.notify({
-          type: 'warning',
-          message: 'Deleted',
-          actions: [
-            {
-              label: 'Undo',
-              handler: () => {
-                this.$store.dispatch('cards/create', deletedCard)
+      this.$q.dialog({
+        title: 'Delete card',
+        message: `Are you sure you want to delete ${this.model.title}?`,
+        ok: true,
+        cancel: true
+      }).then(() => {
+        this.$store.dispatch('cards/remove', this.model).then((deletedCard) => {
+          this.$q.notify({
+            type: 'warning',
+            message: 'Card deleted',
+            actions: [
+              {
+                label: 'Undo',
+                handler: () => {
+                  this.$store.dispatch('cards/create', deletedCard)
+                }
               }
-            }
-          ]
+            ]
+          })
         })
       })
     },

@@ -34,10 +34,11 @@ export const allStates = (state) => {
   return states
 }
 
-export const itemState = (state) => (name) => {
-  if (!state.items) return []
+export const itemState = (state) => (name, raw) => {
+  if (!state.items) return null
   let item = state.items.find(item => item.name === name)
   if (item && item.state) {
+    if (raw) return item.state
     if (item.transformedState) {
       return item.transformedState
     } else if (item.stateDescription && item.stateDescription.pattern) {
