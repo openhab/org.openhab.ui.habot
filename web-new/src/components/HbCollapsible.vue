@@ -1,5 +1,6 @@
 <template>
-<q-collapsible :group="model.config.group" :sparse="model.config.sparse" :dense="model.config.dense" :indent="model.config.indent" separator>
+<q-collapsible :group="model.config.group" :sparse="model.config.sparse" :dense="model.config.dense" :indent="model.config.indent" separator
+  :class="{'highlight-and-fade': this.model.highlight}">
   <template slot="header">
     <q-item-main>
       <q-item-tile label>{{label}}</q-item-tile>

@@ -1,5 +1,5 @@
 <template>
-  <q-toggle :value="itemState" true-value="ON" false-value="OFF" @input="onChange"></q-toggle>
+  <q-toggle :value="itemState" true-value="ON" false-value="OFF" @input="onChange" :class="{'highlight-and-fade': this.model.highlight}"></q-toggle>
 </template>
 
 <style lang="stylus">

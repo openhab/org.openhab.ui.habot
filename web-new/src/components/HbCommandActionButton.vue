@@ -1,5 +1,6 @@
 <template>
-  <q-btn flat :label="label" :icon="this.model.config.icon" :disabled="disabled" :text-color="textColor" @click="sendCmd()">
+  <q-btn flat :label="label" :icon="this.model.config.icon" :disabled="disabled" :text-color="textColor" @click="sendCmd()"
+    :class="{'highlight-and-fade': this.model.highlight}">
   </q-btn>
 </template>
 

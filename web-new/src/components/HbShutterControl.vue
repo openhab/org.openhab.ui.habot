@@ -1,5 +1,6 @@
 <template>
-  <q-btn-group :flat="this.model.config.flat" :rounded="this.model.config.rounded" :outline="this.model.config.outline" :push="this.model.config.push">
+  <q-btn-group :flat="this.model.config.flat" :rounded="this.model.config.rounded" :outline="this.model.config.outline" :push="this.model.config.push"
+    :class="{'highlight-and-fade': this.model.highlight}">
     <q-btn :flat="this.model.config.flat" :rounded="this.model.config.rounded" :outline="this.model.config.outline" :dense="this.model.config.dense"
            :push="this.model.config.push" :glossy="this.model.config.glossy" :no-ripple="this.model.config.noRipple"
            :size="this.model.config.size" :icon="iconUpDown('up')" :text-color="upColor" @click="sendCmd('UP')" />

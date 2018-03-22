@@ -1,5 +1,5 @@
 <template>
-<q-card inline v-if="model" :class="{ bigger: model.config && model.config.bigger }" :color="color" :text-color="textColor">
+<q-card inline v-if="model" :class="{ bigger: model.config && model.config.bigger, 'highlight-and-fade': this.model.highlight }" :color="color" :text-color="textColor">
   <q-card-media v-if="model.slots && model.slots.media">
     <component v-for="(component, idx) in model.slots.media" :key="'card-media-' + idx" :is="component.component" :model="component"></component>
   </q-card-media>

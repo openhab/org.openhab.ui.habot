@@ -1,12 +1,13 @@
 <template>
   <q-knob v-model="itemState" ref="knob"
+    :class="{'highlight-and-fade': this.model.highlight}"
     :color="color || undefined"
     :trackColor="trackColor || undefined"
     :size="model.config.size || undefined"
     :style="{ 'font-size': this.model.config.textSize }"
     :min="parseFloat(model.config.min) || defaultMin"
     :max="parseFloat(model.config.max) || defaultMax"
-    :step="parseFloat(model.config.max) || defaultStep"
+    :step="parseFloat(model.config.step) || defaultStep"
     :lineWidth="model.config.lineWidth ? parseInt(model.config.lineWidth) : undefined"
   >
     <span v-if="label || iconLeft || iconRight">

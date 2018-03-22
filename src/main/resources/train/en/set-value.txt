@@ -8,7 +8,7 @@ change the <START:object> volume <END> in the <START:location> kitchen <END> at 
 set the <START:object> music volume <END> in the <START:location> kitchen <END> at <START:value> 70 % <END>
 change the color of the <START:object> lights <END> of the <START:location> bathroom <END> <START:color> yellow <END>
 change the <START:object> lights <END> color on the <START:location> first floor <END> in <START:color> white <END>
-put the <START:object> lights <END> in the <START:color> bedroom <END> at <START:object> 30% <END>
+put the <START:object> lights <END> in the <START:color> bedroom <END> at <START:value> 30% <END>
 set the <START:object> heating <END> in the <START:location> guest house <END> to <START:color> 70°F <END>
 set the <START:object> lights <END> to <START:color> red <END>
 put the <START:object> lights <END> to <START:color> orange <END>

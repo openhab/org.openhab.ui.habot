@@ -1,5 +1,5 @@
 <template>
-  <big class="big-value">{{state}}</big>
+  <big class="big-value" :class="{'highlight-and-fade': this.model.highlight}">{{state}}</big>
 </template>
 
 <style lang="stylus" scoped>

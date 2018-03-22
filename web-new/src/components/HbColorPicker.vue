@@ -1,5 +1,6 @@
 <template>
-  <div v-if="!this.model.config.inline" class="q-color-swatch q-mr-md q-ml-md overflow-hidden hb-color-swatch shadow-4" @click="showModal = true" >
+  <div v-if="!this.model.config.inline" class="q-color-swatch q-mr-md q-ml-md overflow-hidden hb-color-swatch shadow-4" @click="showModal = true"
+    :class="{'highlight-and-fade': this.model.highlight}">
     <div class="fit" v-if="colorHex" :style="{ 'background-color': colorHex }"></div>
     <q-modal minimized v-model="showModal">
       <q-color-picker class="hb-color-modal" v-model="rgb" />

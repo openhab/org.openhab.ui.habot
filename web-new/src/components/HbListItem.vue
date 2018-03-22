@@ -1,5 +1,5 @@
 <template>
-<q-item :tag="tag">
+<q-item :tag="tag" :class="{'highlight-and-fade': this.model.highlight}">
   <q-item-side v-if="model.config.leftIcon || model.config.leftLetter || model.config.leftAvatar"
     :icon="leftIcon" :letter="leftLetter" :avatar="this.model.config.leftAvatar" :color="leftColor" :inverted="this.model.config.leftInverted" />
   <q-item-main>

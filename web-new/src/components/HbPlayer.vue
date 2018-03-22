@@ -1,5 +1,5 @@
 <template>
-  <hb-btn-group :model="btnGroupModel" />
+  <hb-btn-group :model="btnGroupModel" :class="{'highlight-and-fade': this.model.highlight}" />
 </template>
 
 <script>

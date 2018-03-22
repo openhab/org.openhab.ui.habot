@@ -1,5 +1,5 @@
 <template>
-  <q-btn flat icon="timeline" label="Analyze" @click="showAnalyzer = true">
+  <q-btn flat icon="timeline" label="Analyze" @click="showAnalyzer = true" :class="{'highlight-and-fade': this.model.highlight}">
     <q-modal v-model="showAnalyzer" :content-css="{minWidth: '80vw', minHeight: '80vh'}" @show="opened()" maximized>
       <analyze ref="analyzer" v-if="showAnalyzer" :model="model"></analyze>
     </q-modal>

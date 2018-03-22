@@ -201,6 +201,7 @@ function componentToTreeNode (c, prefix) {
     icon: 'widgets',
     label: c.component
   }
+  // Vue.set(c, 'highlight', false)
   if (c.title) node.title = c.title
   if (c.subtitle) node.subtitle = c.subtitle
   if (!c.config) c.config = {}
@@ -381,7 +382,6 @@ export default {
           for (let child of node.children) {
             let found = findInTree(child, id)
             if (found) {
-              found.component.highlighted = true
               return found
             }
           }
@@ -503,6 +503,17 @@ export default {
     }
 
     vm.originalCard = JSON.stringify(vm.card)
+  },
+  watch: {
+    selectedNode (val, old) {
+      if (!val || !val.component) return
+      if (val.component.component === 'HbCard') return // don't highlight the whole card
+      let component = val.component
+      Vue.set(component, 'highlight', true)
+      window.setTimeout(() => {
+        Vue.delete(component, 'highlight')
+      }, 1000)
+    }
   },
   beforeRouteLeave (to, from, next) {
     if (JSON.stringify(this.cardModel) === this.originalCard) {

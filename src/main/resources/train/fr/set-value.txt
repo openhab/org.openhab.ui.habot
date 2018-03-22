@@ -20,8 +20,8 @@ change la couleur du <START:location> couloir <END> en <START:color> mauve <END>
 mets les <START:location> lumières <END> en couleur <START:color> jaune <END>
 couleur <START:color> vert <END> pour le <START:location> bureau <END>
 change la couleur en <START:color> orange <END> dans le <START:location> séjour <END>
-mets la <START:object> lumière <END> de la <START:location> table <END> en <START:couleur> vert <END>
-mets la <START:object> lumière <END> de la <START:location> table <END> en <START:couleur> vert <END>
+mets la <START:object> lumière <END> de la <START:location> table <END> en <START:color> vert <END>
+mets la <START:object> lumière <END> de la <START:location> table <END> en <START:color> vert <END>
 mets la <START:object> musique <END> à <START:value> 60% <END>
 mets la <START:object> température <END> du <START:location> premier étage <END> à <START:value> 22 degrés <END>
 change la <START:object> température <END> dans la <START:location> chambre d amis <END> à <START:value> 23 °C <END>

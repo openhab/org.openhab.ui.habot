@@ -1,5 +1,6 @@
 <template>
   <q-btn v-if="!hasPopover"
+         :class="{'highlight-and-fade': this.model.highlight}"
          :icon="this.model.config.icon"
          :icon-right="this.model.config.iconRight"
          :disabled="disabled"

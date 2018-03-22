@@ -1,5 +1,5 @@
 <template>
-  <div style="width: 100%; padding-bottom: 50%">
+  <div style="width: 100%; padding-bottom: 50%" :class="{'highlight-and-fade': this.model.highlight}">
     <img :src="imageUrl" style="position: absolute; top: 0; width: 100%">
     <q-inner-loading :visible="working" color="primary"></q-inner-loading>
   </div>

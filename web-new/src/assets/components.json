@@ -111,7 +111,15 @@
         "configDescriptions": {
             "classes": {
                 "type": "array",
-                "description": "CSS Classes to apply to the container; see http://quasar-framework.org/components/"
+                "description": "CSS classes to apply to the container; see http://quasar-framework.org/components/"
+            },
+            "classesExpr": {
+                "type": "text",
+                "description": "Optional expression which should evaluate to an array with additional CSS classes to apply; for example: [\"bg-\" + (items.Temperature.state > 16 ? \"positive\" : \"negative\"]"
+            },
+            "visible": {
+                "type": "text",
+                "description": "Optional boolean expression to control the visibility of the container (hidden if false); for example: items.Temperature.state <= 16"
             },
             "text": {
                 "type": "text",

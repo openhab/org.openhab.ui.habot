@@ -1,5 +1,5 @@
 <template>
-  <q-slider ref="slider" v-model="itemState" :color="color"
+  <q-slider ref="slider" v-model="itemState" :color="color" :class="{'highlight-and-fade': this.model.highlight}"
             :min="parseFloat(model.config.min) || defaultMin" :max="parseFloat(model.config.max) || defaultMax" :step="parseFloat(model.config.step) || defaultStep"
             :snap="model.config.snap" :markers="model.config.markers" :square="model.config.square"
             :label="model.config.label" :label-always="model.config.labelAlways" :label-value="label"

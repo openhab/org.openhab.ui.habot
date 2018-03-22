@@ -1,5 +1,6 @@
 <template>
-  <q-list :link="model.config.link" v-if="model.slots" :separator="!this.model.config.noseparator" :striped="this.model.config.striped">
+  <q-list :link="model.config.link" v-if="model.slots" :separator="!this.model.config.noseparator" :striped="this.model.config.striped"
+      :class="{'highlight-and-fade': this.model.highlight}">
     <component :is="component.component" v-for="(component, idx) in model.slots.items" :model="component" :link="model.config.link" :key="'list-item-' + idx" />
   </q-list>
 </template>
