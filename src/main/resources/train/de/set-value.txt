@@ -1,0 +1,21 @@
+stell den <START:object> Thermostat <END> auf <START:value> 23 <END> °C
+stell den <START:object> Thermostat <END> auf <START:value> 23 <END> Grad
+regle die <START:object> Temperatur <END> auf <START:value> 21 <END> Grad
+<START:object> Temperatur <END> auf <START:value> 21 <END> Grad erhöhen
+<START:object> Temperatur <END> auf <START:value> 10 <END> Grad
+<START:object> Licht <END> auf <START:value> 75 <END> % dimmen
+Dimme das <START:object> Licht <END> auf <START:value> 20 <END> %
+Dimme das <START:object> Licht <END> auf <START:value> 20 <END> % herrunter
+stell die Intensität des <START:object> Licht <END> auf <START:value> 100 <END>%
+dimme das <START:object> Licht <END> im <START:location> Wohnzimmer <END> auf <START:value> 20 <END>%
+dimme das <START:object> Licht <END> im <START:location> Schlafzimmer <END> auf <START:value> 20 <END>% herrunter
+dimme die <START:object> Beleuchtung <END> in der <START:location> Küche <END> auf <START:value> 100 <END>%
+regle die <START:object> Lautstärke <END> auf <START:value> 20 <END>
+regle die <START:object> Lautstärke <END> im <START:location> Wohnzimmer <END> auf <START:value> 20 <END>
+<START:object> Lautstärke <END> im <START:location> Wohnzimmer <END> auf <START:value> 20 <END>
+stell die <START:object> Lautstärke <END> in der <START:location> Küche <END> auf <START:value> 20 <END>
+stell die <START:object> Lautstärke <END> des <START:object> Fernsehers <END> auf <START:value> 20 <END>
+färbe das <START:object> Licht <END> <START:value> rot <END>
+färbe das <START:object> Licht <END> im <START:location> Pool <END> <START:value> rot <END>
+mach das <START:object> Licht <END> im <START:location> Pool <END> <START:value> rot <END>
+<START:object> Licht <END> in <START:value> rot <END> einfärben
