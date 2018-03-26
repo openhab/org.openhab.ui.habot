@@ -8,8 +8,13 @@ import java.util.stream.Collectors;
 import org.eclipse.smarthome.core.items.Item;
 import org.eclipse.smarthome.core.items.ItemRegistry;
 import org.eclipse.smarthome.core.library.CoreItemFactory;
+import org.eclipse.smarthome.core.transform.TransformationHelper;
+import org.eclipse.smarthome.core.types.State;
+import org.eclipse.smarthome.core.types.StateDescription;
 import org.openhab.ui.habot.card.internal.CardRegistry;
 import org.openhab.ui.habot.nlp.Intent;
+import org.openhab.ui.habot.nlp.internal.skill.HistoryLastChangesSkill;
+import org.osgi.framework.FrameworkUtil;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -146,16 +151,37 @@ public class CardBuilder {
                     card.addComponent("main", brightnessDimmerContainerComponent);
                     break;
                 default:
-                    // TODO: display in the main slot instead, depending on the width of the (transformed) state
-                    Component singleItemComponent = new Component("HbSingleItemValue");
-                    singleItemComponent.addConfig("item", item.getName());
-                    card.addComponent("right", singleItemComponent);
+                    if (item.getType() == CoreItemFactory.IMAGE
+                            || item.getTags().stream().anyMatch(t -> t.startsWith("habot:image:sitemap:"))) {
+                        /*
+                         * If the item is an image (or a String with a tag indicating it's an image), build a
+                         * HbImage component in the "media" slot
+                         */
+                        Component singleImageComponent = new Component("HbImage");
+                        singleImageComponent.addConfig("item", item.getName());
+                        card.addComponent("media", singleImageComponent);
+                    } else {
+                        /*
+                         * Try to get a formatted state to determine whether it's small enough to display
+                         * in the "right" slot - otherwise add it to the "main" slot
+                         */
+                        String formattedState = formatState(item, item.getState());
+                        Component singleItemComponent = new Component("HbSingleItemValue");
+                        singleItemComponent.addConfig("item", item.getName());
+                        if (formattedState.length() < 10) {
+                            card.addComponent("right", singleItemComponent);
+                        } else {
+                            card.addComponent("main", singleItemComponent);
+                        }
+                    }
                     break;
             }
 
         } else {
             card.setTitle(getCardTitleFromGroupLabels(tags));
             card.setSubtitle(matchedItems.size() + " items"); // TODO: i18n
+
+            // TODO: detect images and build a HbCarousel with them - for webcams etc.
 
             Component list = new Component("HbList");
             for (Item item : matchedItems) {
@@ -210,6 +236,32 @@ public class CardBuilder {
             return "";
         } else {
             return groups.stream().map(i -> i.getLabel()).collect(Collectors.joining(", "));
+        }
+    }
+
+    private String formatState(Item item, State state) {
+        if (item.getStateDescription() != null) {
+            StateDescription stateDescription = item.getStateDescription();
+            if (stateDescription != null && stateDescription.getPattern() != null) {
+                try {
+                    String transformedState = TransformationHelper.transform(
+                            FrameworkUtil.getBundle(HistoryLastChangesSkill.class).getBundleContext(),
+                            stateDescription.getPattern(), state.toString());
+                    if (transformedState.equals(state.toString())) {
+                        return state.format(stateDescription.getPattern());
+                    } else {
+                        return transformedState;
+                    }
+                } catch (NoClassDefFoundError ex) {
+                    // TransformationHelper is optional dependency, so ignore if class not found
+                    // return state as it is without transformation
+                    return state.toString();
+                }
+            } else {
+                return state.toString();
+            }
+        } else {
+            return state.toString();
         }
     }
 }

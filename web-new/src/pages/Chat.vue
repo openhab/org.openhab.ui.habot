@@ -2,7 +2,7 @@
   <q-page padding class="row justify-center">
     <q-page-sticky position="top" v-if="showPWAPrompt" style="z-index: 2000">
       <q-alert icon="info" color="yellow" text-color="grey-9"
-        :actions="[{ label: 'Learn how', handler () {} }, { label: 'Dismiss', handler () { showPWAPrompt = false } }]">
+        :actions="[{ label: 'Learn how', handler: openEnhancedFeaturesTutorial }, { label: 'Dismiss', handler () { showPWAPrompt = false } }]">
         Using Chrome on Android? Use a secure origin like myopenhab.org and add HABot to the home screen for the best experience!
       </q-alert>
     </q-page-sticky>
@@ -332,6 +332,9 @@ export default {
     },
     resetSpeech () {
       this.inputPlaceholder = 'Ask me about your home'
+    },
+    openEnhancedFeaturesTutorial () {
+      this.$router.push({ path: '/help', query: { topic: 'enhanced-features' } })
     }
   },
   beforeDestroyed () {

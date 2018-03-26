@@ -63,7 +63,12 @@ export default {
         vm.webkitSpeechRecognition.start()
       } else {
         try {
-          vm.audioContext = new AudioContext()
+          if ('AudioContext' in window) {
+            vm.audioContext = new AudioContext()
+          } else if ('webkitAudioContext' in window) {
+            // eslint-disable-next-line new-cap
+            vm.audioContext = new window.webkitAudioContext()
+          }
           console.log('Audio context set up')
 
           switch (vm.speechApi) {

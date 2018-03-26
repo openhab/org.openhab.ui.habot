@@ -85,6 +85,7 @@
 import HbSingleItemValue from 'components/HbSingleItemValue.vue'
 import HbAnalyzeActionButton from 'components/HbAnalyzeActionButton.vue'
 import HbCommandActionButton from 'components/HbCommandActionButton.vue'
+import HbCarousel from 'components/HbCarousel.vue'
 import HbComponents from 'components/index'
 
 import { uid, extend } from 'quasar'
@@ -95,6 +96,7 @@ export default {
     HbSingleItemValue,
     HbAnalyzeActionButton,
     HbCommandActionButton,
+    HbCarousel,
     ...HbComponents
   },
   props: ['model', 'menu'],

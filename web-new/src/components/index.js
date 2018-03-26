@@ -14,6 +14,7 @@ import HbPlayer from './HbPlayer.vue'
 import HbChartImage from './HbChartImage.vue'
 import HbTimeline from './HbTimeline.vue'
 import HbShutterControl from './HbShutterControl.vue'
+import HbImage from './HbImage.vue'
 
 Vue.component('HbBtn', HbBtn)
 Vue.component('HbBtnGroup', HbBtnGroup)
@@ -28,6 +29,7 @@ Vue.component('HbColorPicker', HbColorPicker)
 Vue.component('HbPlayer', HbPlayer)
 Vue.component('HbTimeline', HbTimeline)
 Vue.component('HbShutterControl', HbShutterControl)
+Vue.component('HbImage', HbImage)
 
 export default {
   HbBtn,
@@ -43,5 +45,6 @@ export default {
   HbPlayer,
   HbChartImage,
   HbTimeline,
-  HbShutterControl
+  HbShutterControl,
+  HbImage
 }

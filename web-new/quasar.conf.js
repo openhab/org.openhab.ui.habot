@@ -75,7 +75,8 @@ module.exports = function (ctx) {
       open: false, // opens browser window automatically
       proxy: {
         '/rest': 'http://localhost:8080',
-        '/chart': 'http://localhost:8080'
+        '/chart': 'http://localhost:8080',
+        '/proxy': 'http://localhost:8080'
       }
     },
     // framework: 'all' --- includes everything; for dev only!
@@ -145,7 +146,10 @@ module.exports = function (ctx) {
         'QTimeline',
         'QTimelineEntry',
         'QColorPicker',
-        'QDatetime'
+        'QDatetime',
+        'QCarousel',
+        'QCarouselSlide',
+        'QCarouselControl'
       ],
       directives: [
         'Ripple',
