@@ -24,14 +24,9 @@
 </style>
 
 <script>
-import HbComponents from 'components/index'
-
 export default {
   name: 'HbCollapsible',
   props: ['model'],
-  components: {
-    ...HbComponents
-  },
   data () {
     return {
       config: this.model.config

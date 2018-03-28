@@ -66,17 +66,19 @@
 </template>
 
 <script>
-import HbComponents from 'components/index'
+// import HbComponents from 'components/index'
 
 export default {
-  name: 'HbCommandActionButton',
+  name: 'HbBtn',
   props: ['model'],
-  components: HbComponents,
   data () {
     return {
       showModal: false,
       showPopover: false
     }
+  },
+  beforeCreate () {
+    this.$options.components.HbContainer = require('./HbContainer.vue').default
   },
   methods: {
     click () {

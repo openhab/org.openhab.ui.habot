@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 import org.eclipse.jdt.annotation.Nullable;
 import org.eclipse.smarthome.core.common.registry.Identifiable;
@@ -27,6 +28,7 @@ public class Card extends Component implements Identifiable<String> {
 
     public Card(String name) {
         super(name);
+        this.uid = UUID.randomUUID().toString();
     }
 
     public Card(String uid, String name) {

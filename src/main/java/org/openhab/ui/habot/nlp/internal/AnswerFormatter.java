@@ -14,12 +14,14 @@ public class AnswerFormatter {
 
     public AnswerFormatter(Locale locale) {
         this.locale = locale;
-        this.answers = ResourceBundle.getBundle("answers", locale);
+        this.answers = ResourceBundle.getBundle("answers", locale,
+                ResourceBundle.Control.getNoFallbackControl(ResourceBundle.Control.FORMAT_DEFAULT));
     }
 
     public AnswerFormatter(String language) {
         this.locale = new Locale(language);
-        this.answers = ResourceBundle.getBundle("answers", locale);
+        this.answers = ResourceBundle.getBundle("answers", locale,
+                ResourceBundle.Control.getNoFallbackControl(ResourceBundle.Control.FORMAT_DEFAULT));
     }
 
     public String getRandomAnswer(String key, Map<String, String> placeholderValues) {

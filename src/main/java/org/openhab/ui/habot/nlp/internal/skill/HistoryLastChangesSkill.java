@@ -16,6 +16,7 @@ import org.eclipse.smarthome.core.types.StateDescription;
 import org.eclipse.smarthome.model.persistence.extensions.PersistenceExtensions;
 import org.openhab.ui.habot.card.Card;
 import org.openhab.ui.habot.card.Component;
+import org.openhab.ui.habot.card.internal.CardRegistry;
 import org.openhab.ui.habot.nlp.AbstractItemIntentInterpreter;
 import org.openhab.ui.habot.nlp.Intent;
 import org.openhab.ui.habot.nlp.IntentInterpretation;
@@ -26,7 +27,7 @@ import org.osgi.service.component.annotations.Reference;
 @org.osgi.service.component.annotations.Component(service = Skill.class)
 public class HistoryLastChangesSkill extends AbstractItemIntentInterpreter {
 
-    // private CardBuilder cardBuilder;
+    private CardRegistry cardRegistry;
 
     @Override
     public String getIntentId() {
@@ -51,6 +52,7 @@ public class HistoryLastChangesSkill extends AbstractItemIntentInterpreter {
         card.addTags(tags);
         card.updateTimestamp();
         card.setEphemeral(true);
+        card.setAddToDeckDenied(true);
 
         Component timeline = new Component("HbTimeline");
 
@@ -84,6 +86,8 @@ public class HistoryLastChangesSkill extends AbstractItemIntentInterpreter {
         }
 
         card.addComponent("main", timeline);
+
+        this.cardRegistry.add(card);
 
         interpretation.setAnswer(answerFormatter.getRandomAnswer("info_found_simple"));
         interpretation.setCard(card);
@@ -123,6 +127,15 @@ public class HistoryLastChangesSkill extends AbstractItemIntentInterpreter {
 
     public void unsetItemRegistry(ItemRegistry itemRegistry) {
         this.itemRegistry = null;
+    }
+
+    @Reference
+    protected void setCardRegistry(CardRegistry cardRegistry) {
+        this.cardRegistry = cardRegistry;
+    }
+
+    protected void unsetCardRegistry(CardRegistry cardRegistry) {
+        this.cardRegistry = null;
     }
 
 }

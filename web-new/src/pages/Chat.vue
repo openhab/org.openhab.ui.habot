@@ -257,9 +257,9 @@ export default {
 
         if (response.data.card) {
           currentChat.card = response.data.card
-          if (!currentChat.card.uid) {
-            currentChat.card.config = { bigger: true }
-          }
+          // if (!currentChat.card.uid) {
+          //   currentChat.card.config = { bigger: true }
+          // }
         }
 
         this.busy = false

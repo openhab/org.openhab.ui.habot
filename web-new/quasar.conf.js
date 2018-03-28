@@ -8,7 +8,8 @@ module.exports = function (ctx) {
   return {
     plugins: [
       'axios',
-      'jexl'
+      'jexl',
+      'moment'
     ],
     css: [
       'app.styl'

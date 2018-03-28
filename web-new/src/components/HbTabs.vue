@@ -14,15 +14,9 @@
 </style>
 
 <script>
-// import HbTabPane from 'components/HbTabPane.vue'
-// import HbComponents from 'components/index'
-
 export default {
   name: 'HbTabs',
   props: ['model'],
-  // components: {
-  //   HbTabPane
-  // },
   data () {
     return {
       config: this.model.config

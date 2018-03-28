@@ -13,20 +13,23 @@
       <q-btn round flat icon="more_vert" slot="right">
         <q-popover anchor="bottom right" self="top right">
           <q-list link class="no-border">
-            <q-item v-close-overlay v-if="this.menu === 'chat' && !this.model.uid && !this.model.addToDeckDenied" @click.native="addCardToDeck()">
+            <q-item v-close-overlay v-if="(this.menu === 'chat' || this.menu === 'recent') && this.model.ephemeral && !this.model.addToDeckDenied" @click.native="addCardToDeck()">
               <q-item-main label="Add to Card deck" />
             </q-item>
-            <q-item v-close-overlay v-if="this.menu === 'chat' && !this.model.uid && !this.model.addToDeckDenied" @click.native="addCardToDeckAndBookmark()">
+            <q-item v-close-overlay v-if="(this.menu === 'chat' || this.menu === 'recent') && this.model.ephemeral && !this.model.addToDeckDenied" @click.native="addCardToDeckAndBookmark()">
               <q-item-main label="Add &amp; bookmark" />
             </q-item>
-            <q-item v-close-overlay v-if="this.menu === 'chat' && this.model.uid" @click.native="editCard()">
+            <q-item v-close-overlay v-if="(this.menu === 'chat' || this.menu === 'recent') && !this.model.ephemeral" @click.native="editCard()">
               <q-item-main label="Edit" />
             </q-item>
-            <q-item v-close-overlay v-if="this.menu === 'chat' && this.model.uid && !this.model.bookmarked" @click.native="bookmarkCard()">
+            <q-item v-close-overlay v-if="(this.menu === 'chat' || this.menu === 'recent') && !this.model.ephemeral && !this.model.bookmarked" @click.native="bookmarkCard()">
               <q-item-main label="Bookmark" />
             </q-item>
-            <q-item v-close-overlay v-if="this.menu === 'chat' && this.model.uid && this.model.bookmarked" @click.native="unbookmarkCard()">
+            <q-item v-close-overlay v-if="(this.menu === 'chat' || this.menu === 'recent') && !this.model.ephemeral && this.model.bookmarked" @click.native="unbookmarkCard()">
               <q-item-main label="Remove bookmark" />
+            </q-item>
+            <q-item v-close-overlay v-if="this.menu === 'recent' && this.model.ephemeral" @click.native="forgetCard()">
+              <q-item-main label="Forget" />
             </q-item>
             <q-item v-close-overlay v-if="this.menu === 'deck'" @click.native="editCard()">
               <q-item-main label="Edit" />
@@ -88,7 +91,7 @@ import HbCommandActionButton from 'components/HbCommandActionButton.vue'
 import HbCarousel from 'components/HbCarousel.vue'
 import HbComponents from 'components/index'
 
-import { uid, extend } from 'quasar'
+import { extend } from 'quasar'
 
 export default {
   name: 'HbCard',
@@ -107,8 +110,7 @@ export default {
   methods: {
     addCardToDeck () {
       let newcard = extend({}, this.model)
-      newcard.uid = uid()
-      if (!newcard.tags) newcard.tags = [] // todo add tags from the chat reply
+      newcard.ephemeral = this.model.ephemeral = false
       if (!newcard.slots) newcard.slots = {} // temp
       return new Promise((resolve, reject) => {
         this.$store.dispatch('cards/create', newcard).then((card) => {
@@ -163,6 +165,21 @@ export default {
             ]
           })
         })
+      })
+    },
+    forgetCard () {
+      // Don't use the store because the card is ephemeral and not in it,
+      // delete it directly
+      let uid = this.model.uid
+      let request = (window && window.location && window.location.host === 'home.myopenhab.org')
+        ? this.$http.post('/rest/habot/compat/cards/' + uid + '/delete', null, { headers: { 'Content-Type': 'text/plain' } })
+        : this.$http.delete('/rest/habot/cards/' + uid)
+
+      request.then(() => {
+        this.$q.notify({ type: 'positive', message: 'Card forgotten' })
+        this.$emit('forgotten', uid)
+      }).catch((err) => {
+        this.$q.notify('Cannot forget card: ' + err)
       })
     },
     forceRedraw () {

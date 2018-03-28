@@ -22,6 +22,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -199,7 +200,7 @@ public class HABotResource implements RESTResource {
     @ApiResponses(value = { @ApiResponse(code = 200, message = "OK"),
             @ApiResponse(code = 500, message = "An error occured") })
     public Response getAllCards() {
-        Collection<Card> cards = this.cardRegistry.getAll();
+        Collection<Card> cards = this.cardRegistry.getNonEphemeral();
 
         return Response.ok(cards).build();
     }
@@ -228,6 +229,11 @@ public class HABotResource implements RESTResource {
             @ApiResponse(code = 500, message = "An error occured") })
     public Response createCard(@ApiParam(value = "card", required = true) Card card) {
         card.updateTimestamp();
+        card.setEphemeral(false);
+        Card existingCard = this.cardRegistry.get(card.getUID());
+        if (existingCard != null && existingCard.isEphemeral()) {
+            this.cardRegistry.remove(card.getUID());
+        }
         Card createdCard = this.cardRegistry.add(card);
 
         return Response.ok(createdCard).build();
@@ -275,6 +281,18 @@ public class HABotResource implements RESTResource {
         this.cardRegistry.update(card);
 
         return Response.ok().build();
+    }
+
+    @GET
+    @Path("/cards/recent")
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Creates a new card in the card deck.")
+    @ApiResponses(value = { @ApiResponse(code = 200, message = "The card was created"),
+            @ApiResponse(code = 500, message = "An error occured") })
+    public Response createCard(@QueryParam(value = "skip") int skip, @QueryParam(value = "count") int count) {
+        Collection<Card> cards = this.cardRegistry.getRecent(skip, count);
+
+        return Response.ok(cards).build();
     }
 
     @DELETE
