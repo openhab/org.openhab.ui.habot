@@ -1,17 +1,13 @@
 package org.openhab.ui.habot.test;
 
-import static org.junit.Assert.*;
-
 import org.junit.Test;
-import org.openhab.ui.habot.nlp.Intent;
 import org.openhab.ui.habot.nlp.internal.IntentTrainer;
 
 public class TrainerEnTest extends AbstractTrainerTest {
 
-
-
     @Test
     public void testEN() throws Exception {
+        skills.add(new MockSkill("create-rule"));
         this.trainer = new IntentTrainer("en", skills);
 
         assertIsGetStatus("Temperature in the kitchen?", "temperature", "kitchen");
@@ -75,6 +71,12 @@ public class TrainerEnTest extends AbstractTrainerTest {
         assertIsSetValue("please put the lights in the child's room at 50%");
         assertIsSetValue("change the color the lights in blue");
         assertIsSetValue("set the lights in the living room to 35%");
+
+        assertIs("create-rule", "i want to create a rule to run on Monday");
+        assertIs("create-rule", "set up something to run later");
+        assertIs("create-rule", "set up a new rule to run in 90 minutes");
+        assertIs("create-rule", "set up a new rule to run tomorrow at 8");
+        assertIs("create-rule", "set up a new rule to run on Wednesday at 11h30");
     }
 
 }

@@ -25,11 +25,11 @@
           :stamp="msg.stamp"
         />
 
-        <hb-card v-if="chat.card && chat.card.component === 'HbCard'" :model="chat.card" menu="chat">
+        <hb-card v-if="chat.card && chat.card.component === 'HbCard'" :model="chat.card" menu="chat" />
 
-        </hb-card>
+        <hb-create-rule-card v-else-if="chat.card && chat.card.component === 'HbCreateRuleCard'" :model="chat.card" />
 
-        <q-card v-if="chat.card && chat.card.component === 'HbDumpIntentCard'">
+        <q-card v-else-if="chat.card && chat.card.component === 'HbDumpIntentCard'">
           <q-card-title>
             Intent: {{chat.intent.name}}
             <span slot="subtitle">Sorry, this intent is currently unsupported :(</span>
@@ -93,10 +93,10 @@
     max-width 600px
     left 50%
     transform translateX(-50%)
-    .q-card
+    .hb-card
       width $card-min-width
   @media (max-width $breakpoint-xs-max)
-    .q-card
+    .hb-card
       width calc(100%)
 
 .chat-input-toolbar
@@ -111,12 +111,14 @@
 <script>
 import { date } from 'quasar'
 import HbCard from 'components/HbCard.vue'
+import HbCreateRuleCard from 'components/rules/HbCreateRuleCard.vue'
 import SpeechButton from 'components/speech/SpeechButton.vue'
 
 export default {
   name: 'PageChat',
   components: {
     HbCard,
+    HbCreateRuleCard,
     SpeechButton
   },
   data () {
