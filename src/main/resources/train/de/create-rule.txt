@@ -6,6 +6,8 @@ einen Timer einrichten
 einen Timer stellen
 Timer stellen
 stell einen Timer
+Ich möchte einen Wecker stellen
+Wecker stellen
 etwas für morgen einrichten
 etwas einrichten, das montags läuft.
 etwas um 8 Uhr tun
