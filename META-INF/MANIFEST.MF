@@ -25,6 +25,8 @@ Import-Package: com.google.common.collect,
  org.apache.http.entity,
  org.apache.http.message,
  org.eclipse.jdt.annotation;resolution:=optional,
+ org.eclipse.smarthome.automation,
+ org.eclipse.smarthome.automation.handler,
  org.eclipse.smarthome.config.core,
  org.eclipse.smarthome.core.auth,
  org.eclipse.smarthome.core.common.registry,
@@ -51,3 +53,6 @@ Import-Package: com.google.common.collect,
  org.slf4j
 Service-Component: OSGI-INF/*.xml
 Bundle-ActivationPolicy: lazy
+Export-Package: org.openhab.ui.habot.card,
+ org.openhab.ui.habot.nlp,
+ org.openhab.ui.habot.notification

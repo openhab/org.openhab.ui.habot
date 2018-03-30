@@ -57,7 +57,8 @@
 
     <q-page-sticky position="bottom" class="chat-input-sticky">
       <q-toolbar class="chat-input-toolbar bg-grey-3 shadow-up-3">
-        <q-input :disabled="busy" ref="input" v-model="text" class="full-width" :placeholder="inputPlaceholder" :autofocus="$q.platform.is.desktop" :after="inputAfter" @keyup="keyUp" />
+        <q-input :disabled="busy" ref="input" v-model="text" class="full-width" :placeholder="inputPlaceholder" :autofocus="$q.platform.is.desktop" :after="inputAfter"
+                  @keyup="keyUp" @focus="scrollToBottom(true)" @blur="stickToBottom = false" />
       </q-toolbar>
     </q-page-sticky>
 
@@ -139,6 +140,7 @@ export default {
       }],
       showPWAPrompt: false,
       inputPlaceholder: 'Ask me about your home',
+      stickToBottom: false,
       suggestionsCount: 0,
       bookmarksCount: 0
     }
@@ -217,14 +219,43 @@ export default {
       }
 
       let notification = JSON.parse(ev.data)
+      let notificationDate = (notification.timestamp) ? new Date(notification.timestamp) : new Date()
 
-      currentChat.messages.push({
-        id: new Date(),
+      let message = {
+        id: notificationDate,
         name: 'Notification', // 'HABot',
         text: [notification.body],
         avatar: 'statics/icons/icon-192x192.png',
-        stamp: date.formatDate(new Date(), 'HH:mm')
-      })
+        stamp: date.formatDate(notificationDate, 'HH:mm')
+      }
+
+      // find a suitable card to display with the notification
+      if (notification.data && notification.data.cardUID) {
+        let card = this.$store.getters['cards/single'](notification.data.cardUID)
+        currentChat.finished = true
+        currentChat.card = card
+      } else if (notification.data && notification.data.tags) {
+        let objects = notification.data.tags.filter(t => t.indexOf('object:') === 0)
+        let locations = notification.data.tags.filter(t => t.indexOf('location:') === 0)
+        let cardCandidates = this.$store.getters['cards/tags'](objects, locations)
+        let matchingCards = cardCandidates.filter(c => c.tags.every(t => notification.data.tags.indexOf(t) >= 0))
+
+        // if more than one match, tough luck, just take the first one
+        if (matchingCards.length > 0) {
+          currentChat.finished = true
+          currentChat.card = matchingCards[0]
+        }
+      }
+
+      if (currentChat.greetingSuggestions) delete currentChat.greetingSuggestions
+      currentChat.messages.push(message)
+      if (currentChat.finished) {
+        this.chats.push({
+          messages: [],
+          card: null,
+          finished: false
+        })
+      }
     },
 
     send () {
@@ -240,6 +271,7 @@ export default {
       })
 
       this.busy = true
+      this.scrollToBottom(true)
 
       this.$http.post('/rest/habot/chat', this.text, {
         headers: {
@@ -259,12 +291,10 @@ export default {
 
         if (response.data.card) {
           currentChat.card = response.data.card
-          // if (!currentChat.card.uid) {
-          //   currentChat.card.config = { bigger: true }
-          // }
         }
 
         this.busy = false
+        this.stickToBottom = false
 
         currentChat.finished = true
         this.chats.push({
@@ -310,7 +340,11 @@ export default {
       this.scrollToBottom()
     },
 
-    scrollToBottom () {
+    scrollToBottom (force) {
+      if (force) {
+        this.stickToBottom = true
+      }
+      if (!this.stickToBottom) return
       var appEl = document.getElementById('q-app')
       appEl.scrollTop = appEl.scrollHeight
       document.body.scrollTop = document.body.scrollHeight

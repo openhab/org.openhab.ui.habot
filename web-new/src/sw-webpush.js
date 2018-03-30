@@ -32,6 +32,7 @@ self.addEventListener('push', function (event) {
 
   if (event.data) {
     const payload = event.data.json()
+    if (payload.title) notificationTitle = payload.title
     Object.assign(notificationOptions, payload)
   }
 
@@ -71,7 +72,8 @@ self.addEventListener('notificationclick', function (event) {
         title: event.notification.title,
         body: event.notification.body,
         data: event.notification.data,
-        actions: event.notification.actions
+        actions: event.notification.actions,
+        timestamp: event.notification.timestamp
       })
       let url = 'index.html#/notification#' + btoa(encodeURIComponent(payload))
       if (clientList.length > 0) {

@@ -6,7 +6,7 @@
         <q-datetime v-model="triggerTime" type="time" format24h class="col" :disable="trigger !== 'time'" :disabled="trigger !== 'time'" />
       </div>
       <q-radio v-model="trigger" val="item" label="When something happens" style="padding-bottom: 8px" />
-      <q-field v-if="trigger === 'time'" label="Recurrence" icon="update">
+      <q-field v-if="trigger === 'time'" label="Recurrence" icon="update" orientation="horizontal">
         <q-option-group
           color="primary"
           v-model="triggerRecurrence"
@@ -40,7 +40,7 @@
           v-model="triggerItems"
           :options="items" />
       </q-field>
-      <div v-if="trigger === 'item'" class="row">
+      <div v-if="trigger === 'item'" class="row" style="padding-bottom: 8px">
         <q-select class="col" v-model="triggerItemEvent" :options="[
           {label: triggerItems.length !== 1 ? 'change' : 'changes', value: 'change'},
           {label: triggerItems.length !== 1 ? 'are updated' : 'is updated', value: 'update'},
@@ -63,13 +63,38 @@
     </q-step>
     <q-step :order="2" name="then" title="Then" :subtitle="thenSubtitle" :disable="ruleCreated">
       <q-input prefix="Send&nbsp;&nbsp;" suffix="to" v-model="actionCommand" />
-      <q-field icon="device_hub" orientation="vertical">
+      <q-field icon="device_hub" orientation="vertical" style="padding-bottom: 8px">
         <q-select
           multiple filter clearable
           placeholder="Item(s)"
           color="primary"
           v-model="actionItems"
           :options="items" />
+      </q-field>
+      <q-field
+        icon="announcement"
+        label="and notify me via (optional)"
+        orientation="vertical"
+      >
+        <q-option-group
+          type="toggle"
+          v-model="actionNotify"
+          :options="[
+            { label: 'Push notification', value: 'webpush' },
+            { label: 'Speak (default audio sink)', value: 'say' }
+          ]"
+        />
+      </q-field>
+      <q-field v-if="actionNotify.length > 0" icon="message" label="Message" orientation="vertical">
+        <q-input v-model="actionNotifyMessage" />
+      </q-field>
+      <q-field v-if="actionNotify.indexOf('webpush') >= 0" icon="label_outline" label="Tags" orientation="vertical"
+        helper="Optional. The first card matching these tags will be shown when clicking the notification.">
+        <q-select
+          multiple chips secondary
+          color="secondary"
+          v-model="actionNotifyTags"
+          :options="tags" />
       </q-field>
       <q-stepper-navigation v-if="!globalNavigation">
         <q-btn color="primary" :disabled="thenSubtitle === ''" @click="createRule()">Create</q-btn>
@@ -122,6 +147,9 @@ export default {
       triggerItemRepeat: 'forever',
       actionItems: [],
       actionCommand: null,
+      actionNotify: [],
+      actionNotifyMessage: null,
+      actionNotifyTags: [],
       busy: false,
       ruleCreated: false,
       rule: {},
@@ -132,7 +160,16 @@ export default {
           sublabel: item.label,
           stamp: item.type
         }
-      })
+      }),
+      tags: this.$store.getters['cards/objectSet']
+        .concat(this.$store.getters['cards/locationSet'])
+        .map((t) => {
+          return {
+            value: t,
+            label: t.split(':')[1],
+            stamp: t.split(':')[0]
+          }
+        })
     }
   },
   methods: {
@@ -221,7 +258,7 @@ export default {
           break
       }
 
-      // Then
+      // "Then"
       for (let item of this.actionItems) {
         let action = {
           id: currentModuleId++,
@@ -245,6 +282,29 @@ export default {
           configuration: {
             enable: false,
             ruleUIDs: [this.rule.uid]
+          }
+        })
+      }
+
+      // Handle the notifications
+      if (this.actionNotify.indexOf('webpush') >= 0 && this.actionNotifyMessage) {
+        this.rule.actions.push({
+          id: currentModuleId++,
+          type: 'habot.WebPushNotificationAction',
+          label: 'Send a push notification',
+          configuration: {
+            body: this.actionNotifyMessage,
+            tags: this.actionNotifyTags
+          }
+        })
+      }
+      if (this.actionNotify.indexOf('say') >= 0 && this.actionNotifyMessage) {
+        this.rule.actions.push({
+          id: currentModuleId++,
+          type: 'media.SayAction',
+          label: 'Speak through the default audio sink',
+          configuration: {
+            text: this.actionNotifyMessage
           }
         })
       }

@@ -2,6 +2,7 @@ package org.openhab.ui.habot.notification;
 
 import java.security.GeneralSecurityException;
 import java.util.HashMap;
+import java.util.List;
 
 import org.eclipse.smarthome.model.script.engine.action.ActionDoc;
 import org.eclipse.smarthome.model.script.engine.action.ActionService;
@@ -22,18 +23,34 @@ public class WebPushNotificationAction implements ActionService {
 
     @ActionDoc(text = "Sends a web push notification to all HABot subscribed clients")
     public static void sendHABotNotification(String message) {
+        sendHABotNotificationExt("HABot", message, null, null);
+    }
+
+    @ActionDoc(text = "Sends a web push notification to all HABot subscribed clients")
+    public static void sendHABotNotificationWithCard(String message, String cardUID) {
+        sendHABotNotificationExt("HABot", message, cardUID, null);
+    }
+
+    @ActionDoc(text = "Sends a web push notification to all HABot subscribed clients")
+    public static void sendHABotNotificationWithTags(String message, List<Object> tags) {
+        sendHABotNotificationExt("HABot", message, null, tags);
+    }
+
+    @ActionDoc(text = "Sends a web push notification to all HABot subscribed clients")
+    public static void sendHABotNotificationExt(String title, String message, String cardUID, List<Object> tags) {
         try {
             Gson gson = new Gson();
             HashMap<String, Object> payload = new HashMap<String, Object>();
-            payload.put("title", "HABot");
+            payload.put("title", title);
             payload.put("body", message);
-            // HashMap<String, String> action1 = new HashMap<String, String>();
-            // action1.put("action", "alarm");
-            // action1.put("title", "Sound alarm");
-            // HashMap<String, String> action2 = new HashMap<String, String>();
-            // action2.put("action", "dismiss");
-            // action2.put("title", "Dismiss");
-            // payload.put("actions", new HashMap[] { action1, action2 });
+            HashMap<String, Object> data = new HashMap<String, Object>();
+            if (cardUID != null) {
+                data.put("cardUID", cardUID);
+            }
+            if (tags != null) {
+                data.put("tags", tags);
+            }
+            payload.put("data", data);
 
             String payloadJson = gson.toJson(payload);
             notificationService.broadcastNotification(payloadJson);
