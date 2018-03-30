@@ -17,11 +17,11 @@ import org.openhab.ui.habot.nlp.internal.IntentTrainer;
 
 public class AbstractTrainerTest {
 
-	IntentTrainer trainer = null;
-	
-	protected List<Skill> skills;
+    IntentTrainer trainer = null;
 
-   public class Skills {
+    protected List<Skill> skills;
+
+    public class Skills {
         public final static String GET_STATUS = "get-status";
         public final static String ACTIVATE_OBJECT = "activate-object";
         public final static String DEACTIVATE_OBJECT = "deactivate-object";
@@ -31,23 +31,26 @@ public class AbstractTrainerTest {
         public final static String GET_HISTORY_MONTHLY = "get-history-monthly";
         public final static String GET_HISTORY_LAST_CHANGES = "get-history-last-changes";
         public final static String SET_VALUE = "set-value";
-    }	
+        public final static String CREATE_RULE = "create-rule";
 
-	@Before
-	public void initializeMockSkills() {
-	    skills = new ArrayList<Skill>();
-	
-	    skills.add(new MockSkill(Skills.GET_STATUS));
-	    skills.add(new MockSkill(Skills.ACTIVATE_OBJECT));
-	    skills.add(new MockSkill(Skills.DEACTIVATE_OBJECT));
-	    skills.add(new MockSkill(Skills.GET_HISTORY_HOURLY));
-	    skills.add(new MockSkill(Skills.GET_HISTORY_DAILY));
-	    skills.add(new MockSkill(Skills.GET_HISTORY_WEEKLY));
-	    skills.add(new MockSkill(Skills.GET_HISTORY_MONTHLY));
-	    skills.add(new MockSkill(Skills.GET_HISTORY_LAST_CHANGES));
-	    skills.add(new MockSkill(Skills.SET_VALUE));
-	}
-	
+    }
+
+    @Before
+    public void initializeMockSkills() {
+        skills = new ArrayList<Skill>();
+
+        skills.add(new MockSkill(Skills.GET_STATUS));
+        skills.add(new MockSkill(Skills.ACTIVATE_OBJECT));
+        skills.add(new MockSkill(Skills.DEACTIVATE_OBJECT));
+        skills.add(new MockSkill(Skills.GET_HISTORY_HOURLY));
+        skills.add(new MockSkill(Skills.GET_HISTORY_DAILY));
+        skills.add(new MockSkill(Skills.GET_HISTORY_WEEKLY));
+        skills.add(new MockSkill(Skills.GET_HISTORY_MONTHLY));
+        skills.add(new MockSkill(Skills.GET_HISTORY_LAST_CHANGES));
+        skills.add(new MockSkill(Skills.SET_VALUE));
+        skills.add(new MockSkill(Skills.CREATE_RULE));
+    }
+
     public class MockSkill implements Skill {
 
         private String intent;
@@ -71,67 +74,67 @@ public class AbstractTrainerTest {
             // TODO Auto-generated method stub
             return null;
         }
-    }	
+    }
 
-	protected Intent interpret(String query) {
-	    System.out.println("----");
-	    System.out.println("\"" + query + "\"");
-	    System.out.println(new TreeMap<>(this.trainer.getScoreMap(query)).descendingMap().toString());
-	    Intent intent = this.trainer.interpret(query);
-	    System.out.println(intent.toString());
-	    return intent;
-	}
+    protected Intent interpret(String query) {
+        System.out.println("----");
+        System.out.println("\"" + query + "\"");
+        System.out.println(new TreeMap<>(this.trainer.getScoreMap(query)).descendingMap().toString());
+        Intent intent = this.trainer.interpret(query);
+        System.out.println(intent.toString());
+        return intent;
+    }
 
-	protected void checkInterpretation(String intentName, String query, String object, String location) {
-	    Intent actual = interpret(query);
-	
-	    assertEquals(intentName, actual.getName());
-	
-	    if (object != null) {
-	        assertTrue(actual.getEntities().containsKey("object"));
-	        assertEquals(object, actual.getEntities().get("object"));
-	    }
-	
-	    if (location != null) {
-	        assertTrue(actual.getEntities().containsKey("location"));
-	        assertEquals(location, actual.getEntities().get("location"));
-	    }
-	}
+    protected void checkInterpretation(String intentName, String query, String object, String location) {
+        Intent actual = interpret(query);
 
-	protected void assertIs(String intentName, String query) {
-	    checkInterpretation(intentName, query, null, null);
-	}
+        assertEquals(intentName, actual.getName());
 
-	protected void assertIsGetStatus(String query, String object, String location) {
-	    checkInterpretation(Skills.GET_STATUS, query, object, location);
-	}
+        if (object != null) {
+            assertTrue(actual.getEntities().containsKey("object"));
+            assertEquals(object, actual.getEntities().get("object"));
+        }
 
-	protected void assertIsGetStatus(String query) {
-	    checkInterpretation(Skills.GET_STATUS, query, null, null);
-	}
+        if (location != null) {
+            assertTrue(actual.getEntities().containsKey("location"));
+            assertEquals(location, actual.getEntities().get("location"));
+        }
+    }
 
-	protected void assertIsActivate(String query, String object, String location) {
-	    checkInterpretation(Skills.ACTIVATE_OBJECT, query, object, location);
-	}
+    protected void assertIs(String intentName, String query) {
+        checkInterpretation(intentName, query, null, null);
+    }
 
-	protected void assertIsActivate(String query) {
-	    checkInterpretation(Skills.ACTIVATE_OBJECT, query, null, null);
-	}
+    protected void assertIsGetStatus(String query, String object, String location) {
+        checkInterpretation(Skills.GET_STATUS, query, object, location);
+    }
 
-	protected void assertIsDeactivate(String query, String object, String location) {
-	    checkInterpretation(Skills.DEACTIVATE_OBJECT, query, object, location);
-	}
+    protected void assertIsGetStatus(String query) {
+        checkInterpretation(Skills.GET_STATUS, query, null, null);
+    }
 
-	protected void assertIsDeactivate(String query) {
-	    checkInterpretation(Skills.DEACTIVATE_OBJECT, query, null, null);
-	}
+    protected void assertIsActivate(String query, String object, String location) {
+        checkInterpretation(Skills.ACTIVATE_OBJECT, query, object, location);
+    }
 
-	protected void assertIsSetValue(String query, String object, String location) {
-	    checkInterpretation(Skills.SET_VALUE, query, object, location);
-	}
+    protected void assertIsActivate(String query) {
+        checkInterpretation(Skills.ACTIVATE_OBJECT, query, null, null);
+    }
 
-	protected void assertIsSetValue(String query) {
-	    checkInterpretation(Skills.SET_VALUE, query, null, null);
-	}
+    protected void assertIsDeactivate(String query, String object, String location) {
+        checkInterpretation(Skills.DEACTIVATE_OBJECT, query, object, location);
+    }
+
+    protected void assertIsDeactivate(String query) {
+        checkInterpretation(Skills.DEACTIVATE_OBJECT, query, null, null);
+    }
+
+    protected void assertIsSetValue(String query, String object, String location) {
+        checkInterpretation(Skills.SET_VALUE, query, object, location);
+    }
+
+    protected void assertIsSetValue(String query) {
+        checkInterpretation(Skills.SET_VALUE, query, null, null);
+    }
 
 }
