@@ -8,6 +8,9 @@ donne moi l <START:object> humidité <END> dans le <START:location> garage <END>
 <START:object> consommation électrique <END> actuelle
 <START:object> température <END> du <START:location> salon <END>
 <START:object> chauffage <END> dans la <START:location> cuisine <END>
+<START:object> volets <END> de la <START:location> cuisine <END>
+<START:object> volets <END> du <START:location> couloir <END>
+<START:object> fenêtre <END> du <START:location> séjour <END>
 <START:object> ventilateur <END> dans le <START:location> vestibule <END>
 <START:object> air conditionné <END> dans la <START:location> chambre <END>
 la <START:object> porte d'entrée <END> est elle fermée ?
@@ -15,21 +18,24 @@ la <START:object> porte <END> est elle verrouillée ?
 quelle est la <START:object> consommation électrique <END> maintenant
 montre le <START:object> verrouillage <END>
 est ce que l <START:object> alarme <END> est activée ?
-est ce que le <START:object> ventilateur <END> dans le <START:object> salon <END> est en marche ?
-le <START:object> ventilateur <END> au <START:object> premier étage <END> est-il en marche ?
-dis moi si le <START:object> chauffage <END> dans le <START:object> grenier <END> est en marche ?
-dis moi si le <START:object> chauffage <END> de la <START:object> cave <END> est en marche ?
+est ce que le <START:object> ventilateur <END> dans le <START:location> salon <END> est en marche ?
+le <START:object> ventilateur <END> au <START:location> premier étage <END> est-il en marche ?
+dis moi si le <START:object> chauffage <END> dans le <START:location> grenier <END> est en marche ?
+dis moi si le <START:object> chauffage <END> de la <START:location> cave <END> est en marche ?
+est ce que la <START:object> fenêtre <END> du <START:location> séjour <END> est ouverte ?
 est ce que la <START:object> télé <END> est allumée ?
 est ce que la <START:object> télé <END> du <START:location> salon <END> est allumée ?
 est ce que la <START:object> télé <END> dans la <START:location> chambre <END> est allumée ?
 donne les <START:object> températures <END>
 donne la <START:object> température <END> du <START:location> salon <END>
+montre les <START:object> volets <END> du <START:location> premier étage <END>
 montre le <START:object> chauffage <END> du <START:location> 2ème étage <END>
 <START:object> luminosité <END> au <START:location> rez-de-chaussée <END>
 <START:object> lampes <END> du <START:object> couloir <END>
 <START:object> chauffage <END> dans la <START:location> salle de bain <END>
 <START:object> lumières <END> dans la <START:location> salle de bain <END>
-<START:object> ventilation <END> dans la <START:location> chambre <END>
+<START:object> lampes <END> du <START:object> couloir <END>
+<START:object> fenêtre <END> du <START:location> séjour <END>
 <START:object> température <END> dans la <START:location> chambre d'amis <END>
 <START:object> lumière <END> dans la <START:location> salle de jeux <END>
 <START:object> lumières <END> du <START:location> couloir <END>

@@ -1,14 +1,12 @@
 package org.openhab.ui.habot.test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 import org.openhab.ui.habot.nlp.Intent;
 import org.openhab.ui.habot.nlp.internal.IntentTrainer;
 
 public class TrainerFrTest extends AbstractTrainerTest {
-
-
 
     @Test
     public void testFR() throws Exception {
@@ -104,7 +102,7 @@ public class TrainerFrTest extends AbstractTrainerTest {
         assertIs(Skills.GET_HISTORY_MONTHLY, "graphique mensuel de la température sur 2 mois");
         assertIs(Skills.GET_HISTORY_WEEKLY, "graphique de la température de la semaine");
 
-       assertIsSetValue("mets la température du salon à 23");
+        assertIsSetValue("mets la température du salon à 23");
         assertIsSetValue("mets le volume de la musique à 50 %");
         assertIsSetValue("mets le volume à 50 %");
         assertIsSetValue("change la lumière au rez-de-chaussée à 12%");
@@ -118,5 +116,11 @@ public class TrainerFrTest extends AbstractTrainerTest {
         assertIsSetValue("mets les lumières dans le jardin en violet");
         assertIsSetValue("mets les lumières dans la buanderie à 40%");
         assertIsSetValue("mets les lumières dans le couloir à 20%");
-	}  
+
+        assertIs(Skills.CREATE_RULE, "programme un truc pour demain matin");
+        assertIs(Skills.CREATE_RULE, "fais une règle à exécuter ce soir");
+        assertIs(Skills.CREATE_RULE, "programmer une tâche pour dans 2 heures");
+        assertIs(Skills.CREATE_RULE, "programme une tâche pour samedi à 10h45");
+        assertIs(Skills.CREATE_RULE, "peux-tu ajouter une règle pour cet après midi");
+    }
 }

@@ -7,7 +7,8 @@ set up something for tomorrow
 set up something to run on Mondays
 do something at 8 o'clock
 i want you to do something in 3 hours
-i'd like to set something in 90 hours
+i'd like to set something in 90 minutes
+i want to delay something for 2h30
 set up a rule for 12:30
 create a rule to run at 8
 set up a new rule

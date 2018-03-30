@@ -7,7 +7,6 @@ public class TrainerEnTest extends AbstractTrainerTest {
 
     @Test
     public void testEN() throws Exception {
-        skills.add(new MockSkill("create-rule"));
         this.trainer = new IntentTrainer("en", skills);
 
         assertIsGetStatus("Temperature in the kitchen?", "temperature", "kitchen");
