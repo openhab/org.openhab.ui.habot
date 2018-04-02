@@ -1,3 +1,11 @@
+/**
+ * Copyright (c) 2010-2018 by the respective copyright holders.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ */
 package org.openhab.ui.habot.notification;
 
 import java.security.GeneralSecurityException;
@@ -16,18 +24,34 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 
+/**
+ * A module handler for an {@link Action} sending web push notification to all subscribed HABot clients.
+ *
+ * @author Yannick Schaus
+ */
 public class WebPushNotificationActionHandler extends BaseModuleHandler<Action> implements ActionHandler {
 
+    /**
+     * The ID of this module type
+     */
+    @NonNull
     public static final String TYPE_ID = "habot.WebPushNotificationAction";
-    public static final String PARAM_TITLE = "title";
-    public static final String PARAM_BODY = "body";
-    public static final String PARAM_CARD_UID = "cardUID";
-    public static final String PARAM_TAGS = "tags";
 
-    private final static Logger logger = LoggerFactory.getLogger(WebPushNotificationActionHandler.class);
+    protected static final String PARAM_TITLE = "title";
+    protected static final String PARAM_BODY = "body";
+    protected static final String PARAM_CARD_UID = "cardUID";
+    protected static final String PARAM_TAGS = "tags";
+
+    private final Logger logger = LoggerFactory.getLogger(WebPushNotificationActionHandler.class);
 
     private final NotificationService notificationService;
 
+    /**
+     * Constructs a WebPushNotificationActionHandler instance
+     *
+     * @param module the {@link Action} module instance
+     * @param notificationService the notification service to use to send the web push notifications
+     */
     public WebPushNotificationActionHandler(Action module, NotificationService notificationService) {
         super(module);
         this.notificationService = notificationService;

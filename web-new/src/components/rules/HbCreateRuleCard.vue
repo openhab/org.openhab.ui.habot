@@ -34,7 +34,7 @@
       </q-field>
       <q-field v-if="trigger === 'item'" icon="device_hub" orientation="vertical">
         <q-select
-          multiple filter clearable
+          multiple filter
           placeholder="Item(s)"
           color="primary"
           v-model="triggerItems"
@@ -65,7 +65,7 @@
       <q-input prefix="Send&nbsp;&nbsp;" suffix="to" v-model="actionCommand" />
       <q-field icon="device_hub" orientation="vertical" style="padding-bottom: 8px">
         <q-select
-          multiple filter clearable
+          multiple filter
           placeholder="Item(s)"
           color="primary"
           v-model="actionItems"
@@ -272,20 +272,6 @@ export default {
         this.rule.actions.push(action)
       }
 
-      // Handle the "one-time" behavior
-      if ((this.trigger === 'time' && this.triggerRecurrence === 'once') ||
-          (this.trigger === 'item' && this.triggerItemRepeat === 'once')) {
-        this.rule.actions.push({
-          id: currentModuleId++,
-          type: 'core.RuleEnablementAction',
-          label: 'Disable this rule after it has run',
-          configuration: {
-            enable: false,
-            ruleUIDs: [this.rule.uid]
-          }
-        })
-      }
-
       // Handle the notifications
       if (this.actionNotify.indexOf('webpush') >= 0 && this.actionNotifyMessage) {
         this.rule.actions.push({
@@ -305,6 +291,20 @@ export default {
           label: 'Speak through the default audio sink',
           configuration: {
             text: this.actionNotifyMessage
+          }
+        })
+      }
+
+      // Handle the "one-time" behavior
+      if ((this.trigger === 'time' && this.triggerRecurrence === 'once') ||
+          (this.trigger === 'item' && this.triggerItemRepeat === 'once')) {
+        this.rule.actions.push({
+          id: currentModuleId++,
+          type: 'core.RuleEnablementAction',
+          label: 'Disable this rule after it has run',
+          configuration: {
+            enable: false,
+            ruleUIDs: [this.rule.uid]
           }
         })
       }

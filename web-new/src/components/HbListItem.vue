@@ -9,7 +9,7 @@
   </q-item-main>
   <q-item-side right>
     <hb-color-picker :model="{ config: { item: item.name } }" v-if="item && (item.type === 'Color')"></hb-color-picker>
-    <hb-switch :model="{ config: { item: item.name } }" v-if="item && (item.type === 'Switch' || item.type === 'Dimmer' || item.type === 'Color')"></hb-switch>
+    <hb-switch :model="{ config: { item: item.name } }" v-if="item && (item.type === 'Switch' || (item.type === 'Dimmer' && item.tags.indexOf('habot:switchable') >= 0) || item.type === 'Color')"></hb-switch>
     <hb-shutter-control v-else-if="item && item.type === 'Rollershutter'" class="text-black" style="margin-top: -2px; margin-bottom: -2px"
         :model="{ config: { item: item.name, rounded: true, dense: true, push: true, size: 'lg', stopIcon: 'close', glossy: true } }"></hb-shutter-control>
     <big v-else class="big-value">{{state}}</big>

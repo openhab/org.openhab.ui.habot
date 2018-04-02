@@ -1,3 +1,11 @@
+/**
+ * Copyright (c) 2010-2018 by the respective copyright holders.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ */
 package org.openhab.ui.habot.notification.internal.webpush;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -9,6 +17,14 @@ import java.security.NoSuchProviderException;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 
+/**
+ * This code in this package is mostly borrowed from
+ * <a href=
+ * "https://github.com/web-push-libs/webpush-java/tree/master/src/main/java/nl/martijndwars/webpush">webpush-java</a>.
+ *
+ * @author Martijn Dwars
+ * @author Yannick Schaus - integration for HABot
+ */
 public class Notification {
     /**
      * The endpoint associated with the push subscription

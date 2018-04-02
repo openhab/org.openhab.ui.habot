@@ -7,7 +7,7 @@
       <div v-if="cards.length === 0" class="fit text-center q-pt-xl q-pl-lg q-pr-lg text-grey">
         <h4 class="q-display-1">No suggestions at this time</h4>
         <p>Edit cards from the
-        <q-btn flat icon="dashboard" @click="$router.push('/cards/deck')" style="margin-top: -1px">Card deck</q-btn>
+        <q-btn flat icon="dashboard" @click="$router.push('/cards/deck')" style="margin-top: -1px" label="Card deck" />
         and add criteria in the designer to make them appear here when relevant.</p>
       </div>
       <div class="full-width q-ma-lg text-center">

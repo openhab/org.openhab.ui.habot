@@ -8,13 +8,13 @@
     </q-page-sticky>
 
     <div :style="{ 'width': '100%', 'margin-top': (showPWAPrompt) ? '150px' : '100px' }">
-      <div class="chat-area" v-for="chat in chats" :key="chat" ref="chat">
+      <div class="chat-area" v-for="(chat, idx) in chats" :key="idx" ref="chat">
         <q-resize-observable @resize="onChatAreaResized"></q-resize-observable>
-        <q-window-resize-observable @resize="scrollToBottom"></q-window-resize-observable>
+        <q-window-resize-observable @resize="scrollToBottom(false)"></q-window-resize-observable>
 
         <q-chat-message
-          v-for="msg in chat.messages"
-          :key="msg"
+          v-for="(msg, msgid) in chat.messages"
+          :key="msgid"
           :label="msg.label"
           :sent="msg.sent"
           :text-color="msg.textColor"
@@ -24,6 +24,9 @@
           :text="msg.text"
           :stamp="msg.stamp"
         />
+        <q-chat-message v-if="!chat.finished && busy && thinking" avatar="statics/icons/icon-192x192.png">
+          <q-spinner-dots size="2rem" />
+        </q-chat-message>
 
         <hb-card v-if="chat.card && chat.card.component === 'HbCard'" :model="chat.card" menu="chat" />
 
@@ -83,6 +86,9 @@
   padding-bottom 64px
   padding-left 10px
   padding-right 10px
+  .q-spinner
+    width 2rem
+    margin 3px
   .q-message-avatar
     min-width 48px !important
   .q-message-sent .q-message-avatar
@@ -116,7 +122,6 @@ import HbCreateRuleCard from 'components/rules/HbCreateRuleCard.vue'
 import SpeechButton from 'components/speech/SpeechButton.vue'
 
 export default {
-  name: 'PageChat',
   components: {
     HbCard,
     HbCreateRuleCard,
@@ -125,6 +130,7 @@ export default {
   data () {
     return {
       busy: false,
+      thinking: false,
       text: '',
       chats: [
         {
@@ -161,11 +167,15 @@ export default {
       return
     }
 
-    this.$http.get('/rest/habot/greet').then(function (response) {
+    this.busy = true
+    this.thinking = false
+    setTimeout(() => { if (this.busy) this.thinking = true }, 500)
+    this.$http.get('/rest/habot/greet').then((response) => {
       vm.$store.commit('setLang', response.data.language)
       if (!vm.language) {
         vm.language = 'en'
       }
+      vm.busy = false
       vm.chats[0].messages.push({
         id: new Date(),
         name: '', // 'HABot',
@@ -174,7 +184,8 @@ export default {
         stamp: date.formatDate(new Date(), 'HH:mm')
       })
       vm.chats[0].greetingSuggestions = true
-    }).catch(function (error) {
+    }).catch((error) => {
+      vm.busy = false
       let errormessage = (error.response && error.response.data && error.response.data.error && error.response.data.error.message) ? error.response.data.error.message
         : (error.response && error.response.statusText) ? error.response.statusText : error.message
       vm.chats[0].messages.push({
@@ -271,7 +282,9 @@ export default {
       })
 
       this.busy = true
-      this.scrollToBottom(true)
+      this.thinking = false
+      setTimeout(() => { if (this.busy) this.thinking = true }, 500)
+      setTimeout(() => { this.scrollToBottom(true) })
 
       this.$http.post('/rest/habot/chat', this.text, {
         headers: {
@@ -293,15 +306,19 @@ export default {
           currentChat.card = response.data.card
         }
 
-        this.busy = false
-        this.stickToBottom = false
-
         currentChat.finished = true
         this.chats.push({
           messages: [],
           card: null,
           finished: false
         })
+
+        this.busy = false
+        if (this.$q.platform.is.mobile) {
+          setTimeout(this.$refs.input.blur)
+        } else {
+          setTimeout(() => { this.stickToBottom = false }, 500)
+        }
 
         currentChat.intent = response.data.intent
       }).catch(function (error) {
@@ -317,22 +334,28 @@ export default {
           textColor: 'white',
           stamp: date.formatDate(new Date(), 'HH:mm')
         })
+
+        if (this.$q.platform.is.mobile) {
+          setTimeout(this.$refs.input.blur)
+        } else {
+          setTimeout(() => { this.stickToBottom = false })
+        }
       })
 
       this.text = ''
-      if (this.$q.platform.is.mobile) {
-        // force hide the virtual keyboard
-        this.$refs.input.blur()
-      }
+      // if (this.$q.platform.is.mobile) {
+      //   // force hide the virtual keyboard
+      //   setTimeout(this.$refs.input.blur, 300)
+      // }
     },
 
     keyUp (event) {
       if (event.keyCode === 13) {
         this.send()
-        if (this.$q.platform.is.mobile) {
-          // force hide the virtual keyboard
-          event.currentTarget.blur()
-        }
+        // if (this.$q.platform.is.mobile) {
+        //   // force hide the virtual keyboard
+        //   setTimeout(event.currentTarget.blur()
+        // }
       }
     },
 

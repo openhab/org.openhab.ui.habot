@@ -3,7 +3,7 @@ import { sprintf } from 'sprintf-js'
 const unique = a => [...new Set(a)]
 
 export const objectSet = (state) => {
-  if (!state.items) return []
+  if (!state.items.length) return []
   const tags = state.items.map((item) => {
     return item.tags || []
   }).reduce((acc, tags) => {
@@ -15,7 +15,7 @@ export const objectSet = (state) => {
 }
 
 export const locationSet = (state) => {
-  if (!state.items) return []
+  if (!state.items.length) return []
   const tags = state.items.map((item) => {
     return item.tags || []
   }).reduce((acc, tags) => {
@@ -35,7 +35,7 @@ export const allStates = (state) => {
 }
 
 export const itemState = (state) => (name, raw) => {
-  if (!state.items) return null
+  if (!state.items.length) return null
   let item = state.items.find(item => item.name === name)
   if (item && item.state) {
     if (raw) return item.state

@@ -1,3 +1,11 @@
+/**
+ * Copyright (c) 2010-2018 by the respective copyright holders.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ */
 package org.openhab.ui.habot.card.internal;
 
 import java.util.ArrayList;
@@ -9,6 +17,7 @@ import java.util.stream.Collectors;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.smarthome.core.common.registry.AbstractRegistry;
+import org.eclipse.smarthome.core.common.registry.Registry;
 import org.eclipse.smarthome.core.events.EventPublisher;
 import org.openhab.ui.habot.card.Card;
 import org.osgi.service.component.annotations.Component;
@@ -18,6 +27,11 @@ import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * The @link {@link Registry} tracking for {@link Card} elements provided by the @link {@link CardProvider}
+ *
+ * @author Yannick Schaus
+ */
 @Component(service = CardRegistry.class, immediate = true)
 public class CardRegistry extends AbstractRegistry<Card, String, CardProvider> {
 
@@ -27,6 +41,12 @@ public class CardRegistry extends AbstractRegistry<Card, String, CardProvider> {
         super(CardProvider.class);
     }
 
+    /**
+     * Returns cards having ALL the specified tags
+     *
+     * @param tags the tags to lookup
+     * @return matching cards
+     */
     public Collection<Card> getCardByTags(Set<String> tags) {
         List<Card> filteredCards = new ArrayList<Card>();
         for (Card card : getAll()) {
@@ -52,7 +72,14 @@ public class CardRegistry extends AbstractRegistry<Card, String, CardProvider> {
         return super.add(element);
     }
 
-    public @NonNull Collection<Card> getRecent(int skip, int count) {
+    /**
+     * Returns the most recent cards according to their timestamp
+     *
+     * @param skip number of elements to skip, for paging
+     * @param count number of elements to retrieve, for paging (default 10)
+     * @return the recent cards, in decreasing order of age
+     */
+    public Collection<Card> getRecent(int skip, int count) {
         int limit = (count < 1) ? 10 : count;
         Comparator<Card> byTimestamp = (e1, e2) -> e2.getTimestamp().compareTo(e1.getTimestamp());
         List<Card> recentCards = getAll().stream().sorted(byTimestamp).skip(skip).limit(limit)
@@ -61,7 +88,12 @@ public class CardRegistry extends AbstractRegistry<Card, String, CardProvider> {
         return recentCards;
     }
 
-    public @NonNull Collection<Card> getNonEphemeral() {
+    /**
+     * Returns all the cards that are not ephemeral
+     *
+     * @return the non-ephemeral cards
+     */
+    public Collection<Card> getNonEphemeral() {
         return getAll().stream().filter(c -> !c.isEphemeral()).collect(Collectors.toList());
     }
 

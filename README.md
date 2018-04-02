@@ -40,6 +40,7 @@ entity_type:value
 ```
 
 For example:
+
 - `object:temperature`
 - `object:water consumption`
 - `location:kitchen`

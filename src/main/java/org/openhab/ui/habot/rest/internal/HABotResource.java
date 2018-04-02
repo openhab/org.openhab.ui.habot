@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2015-2017 by the respective copyright holders.
+ * Copyright (c) 2010-2018 by the respective copyright holders.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -28,9 +28,11 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.smarthome.core.auth.Role;
 import org.eclipse.smarthome.core.i18n.LocaleProvider;
 import org.eclipse.smarthome.core.voice.VoiceManager;
+import org.eclipse.smarthome.core.voice.text.InterpretationException;
 import org.eclipse.smarthome.io.rest.LocaleUtil;
 import org.eclipse.smarthome.io.rest.RESTResource;
 import org.openhab.ui.habot.card.Card;
@@ -66,6 +68,7 @@ public class HABotResource implements RESTResource {
 
     private final Logger logger = LoggerFactory.getLogger(HABotResource.class);
 
+    @NonNull
     private final String OPENNLP_HLI = "opennlp";
 
     private VoiceManager voiceManager;
@@ -123,7 +126,6 @@ public class HABotResource implements RESTResource {
             @ApiResponse(code = 500, message = "There is no support for the configured language") })
     public Response greet(
             @HeaderParam(HttpHeaders.ACCEPT_LANGUAGE) @ApiParam(value = "language (will use the default if omitted)") String language) {
-
         final Locale locale = (this.localeProvider != null && this.localeProvider.getLocale() != null)
                 ? this.localeProvider.getLocale()
                 : LocaleUtil.getLocale(language);
@@ -147,13 +149,15 @@ public class HABotResource implements RESTResource {
             @ApiResponse(code = 500, message = "An interpretation error occured") })
     public Response chat(@HeaderParam(HttpHeaders.ACCEPT_LANGUAGE) @ApiParam(value = "language") String language,
             @ApiParam(value = "human language query", required = true) String query) throws Exception {
-
         final Locale locale = (this.localeProvider != null && this.localeProvider.getLocale() != null)
                 ? this.localeProvider.getLocale()
                 : LocaleUtil.getLocale(language);
 
         // interpret
         OpenNLPInterpreter hli = (OpenNLPInterpreter) voiceManager.getHLI(OPENNLP_HLI);
+        if (hli == null) {
+            throw new InterpretationException("The OpenNLP interpreter is not available");
+        }
         ChatReply reply = hli.reply(locale, query);
 
         return Response.ok(reply).build();
@@ -259,7 +263,8 @@ public class HABotResource implements RESTResource {
     @Path("/cards/{cardUID}")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Deletes a card from the card deck.")
-    public Response deleteCard(@PathParam("cardUID") @ApiParam(value = "cardUID", required = true) String cardUID) {
+    public Response deleteCard(
+            @PathParam("cardUID") @ApiParam(value = "cardUID", required = true) @NonNull String cardUID) {
         this.cardRegistry.remove(cardUID);
 
         return Response.ok().build();
@@ -362,7 +367,8 @@ public class HABotResource implements RESTResource {
     @Path("/compat/cards/{cardUID}/delete")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Deletes a card from the card deck (compatibility endpoint).")
-    public Response deleteCardPost(@PathParam("cardUID") @ApiParam(value = "cardUID", required = true) String cardUID) {
+    public Response deleteCardPost(
+            @PathParam("cardUID") @ApiParam(value = "cardUID", required = true) @NonNull String cardUID) {
         return this.deleteCard(cardUID);
     }
 
@@ -373,7 +379,7 @@ public class HABotResource implements RESTResource {
             @ApiResponse(code = 404, message = "The card with the provided UID doesn't exist"),
             @ApiResponse(code = 500, message = "An error occured") })
     public Response unsetCardBookmarkCompat(
-            @PathParam("cardUID") @ApiParam(value = "cardUID", required = true) String cardUID) {
+            @PathParam("cardUID") @ApiParam(value = "cardUID", required = true) @NonNull String cardUID) {
         return this.unsetCardBookmark(cardUID);
     }
 }

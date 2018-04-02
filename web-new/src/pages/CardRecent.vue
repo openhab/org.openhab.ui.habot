@@ -1,5 +1,16 @@
 <template>
-  <q-timeline class="recent-cards">
+  <div class="q-ma-xl full-width text-center" v-if="busy">
+    <q-spinner-dots width="4rem" color="primary" />
+  </div>
+  <div v-else-if="!cards.length" class="row">
+    <div style="padding: 10px"></div>
+    <div class="fit text-center q-pt-xl q-pl-lg q-pr-lg text-grey">
+      <h4 class="q-display-1">No recent cards</h4>
+      <p>The cards encountered while chatting or modified recently will appear here.</p>
+      <q-btn flat icon="chat" @click="$router.push('/chat')" style="margin-top: -1px" label="Chat with HABot" />
+    </div>
+  </div>
+  <q-timeline v-else class="recent-cards">
     <q-timeline-entry v-for="card in cards" :key="card.uid"
       :subtitle="new Date(card.timestamp) | moment('from')" class="recent-card">
       <hb-card :model="card" menu="recent" @forgotten="cardForgotten" />
@@ -44,12 +55,14 @@ export default {
   },
   data () {
     return {
-      cards: null
+      cards: null,
+      busy: true
     }
   },
   methods: {
     getRecentCards (skip) {
       this.$http.get('/rest/habot/cards/recent').then((resp) => {
+        this.busy = false
         if (resp.data) {
           this.cards = resp.data
         }

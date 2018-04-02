@@ -3,7 +3,7 @@ import { extend } from 'quasar'
 const unique = a => [...new Set(a)]
 
 export const objectSet = (state) => {
-  if (!state.cards) return []
+  if (!state.cards.length) return []
   const tags = state.cards.map((card) => {
     return card.tags || []
   }).reduce((acc, tags) => {
@@ -15,7 +15,7 @@ export const objectSet = (state) => {
 }
 
 export const locationSet = (state) => {
-  if (!state.cards) return []
+  if (!state.cards.length) return []
   const tags = state.cards.map((card) => {
     return card.tags || []
   }).reduce((acc, tags) => {
@@ -27,13 +27,13 @@ export const locationSet = (state) => {
 }
 
 export const tag = (state) => (tag) => {
-  if (!state.cards) return []
+  if (!state.cards.length) return []
   return state.cards.filter((card) => card.tags && card.tags.indexOf(tag) >= 0)
 }
 
 export const tags = (state) => (objects, locations) => {
   if (!objects.length && !locations.length) return []
-  if (!state.cards) return []
+  if (!state.cards.length) return []
   let filtered = state.cards.slice()
   if (objects.length) {
     filtered = filtered.filter((card) => card.tags && objects.some((t) => card.tags.indexOf(t) >= 0))

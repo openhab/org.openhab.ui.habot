@@ -1,7 +1,14 @@
+/**
+ * Copyright (c) 2010-2018 by the respective copyright holders.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ */
 package org.openhab.ui.habot.card;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -18,18 +25,17 @@ import org.osgi.framework.FrameworkUtil;
 import org.osgi.service.component.annotations.Reference;
 
 /**
- * Tries to come up with a {@link Card} to present with HABot's reply when asked about a set of entities.
+ * Retrieves a {@link Card} to present as part of HABot's reply from a provided {@link Intent}.
  *
  * First, tries to look up in the registry ("card deck") for a card previously saved and having tags matching the
- * entities (for example: object:temperature + location:kitchen).
+ * entities (for example: "object:temperature" + "location:kitchen").
  *
- * If so, simply use that {@link Card} - this allows the user to control exactly what they want to see. If no card was
- * found, build one on the fly using the provided matching items. Note that the user will be allowed the opportunity to
- * add the ad-hoc card in the card deck, with the appropriate tags, and edit it so that it would appear with the
- * eventual customizations the next time.
+ * If so, simply use that {@link Card} - this allows the user to design new customized cards and control exactly what
+ * they want to see. If no card was found, build one on the fly using the provided matching items. Note that the user
+ * will be allowed the opportunity in the chat UI to add those generated cards to the card deck, with the appropriate
+ * tags, and from there edit them so that they would appear with the eventual customizations the next time.
  *
  * @author Yannick Schaus - Initial contribution
- *
  */
 @org.osgi.service.component.annotations.Component(service = CardBuilder.class, immediate = true)
 public class CardBuilder {
@@ -47,15 +53,22 @@ public class CardBuilder {
     }
 
     @Reference
-    public void setItemRegistry(ItemRegistry itemRegistry) {
+    protected void setItemRegistry(ItemRegistry itemRegistry) {
         this.itemRegistry = itemRegistry;
     }
 
-    public void unsetItemRegistry(ItemRegistry itemRegistry) {
+    protected void unsetItemRegistry(ItemRegistry itemRegistry) {
         this.itemRegistry = null;
     }
 
-    public Card buildCard(Intent intent, List<Item> matchedItems) {
+    /**
+     * Retrieves or build a card for the specified intent and matched items
+     *
+     * @param intent the intent including entities
+     * @param matchedItems the matched items
+     * @return the card (either retrieved or built)
+     */
+    public Card buildCard(Intent intent, Collection<Item> matchedItems) {
         Set<String> tags = intent.getEntities().entrySet().stream()
                 .filter(e -> e.getKey().equals("object") || e.getKey().equals("location"))
                 .map(e -> e.getKey() + ":" + e.getValue()).collect(Collectors.toSet());
@@ -77,7 +90,7 @@ public class CardBuilder {
         card.updateTimestamp();
 
         if (matchedItems.size() == 1) {
-            Item item = matchedItems.get(0);
+            Item item = matchedItems.stream().findFirst().get();
             card.setTitle(item.getLabel());
             card.setSubtitle(item.getName());
 
@@ -200,11 +213,20 @@ public class CardBuilder {
             card.addComponent("list", list);
         }
 
+        // Adds the (ephemeral) card to the registry anyways so it appears in the "recent cards" page
         cardRegistry.add(card);
         return card;
     }
 
-    public Card buildChartCard(Intent intent, List<Item> matchedItems, String period) {
+    /**
+     * Builds a card with a chart from an intent and matched items
+     *
+     * @param intent the intent
+     * @param matchedItems the matched items
+     * @param period the chart period
+     * @return the card
+     */
+    public Card buildChartCard(Intent intent, Collection<Item> matchedItems, String period) {
         Set<String> tags = intent.getEntities().entrySet().stream().map(e -> e.getKey() + ":" + e.getValue())
                 .collect(Collectors.toSet());
 
@@ -215,7 +237,7 @@ public class CardBuilder {
         card.updateTimestamp();
 
         if (matchedItems.size() == 1) {
-            Item item = matchedItems.get(0);
+            Item item = matchedItems.stream().findFirst().get();
             card.setTitle(item.getLabel());
             card.setSubtitle(item.getName());
         } else {
@@ -239,6 +261,7 @@ public class CardBuilder {
         return card;
     }
 
+    @SuppressWarnings("null")
     private String getCardTitleFromGroupLabels(Set<String> tags) {
         Collection<Item> groups = this.itemRegistry.getItemsByTagAndType("Group", tags.stream().toArray(String[]::new));
         if (groups.isEmpty()) {
@@ -252,20 +275,15 @@ public class CardBuilder {
         if (item.getStateDescription() != null) {
             StateDescription stateDescription = item.getStateDescription();
             if (stateDescription != null && stateDescription.getPattern() != null) {
-                try {
-                    String transformedState = TransformationHelper.transform(
-                            FrameworkUtil.getBundle(HistoryLastChangesSkill.class).getBundleContext(),
-                            stateDescription.getPattern(), state.toString());
-                    if (transformedState.equals(state.toString())) {
-                        return state.format(stateDescription.getPattern());
-                    } else {
-                        return transformedState;
-                    }
-                } catch (NoClassDefFoundError ex) {
-                    // TransformationHelper is optional dependency, so ignore if class not found
-                    // return state as it is without transformation
-                    return state.toString();
+                String transformedState = TransformationHelper.transform(
+                        FrameworkUtil.getBundle(HistoryLastChangesSkill.class).getBundleContext(),
+                        stateDescription.getPattern(), state.toString());
+                if (transformedState.equals(state.toString())) {
+                    return state.format(stateDescription.getPattern());
+                } else {
+                    return transformedState;
                 }
+
             } else {
                 return state.toString();
             }

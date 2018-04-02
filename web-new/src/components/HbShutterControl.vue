@@ -18,7 +18,9 @@ import HbBtn from 'components/HbBtn.vue'
 export default {
   name: 'HbBtnGroup',
   props: ['model'],
-  components: HbBtn,
+  components: {
+    HbBtn
+  },
   methods: {
     iconUpDown (direction) {
       switch (this.model.config.upDownIcons) {

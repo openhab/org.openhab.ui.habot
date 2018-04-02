@@ -1,3 +1,11 @@
+/**
+ * Copyright (c) 2010-2018 by the respective copyright holders.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ */
 package org.openhab.ui.habot.nlp.internal;
 
 import java.io.InputStream;
@@ -13,6 +21,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.commons.io.IOUtils;
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.smarthome.core.common.registry.RegistryChangeListener;
 import org.eclipse.smarthome.core.events.EventPublisher;
 import org.eclipse.smarthome.core.items.Item;
@@ -32,12 +41,17 @@ import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
 
+/**
+ * The OpenNLP-based interpreter used by HABot.
+ *
+ * @author Yannick Schaus
+ */
 @Component(service = HumanLanguageInterpreter.class, immediate = true, name = "org.openhab.opennlphli", property = {
         "service.config.description.uri=voice:opennlphli", "service.config.label=OpenNLP Interpreter for HABot",
         "service.config.category=voice" })
 public class OpenNLPInterpreter implements HumanLanguageInterpreter {
 
-    private static final Set<Locale> supportedLocales = Collections
+    private static final Set<Locale> SUPPORTED_LOCALES = Collections
             .unmodifiableSet(new HashSet<>(Arrays.asList(Locale.ENGLISH, Locale.FRENCH, Locale.GERMAN)));
 
     private IntentTrainer intentTrainer = null;
@@ -49,7 +63,7 @@ public class OpenNLPInterpreter implements HumanLanguageInterpreter {
 
     private HashMap<String, Skill> skills = new HashMap<String, Skill>();
 
-    private RegistryChangeListener<Item> registryChangeListener = new RegistryChangeListener<Item>() {
+    private @NonNull RegistryChangeListener<Item> registryChangeListener = new RegistryChangeListener<Item>() {
         @Override
         public void added(Item element) {
             // Only invalidate the trainer if the new item has tags
@@ -195,7 +209,7 @@ public class OpenNLPInterpreter implements HumanLanguageInterpreter {
 
     @Override
     public Set<Locale> getSupportedLocales() {
-        return supportedLocales;
+        return SUPPORTED_LOCALES;
     }
 
     @Override
@@ -204,14 +218,14 @@ public class OpenNLPInterpreter implements HumanLanguageInterpreter {
     }
 
     @Reference
-    public void setItemRegistry(ItemRegistry itemRegistry) {
+    protected void setItemRegistry(ItemRegistry itemRegistry) {
         if (this.itemRegistry == null) {
             this.itemRegistry = itemRegistry;
             this.itemRegistry.addRegistryChangeListener(registryChangeListener);
         }
     }
 
-    public void unsetItemRegistry(ItemRegistry itemRegistry) {
+    protected void unsetItemRegistry(ItemRegistry itemRegistry) {
         if (itemRegistry == this.itemRegistry) {
             this.itemRegistry.removeRegistryChangeListener(registryChangeListener);
             this.itemRegistry = null;
@@ -219,26 +233,26 @@ public class OpenNLPInterpreter implements HumanLanguageInterpreter {
     }
 
     @Reference
-    public void setEventPublisher(EventPublisher eventPublisher) {
+    protected void setEventPublisher(EventPublisher eventPublisher) {
         if (this.eventPublisher == null) {
             this.eventPublisher = eventPublisher;
         }
     }
 
-    public void unsetEventPublisher(EventPublisher eventPublisher) {
+    protected void unsetEventPublisher(EventPublisher eventPublisher) {
         if (eventPublisher == this.eventPublisher) {
             this.eventPublisher = null;
         }
     }
 
     @Reference(cardinality = ReferenceCardinality.MULTIPLE, policy = ReferencePolicy.DYNAMIC)
-    public void addSkill(Skill skill) {
+    protected void addSkill(Skill skill) {
         this.skills.put(skill.getIntentId(), skill);
         // reset the trainer
         this.intentTrainer = null;
     }
 
-    public void removeSkill(Skill skill) {
+    protected void removeSkill(Skill skill) {
         this.skills.remove(skill.getIntentId());
         // reset the trainer
         this.intentTrainer = null;

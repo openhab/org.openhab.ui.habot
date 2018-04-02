@@ -10,6 +10,8 @@ import HbBtn from 'components/HbBtn.vue'
 export default {
   name: 'HbBtnGroup',
   props: ['model'],
-  components: HbBtn
+  components: {
+    HbBtn
+  }
 }
 </script>

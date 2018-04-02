@@ -1,3 +1,11 @@
+/**
+ * Copyright (c) 2010-2018 by the respective copyright holders.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ */
 package org.openhab.ui.habot.nlp.internal;
 
 import java.io.IOException;
@@ -7,6 +15,12 @@ import opennlp.tools.doccat.DocumentSample;
 import opennlp.tools.tokenize.WhitespaceTokenizer;
 import opennlp.tools.util.ObjectStream;
 
+/**
+ * This class allows reusing the format used by the @{link NameSampleDataStream} for document categorization - it simply
+ * removes the tags.
+ *
+ * @author Yannick Schaus
+ */
 public class IntentDocumentSampleStream implements ObjectStream<DocumentSample> {
 
     String category;
@@ -22,16 +36,15 @@ public class IntentDocumentSampleStream implements ObjectStream<DocumentSample> 
         String sampleString = stream.read();
 
         if (sampleString != null) {
-
             // Whitespace tokenize entire string
             String[] tokens = WhitespaceTokenizer.INSTANCE.tokenize(sampleString);
 
             // remove entities
             Vector<String> vector = new Vector<String>(tokens.length);
-            boolean skip = false;
+            // boolean skip = false;
             for (String token : tokens) {
                 if (!token.startsWith("<")) {
-                    System.out.print(token + " ");
+                    // System.out.print(token + " ");
                     vector.add(token);
                 }
                 // if (token.startsWith("<")) {
@@ -41,7 +54,7 @@ public class IntentDocumentSampleStream implements ObjectStream<DocumentSample> 
                 // vector.add(token);
                 // }
             }
-            System.out.println();
+            // System.out.println();
 
             tokens = new String[vector.size()];
             vector.copyInto(tokens);

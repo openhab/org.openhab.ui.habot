@@ -104,6 +104,7 @@ module.exports = function (ctx) {
         'QBtnDropdown',
         'QSpinnerRadio',
         'QSpinnerAudio',
+        'QSpinnerDots',
         'QIcon',
         'QList',
         'QListHeader',
