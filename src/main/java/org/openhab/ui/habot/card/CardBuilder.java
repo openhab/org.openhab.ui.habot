@@ -43,24 +43,6 @@ public class CardBuilder {
     private CardRegistry cardRegistry;
     private ItemRegistry itemRegistry;
 
-    @Reference
-    protected void setCardRegistry(CardRegistry cardRegistry) {
-        this.cardRegistry = cardRegistry;
-    }
-
-    protected void unsetCardRegistry(CardRegistry cardRegistry) {
-        this.cardRegistry = null;
-    }
-
-    @Reference
-    protected void setItemRegistry(ItemRegistry itemRegistry) {
-        this.itemRegistry = itemRegistry;
-    }
-
-    protected void unsetItemRegistry(ItemRegistry itemRegistry) {
-        this.itemRegistry = null;
-    }
-
     /**
      * Retrieves or build a card for the specified intent and matched items
      *
@@ -74,7 +56,7 @@ public class CardBuilder {
                 .map(e -> e.getKey() + ":" + e.getValue()).collect(Collectors.toSet());
 
         Collection<Card> cardsInRegistry = this.cardRegistry.getCardByTags(tags).stream()
-                .filter(c -> !c.isNotReuseableInChat()).collect(Collectors.toList());
+                .filter(c -> !c.isNotReuseableInChat() && !c.isEphemeral()).collect(Collectors.toList());
         if (cardsInRegistry.size() > 0) {
             // don't handle multiple cards, just return the first one
             Card existingCard = cardsInRegistry.iterator().next();
@@ -290,5 +272,23 @@ public class CardBuilder {
         } else {
             return state.toString();
         }
+    }
+
+    @Reference
+    protected void setCardRegistry(CardRegistry cardRegistry) {
+        this.cardRegistry = cardRegistry;
+    }
+
+    protected void unsetCardRegistry(CardRegistry cardRegistry) {
+        this.cardRegistry = null;
+    }
+
+    @Reference
+    protected void setItemRegistry(ItemRegistry itemRegistry) {
+        this.itemRegistry = itemRegistry;
+    }
+
+    protected void unsetItemRegistry(ItemRegistry itemRegistry) {
+        this.itemRegistry = null;
     }
 }

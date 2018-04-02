@@ -127,8 +127,8 @@ public class OpenNLPInterpreter implements HumanLanguageInterpreter {
     /**
      * This variant of interpret() returns a more complete interpretation result.
      *
-     * @param locale
-     * @param text
+     * @param locale the locale of the query
+     * @param text the query text
      * @return the interpretation result as a {@link ChatReply} object
      * @throws InterpretationException
      */
