@@ -27,7 +27,7 @@
 				<configuration>
 					<nodeVersion>v8.9.4</nodeVersion>
 					<npmVersion>5.6.0</npmVersion>
-					<workingDirectory>web-new</workingDirectory>
+					<workingDirectory>web</workingDirectory>
 				</configuration>
 
 				<executions>

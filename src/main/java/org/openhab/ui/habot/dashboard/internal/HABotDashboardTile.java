@@ -45,7 +45,7 @@ public class HABotDashboardTile implements DashboardTile {
 
     @Override
     public String getImageUrl() {
-        return "../habot/statics/tile.png";
+        return "../habot/statics/dashboardtile.png";
     }
 
     public static final String HABOT_ALIAS = "/habot";
@@ -57,7 +57,7 @@ public class HABotDashboardTile implements DashboardTile {
     @Activate
     protected void activate() {
         try {
-            httpService.registerResources(HABOT_ALIAS, "web-new/dist/pwa-mat", null);
+            httpService.registerResources(HABOT_ALIAS, "web/dist/pwa-mat", null);
             logger.info("Started HABot at " + HABOT_ALIAS);
         } catch (NamespaceException e) {
             logger.error("Error during HABot startup: {}", e.getMessage());
