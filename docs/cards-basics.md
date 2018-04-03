@@ -2,4 +2,4 @@
 
 TODO
 
-Next, learn how to use the [Card Designer](card-designer)
+Next, learn how to use the [Card Designer](designer)
