@@ -69,14 +69,11 @@
 
 <style lang="stylus">
 @import '~variables'
-// .big-value
-//   font-weight 300
-//   color black
-//   font-size 200%
-//   vertical-align middle
+.hb-card .q-card-title-extra
+  align-self baseline
 .corner-bookmark
   position absolute
-  top: -24px
+  top: -20px
   opacity 0.2
 @media (min-width $breakpoint-sm-min)
   .bigger

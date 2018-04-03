@@ -1,7 +1,8 @@
 // Configuration for your app
 var
   path = require('path'),
-  CopyWebpackPlugin = require('copy-webpack-plugin')
+  CopyWebpackPlugin = require('copy-webpack-plugin'),
+  Visualizer = require('webpack-visualizer-plugin')
   // webpack = require('webpack')
 
 module.exports = function (ctx) {
@@ -64,10 +65,12 @@ module.exports = function (ctx) {
 
         cfg.plugins.push(new CopyWebpackPlugin([
           {
-            from: path.resolve(__dirname, 'src/sw-webpush.js'),
+            from: path.resolve(__dirname, 'src-pwa/sw-webpush.js'),
             to: '.'
           }
         ]))
+
+        cfg.plugins.push(new Visualizer({ filename: '../webpack-stats.html' }))
       }
     },
     devServer: {
