@@ -91,7 +91,12 @@ export default {
         }
       }
       for (var groupName of item.groupNames) {
-        this.addInheritedTags(this.$store.state.items.map[groupName], taglist)
+        let group = this.$store.state.items.map[groupName]
+        if (group) {
+          this.addInheritedTags(group, taglist)
+        } else {
+          console.warn(`Cannot find ${item.name} parent group: ${groupName}!`)
+        }
       }
     },
     processItems () {
