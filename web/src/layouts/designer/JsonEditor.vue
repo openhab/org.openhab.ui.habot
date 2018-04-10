@@ -11,8 +11,9 @@
       <q-toolbar-title>
         {{component.component}} <q-icon name="chevron_right" /> {{slotName}}
       </q-toolbar-title>
-      <q-btn flat round icon="done" @click="validate(false)" />
-      <q-btn flat round icon="system_update_alt" @click="update" />
+      <q-btn flat round icon="format_indent_increase" @click="format"><q-tooltip :disable="$q.platform.has.touch">Format</q-tooltip></q-btn>
+      <q-btn flat round icon="done" @click="validate(false)"><q-tooltip :disable="$q.platform.has.touch">Validate</q-tooltip></q-btn>
+      <q-btn flat round icon="system_update_alt" @click="update"><q-tooltip :disable="$q.platform.has.touch">Update</q-tooltip></q-btn>
     </q-toolbar>
     <q-scroll-area class="fit q-pt-md q-px-sm">
       <q-input class="json-editor" v-model="json" hide-underline type="textarea" />
@@ -131,6 +132,14 @@ export default {
       this.validate(true)
       if (!this.errors.length) {
         this.$emit('update', JSON.parse(this.json))
+      }
+    },
+    format () {
+      try {
+        let parsed = JSON.parse(this.json)
+        this.json = JSON.stringify(parsed, null, 2)
+      } catch (e) {
+        this.$q.notify('JSON parse error:' + e)
       }
     }
   }

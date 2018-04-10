@@ -19,9 +19,13 @@
       </q-toolbar>
     </q-layout-footer>
 
-    <q-layout-drawer side="left" content-class="bg-grey-2 shadow-1 tree-drawer" v-model="layout.treepane">
+    <q-layout-drawer side="left" content-class="bg-grey-2 shadow-1 tree-drawer" v-model="layout.treepane" ref="treeDrawer">
       <div>
-        <q-tree ref="tree" v-if="treeModel" class="designer-tree" :nodes="treeModel" node-key="id" :selected.sync="selectedNodeId" default-expand-all></q-tree>
+        <q-resize-observable @resize="treeViewResized"></q-resize-observable>
+        <q-tree ref="tree"
+                v-if="treeModel" class="designer-tree"
+                :nodes="treeModel" node-key="id" :selected.sync="selectedNodeId" default-expand-all
+                :style="{ 'width': layout.treeViewWidth }"></q-tree>
       </div>
     </q-layout-drawer>
 
@@ -56,8 +60,8 @@
                 <q-item v-close-overlay @click.native="showJsonEditor = true">
                   <q-item-main label="Edit JSON" />
                 </q-item>
-                <q-item v-close-overlay @click.native="pasteComponent()">
-                  <q-item-main label="Paste" />
+                <q-item v-close-overlay @click.native="pasteComponent()" :disabled="!$q.sessionStorage.has('habot.designerClipboard')">
+                  <q-item-main :label="'Paste ' + ($q.sessionStorage.has('habot.designerClipboard') ? $q.sessionStorage.get.item('habot.designerClipboard').component : '')" />
                 </q-item>
               </q-list>
             </q-popover>
@@ -324,7 +328,8 @@ export default {
       components: Components,
       layout: {
         treepane: true,
-        toolpane: true
+        toolpane: true,
+        treeViewWidth: null
       },
       cardModel: null,
       treeModel: null,
@@ -495,6 +500,11 @@ export default {
       console.log(evt)
       if (evt.target.nodeName === 'INPUT' || evt.target.nodeName === 'TEXTAREA') return
       this.pasteComponent()
+    },
+    treeViewResized (size) {
+      let aside = this.$refs.treeDrawer.$el.getElementsByTagName('aside')
+      if (!aside.length) return
+      this.layout.treeViewWidth = (aside[0].scrollWidth > aside[0].clientWidth) ? aside[0].scrollWidth + 'px' : '100%'
     },
     slotJsonUpdated (newSlot) {
       this.selectedNode.component.slots[this.selectedNode.label] = newSlot
