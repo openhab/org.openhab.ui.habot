@@ -25,6 +25,7 @@ const Router = new VueRouter({
 
 Router.beforeEach((to, from, next) => {
   if (store.state.ready) return next()
+  if (to.matched.path === '/offline') return next()
 
   // get the store ready first
   if (navigator.credentials && navigator.credentials.preventSilentAccess) {
