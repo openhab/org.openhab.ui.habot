@@ -1,5 +1,6 @@
 export default {
   ready: false,
   items: [],
-  map: {}
+  map: {},
+  connectionBroken: false
 }
