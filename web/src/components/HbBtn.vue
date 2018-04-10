@@ -1,8 +1,8 @@
 <template>
   <q-btn v-if="!hasPopover"
          :class="{'highlight-and-fade': this.model.highlight}"
-         :icon="this.model.config.icon"
-         :icon-right="this.model.config.iconRight"
+         :icon="icon"
+         :icon-right="iconRight"
          :disabled="disabled"
          :label="label"
          :size="(this.model.config.size) ? this.model.config.size : undefined"
@@ -91,7 +91,7 @@ export default {
       }
     },
     sendCmd () {
-      this.$store.dispatch('items/sendCmd', { itemName: this.model.config.item, command: this.model.config.command })
+      this.$store.dispatch('items/sendCmd', { itemName: this.model.config.item, command: this.$expr(this.model.config.command) })
     }
   },
   computed: {
@@ -115,6 +115,12 @@ export default {
     },
     textColor () {
       return this.$expr(this.model.config.textColor)
+    },
+    icon () {
+      return this.$expr(this.model.config.icon)
+    },
+    iconRight () {
+      return this.$expr(this.model.config.iconRight)
     }
   }
 }

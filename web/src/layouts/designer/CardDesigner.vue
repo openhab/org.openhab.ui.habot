@@ -1,5 +1,5 @@
 <template>
-  <q-layout view="hHh Lpr fFf">
+  <q-layout view="hHh LpR fFf">
     <q-layout-header>
       <q-toolbar>
         <q-btn flat round dense icon="arrow_back" @click="goBack()" />
@@ -27,92 +27,154 @@
 
     <q-layout-drawer side="right" content-class="bg-grey-2 shadow-9 tools-drawer" v-model="layout.toolpane">
       <div v-if="selectedNode" class="properties">
-        <div class="node-header">
+        <div class="node-header bg-white">
+          <q-btn round flat icon="more_vert" size="sm" class="float-right">
+            <q-popover anchor="bottom right" self="top right" v-if="this.selectedNode.type === 'component' && this.selectedNode.component.component !== 'HbCard'">
+              <q-list link class="no-border">
+                <q-item v-close-overlay @click.native="copyCutComponent('cut')">
+                  <q-item-main label="Cut" />
+                </q-item>
+                <q-item v-close-overlay @click.native="copyCutComponent('copy')">
+                  <q-item-main label="Copy" />
+                </q-item>
+                <q-item v-close-overlay @click.native="moveComponent(-1)">
+                  <q-item-main label="Move up" />
+                </q-item>
+                <q-item v-close-overlay @click.native="moveComponent(1)">
+                  <q-item-main label="Move down" />
+                </q-item>
+                <q-item v-close-overlay @click.native="cloneComponent()">
+                  <q-item-main label="Clone" />
+                </q-item>
+                <q-item v-close-overlay @click.native="deleteComponent()">
+                  <q-item-main label="Delete" />
+                </q-item>
+              </q-list>
+            </q-popover>
+            <q-popover anchor="bottom right" self="top right" v-else-if="this.selectedNode.type === 'slot'">
+              <q-list link class="no-border">
+                <q-item v-close-overlay @click.native="showJsonEditor = true">
+                  <q-item-main label="Edit JSON" />
+                </q-item>
+                <q-item v-close-overlay @click.native="pasteComponent()">
+                  <q-item-main label="Paste" />
+                </q-item>
+              </q-list>
+            </q-popover>
+            <q-popover anchor="bottom right" self="top right" v-else-if="this.selectedNode.component.component === 'HbCard'">
+              <q-list link class="no-border">
+                <!-- <q-item v-close-overlay @click.native="showJsonEditor = true">
+                  <q-item-main label="Edit JSON" />
+                </q-item> -->
+                <q-item v-close-overlay disabled @click.native="saveAsNew()">
+                  <q-item-main label="Save as New" />
+                </q-item>
+              </q-list>
+            </q-popover>
+          </q-btn>
           <div class="q-title">{{selectedNode.label}}</div>
           <div class="q-caption">{{selectedNode.type}}</div>
+          <!-- <div v-if="selectedNode.type === 'component'" class="q-body-2">{{currentComponent.description}}</div> -->
         </div>
-        <div v-if="selectedNode.type === 'slot'">
+        <!-- <div v-if="selectedNode.type === 'slot'">
           <div class="q-body-2">{{currentComponent.slotDescriptions[selectedNode.label].description}}</div>
-        </div>
-        <div v-if="selectedNode.type === 'component'">
-          <div class="q-body-2">{{currentComponent.description}}</div>
-          <br />
+        </div> -->
 
-          <!-- Special handling for the root HbCard -->
-          <div v-if="selectedNode && selectedNode.id === 'card'">
-            <q-field label="title" class="config-field" orientation="vertical"
-                     helper="The title of the card">
-              <config-text v-model="selectedNode.component.title"></config-text>
-            </q-field>
-            <q-field label="subtitle" class="config-field" orientation="vertical"
-                     helper="The subtitle of the card">
-              <config-text v-model="selectedNode.component.subtitle"></config-text>
-            </q-field>
-            <q-field label="suggestcriteria" class="config-field" orientation="vertical"
-                    helper="The expression to evaluate in order to determine whether the card will be considered as a suggestion. Leave blank if the card is not to be suggested. Example: items.Temperature.state < 16">
-              <config-expr v-model="selectedNode.config.suggestcriteria" color="secondary"></config-expr>
-            </q-field>
-            <q-field label="tags" class="config-field" orientation="vertical"
-                    helper="The tags attached to the card - use object:<tag> and location:<tag> to make HABot present this card instead of the default generated one when asked about those tags (unless notReuseableInChat below is set). At least one object tag or one location tag is required.">
-              <q-search class="q-body-1 search-tags" color="secondary" v-model="searchTag"
-                    :error="!hasValidTags"  placeholder="Search from items">
-                  <q-autocomplete :static-data="tagSuggestions" @selected="addTag" />
-              </q-search>
-              <q-chips-input v-model="selectedNode.component.tags" color="secondary"
-                    :error="!hasValidTags" placeholder="Type more">
-              </q-chips-input>
-            </q-field>
-            <q-field label="notReuseableInChat" class="config-field" orientation="vertical"
-                    helper="The card will not be considered when chatting with HABot even if the tags match">
-              <config-bool v-model="selectedNode.component.notReuseableInChat" color="secondary"></config-bool>
-            </q-field>
-          </div>
+        <q-tabs ref="component-config" v-if="selectedNode.type === 'component'" class="properties-tabs" inverted color="grey-7" :two-lines="false" align="center" no-pane-border>
+          <q-tab label="Properties" name="config" slot="title" icon="widgets" default />
+          <q-tab label="Slots" name="slots" slot="title" icon="view_compact" v-if="currentComponent.slotDescriptions" :alert="currentComponent.slotDescriptions && selectedNode.component.slots && (Object.keys(currentComponent.slotDescriptions).length - Object.keys(selectedNode.component.slots).length > 0)" />
 
-          <q-field
-              v-if="currentComponent && currentComponent.configDescriptions && selectedNode.config"
-              v-for="(configDesc, prop) in currentComponent.configDescriptions"
-              :label="prop"
-              class="config-field"
-              orientation="vertical"
-              :helper="configDesc.description" :key="prop">
-            <div class="hidden">{{selectedNode.config[prop]}}</div>
-            <config-bool v-if="configDesc.type === 'boolean'" v-model="selectedNode.config[prop]"></config-bool>
-            <config-option-group v-else-if="configDesc.type === 'optiongroup'" v-model="selectedNode.config[prop]" :options="configDesc.options"></config-option-group>
-            <config-item v-else-if="configDesc.type === 'item'" v-model="selectedNode.config[prop]" :multiple="configDesc.multiple"></config-item>
-            <config-array v-else-if="configDesc.type === 'array'" v-model="selectedNode.config[prop]"></config-array>
-            <config-text v-else v-model="selectedNode.config[prop]"></config-text>
-          </q-field>
-        </div>
+          <q-tab-pane name="config">
+            <div class="q-body-2">{{currentComponent.description}}</div>
+            <br />
+
+            <!-- Special handling for the root HbCard -->
+            <div v-if="selectedNode && selectedNode.id === 'card'">
+              <q-field label="title" class="config-field" orientation="vertical"
+                      helper="The title of the card">
+                <config-text v-model="selectedNode.component.title"></config-text>
+              </q-field>
+              <q-field label="subtitle" class="config-field" orientation="vertical"
+                      helper="The subtitle of the card">
+                <config-text v-model="selectedNode.component.subtitle"></config-text>
+              </q-field>
+              <q-field label="suggestcriteria" class="config-field" orientation="vertical"
+                      helper="The expression to evaluate in order to determine whether the card will be considered as a suggestion. Leave blank if the card is not to be suggested. Example: items.Temperature.state < 16">
+                <config-expr v-model="selectedNode.config.suggestcriteria" color="secondary"></config-expr>
+              </q-field>
+              <q-field label="tags" class="config-field" orientation="vertical"
+                      helper="The tags attached to the card - use object:<tag> and location:<tag> to make HABot present this card instead of the default generated one when asked about those tags (unless notReuseableInChat below is set). At least one object tag or one location tag is required.">
+                <q-search class="q-body-1 search-tags" color="secondary" v-model="searchTag"
+                      :error="!hasValidTags"  placeholder="Search from items">
+                    <q-autocomplete :static-data="tagSuggestions" @selected="addTag" />
+                </q-search>
+                <q-chips-input v-model="selectedNode.component.tags" color="secondary"
+                      :error="!hasValidTags" placeholder="Type more">
+                </q-chips-input>
+              </q-field>
+              <q-field label="notReuseableInChat" class="config-field" orientation="vertical"
+                      helper="The card will not be considered when chatting with HABot even if the tags match">
+                <config-bool v-model="selectedNode.component.notReuseableInChat" color="secondary"></config-bool>
+              </q-field>
+            </div>
+
+            <q-field
+                v-if="currentComponent && currentComponent.configDescriptions && selectedNode.config"
+                v-for="(configDesc, prop) in currentComponent.configDescriptions"
+                :label="prop"
+                class="config-field"
+                orientation="vertical"
+                :helper="configDesc.description" :key="prop">
+              <div class="hidden">{{selectedNode.config[prop]}}</div>
+              <config-bool v-if="configDesc.type === 'boolean'" v-model="selectedNode.config[prop]"></config-bool>
+              <config-option-group v-else-if="configDesc.type === 'optiongroup'" v-model="selectedNode.config[prop]" :options="configDesc.options"></config-option-group>
+              <config-item v-else-if="configDesc.type === 'item'" v-model="selectedNode.config[prop]" :multiple="configDesc.multiple"></config-item>
+              <config-array v-else-if="configDesc.type === 'array'" v-model="selectedNode.config[prop]"></config-array>
+              <config-text v-else v-model="selectedNode.config[prop]"></config-text>
+            </q-field>
+          </q-tab-pane>
+
+          <q-tab-pane name="slots">
+            <q-list v-if="selectedNode && selectedNode.type === 'component' && currentComponent && currentComponent.slotDescriptions && selectedNode.component.slots" no-border>
+              <q-list-header>Add a slot</q-list-header>
+              <q-item v-for="(slotDescription, slotName) in currentComponent.slotDescriptions" :key="slotName" inset-separator>
+                <q-item-side>
+                  <q-btn class="bg-secondary text-white" round icon="add" @click="addSlot(slotName)" :disabled="selectedNode.component.slots[slotName]"></q-btn>
+                </q-item-side>
+                <q-item-main>
+                  <q-item-tile label>{{slotName}}</q-item-tile>
+                  <q-item-tile sublabel>{{slotDescription.description}}</q-item-tile>
+                </q-item-main>
+              </q-item>
+            </q-list>
+            <div v-else class="q-list-header">No slots available for {{selectedNode.component.component}}</div>
+          </q-tab-pane>
+        </q-tabs>
+
+        <q-tabs ref="slot-config" v-show="selectedNode.type === 'slot'" class="properties-tabs" inverted color="grey-7" :two-lines="false" align="center" no-pane-border>
+          <q-tab ref="componentsTab" label="Components" name="components" slot="title" icon="widgets" default />
+          <q-tab-pane name="components">
+            <div v-if="selectedNode && selectedNode.type === 'slot'" class="q-body-2">{{currentComponent.slotDescriptions[selectedNode.label].description}}</div>
+            <br />
+
+            <q-list v-if="selectedNode && selectedNode.type === 'slot'" no-border>
+              <q-list-header>Add a component</q-list-header>
+              <q-item v-for="subcomponent in validSubcomponents(selectedNode.label)" :key="subcomponent" inset-separator>
+                <q-item-side>
+                  <q-btn class="bg-secondary text-white" round icon="add" @click="addComponent(selectedNode.label, subcomponent)"></q-btn>
+                </q-item-side>
+                <q-item-main>
+                  <q-item-tile label>{{subcomponent}}</q-item-tile>
+                  <q-item-tile sublabel>{{components[subcomponent].description}}</q-item-tile>
+                </q-item-main>
+              </q-item>
+            </q-list>
+          </q-tab-pane>
+        </q-tabs>
       </div>
 
-      <q-list v-if="selectedNode && selectedNode.type === 'slot'" no-border>
-        <q-list-header>Add a component</q-list-header>
-        <q-item v-for="subcomponent in validSubcomponents(selectedNode.label)" :key="subcomponent" inset-separator>
-          <q-item-side>
-            <q-btn class="bg-secondary text-white" round icon="add" @click="addComponent(selectedNode.label, subcomponent)"></q-btn>
-          </q-item-side>
-          <q-item-main>
-            <q-item-tile label>{{subcomponent}}</q-item-tile>
-            <q-item-tile sublabel>{{components[subcomponent].description}}</q-item-tile>
-          </q-item-main>
-        </q-item>
-      </q-list>
-
-      <q-list v-if="selectedNode && selectedNode.type === 'component' && currentComponent && currentComponent.slotDescriptions && selectedNode.component.slots" no-border>
-        <q-list-header>Slots</q-list-header>
-        <q-item v-for="(slotDescription, slotName) in currentComponent.slotDescriptions" :key="slotName" inset-separator>
-          <q-item-side>
-            <q-btn class="bg-secondary text-white" round icon="add" @click="addSlot(slotName)" :disabled="selectedNode.component.slots[slotName]"></q-btn>
-          </q-item-side>
-          <q-item-main>
-            <q-item-tile label>{{slotName}}</q-item-tile>
-            <q-item-tile sublabel>{{slotDescription.description}}</q-item-tile>
-          </q-item-main>
-        </q-item>
-      </q-list>
-
       <div v-if="selectedNode" class="actions">
-        <div v-if="selectedNode.type === 'component' && selectedNode.label !== 'HbCard'">
+        <div v-if="selectedNode.type === 'component' && selectedNode.label !== 'HbCard'" class="flex flex-center">
           <q-btn-group push>
             <q-btn push icon="delete" color="red" @click="deleteComponent()"></q-btn>
             <q-btn push icon="keyboard_arrow_up" color="white" text-color="black" @click="moveComponent(-1)"></q-btn>
@@ -132,6 +194,10 @@
     <div class="card-container">
       <hb-card ref="card" v-if="cardModel" :model="cardModel" menu="designer"></hb-card>
     </div>
+
+    <q-modal no-backdrop-dismiss no-esc-dismiss v-model="showJsonEditor" :content-css="{minWidth: '80vw', minHeight: '80vh'}" @hide="showJsonEditor = false">
+      <json-editor v-if="showJsonEditor" ref="jsonEditor" v-model="jsonEditorModel" :component="selectedNode.component" :slotName="selectedNode.label" @update="slotJsonUpdated" />
+    </q-modal>
   </q-layout>
 </template>
 
@@ -155,10 +221,11 @@
 .properties
   padding 1rem
   .node-header
-    margin -15px -15px 10px -15px
-    background white
+    margin -16px -16px 10px -16px
     padding 15px
-    border-bottom 1px solid $grey-5
+  .properties-tabs
+    margin -16px -16px 10px -16px
+    background inherit
 .actions
   padding 1rem
 .config-field
@@ -187,6 +254,7 @@ import ConfigOptionGroup from 'components/designer/ConfigOptionGroup.vue'
 import ConfigItem from 'components/designer/ConfigItem.vue'
 import ConfigExpr from 'components/designer/ConfigExpr.vue'
 import ConfigArray from 'components/designer/ConfigArray.vue'
+import JsonEditor from 'layouts/designer/JsonEditor.vue'
 
 import Vue from 'vue'
 import { extend } from 'quasar'
@@ -248,7 +316,8 @@ export default {
     ConfigOptionGroup,
     ConfigItem,
     ConfigExpr,
-    ConfigArray
+    ConfigArray,
+    JsonEditor
   },
   data () {
     return {
@@ -262,6 +331,7 @@ export default {
       selectedNodeId: 'card',
       newCard: false,
       searchTag: null,
+      showJsonEditor: false,
       tagSuggestions: {
         field: 'label',
         list: []
@@ -310,6 +380,7 @@ export default {
       if (!component.slots) component.slots = {}
       component.slots[name] = []
       this.buildTree()
+      this.selectedNodeId = this.selectedNodeId + '-' + name
     },
     addComponent (slot, type) {
       let component = this.selectedNode.component
@@ -371,6 +442,64 @@ export default {
     addTag (tag) {
       this.searchTag = null
       this.card.tags.push(tag.value)
+    },
+    copyCutComponent (type) {
+      if (!this.selectedNode) return
+      if (this.selectedNode.type === 'slot') {
+        this.$q.notify('Cannot copy an entire slot')
+        return
+      }
+      if (this.selectedNode.component.component === 'HbCard') {
+        this.$q.notify('Cannot copy the root HbCard')
+        return
+      }
+      this.$q.sessionStorage.set('habot.designerClipboard', this.selectedNode.component)
+      switch (type) {
+        case 'cut':
+          this.$q.notify({ type: 'info', message: 'Cut ' + this.selectedNode.component.component })
+          this.deleteComponent()
+          break
+        case 'copy':
+          this.$q.notify({ type: 'info', message: 'Copied ' + this.selectedNode.component.component })
+          break
+      }
+    },
+    pasteComponent () {
+      if (!this.selectedNode) return
+      if (this.selectedNode.type !== 'slot') {
+        this.$q.notify('Select a slot to paste the copied component to')
+        return
+      }
+      let parentComponent = this.selectedNode.component
+      let slotName = this.selectedNode.label
+      let component = extend({}, this.$q.sessionStorage.get.item('habot.designerClipboard'))
+      if (component.component.indexOf('Hb') !== 0) return
+      if (!this.currentComponent ||
+        (this.currentComponent.slotDescriptions[slotName].allowedComponents &&
+        this.currentComponent.slotDescriptions[slotName].allowedComponents.indexOf(component.component) === -1) ||
+        (this.currentComponent.slotDescriptions[slotName].deniedComponents &&
+        this.currentComponent.slotDescriptions[slotName].deniedComponents.indexOf(component.component) !== -1)) {
+        this.$q.notify(`Cannot paste ${component.component} here`)
+        return
+      }
+
+      parentComponent.slots[slotName].push(component)
+      this.buildTree()
+    },
+    copyCutEvent (evt) {
+      console.log(evt)
+      if (evt.target.nodeName === 'INPUT' || evt.target.nodeName === 'TEXTAREA') return
+      this.copyCutComponent(evt.type)
+    },
+    pasteEvent (evt) {
+      console.log(evt)
+      if (evt.target.nodeName === 'INPUT' || evt.target.nodeName === 'TEXTAREA') return
+      this.pasteComponent()
+    },
+    slotJsonUpdated (newSlot) {
+      this.selectedNode.component.slots[this.selectedNode.label] = newSlot
+      this.showJsonEditor = false
+      this.buildTree()
     }
   },
   computed: {
@@ -399,6 +528,11 @@ export default {
     hasValidTags () {
       if (!this.card.tags) return false
       return this.card.tags.some(tag => tag.startsWith('object:') || tag.startsWith('location:'))
+    },
+    jsonEditorModel () {
+      // if (this.selectedNode.label === 'HbCard') return this.selectedNode.component
+      if (this.selectedNode.type === 'slot') return this.selectedNode.component.slots[this.selectedNode.label]
+      return null
     }
   },
   created () {
@@ -503,10 +637,24 @@ export default {
     }
 
     vm.originalCard = JSON.stringify(vm.card)
+
+    // document.addEventListener('keyup', this.keyPressed)
+    document.addEventListener('cut', this.copyCutEvent)
+    document.addEventListener('copy', this.copyCutEvent)
+    document.addEventListener('paste', this.pasteEvent)
+  },
+  destroyed () {
+    // document.removeEventListener('keyup', this.keyPressed)
+    document.removeEventListener('cut', this.copyCutEvent)
+    document.removeEventListener('copy', this.copyCutEvent)
+    document.removeEventListener('paste', this.pasteEvent)
   },
   watch: {
     selectedNode (val, old) {
       if (!val || !val.component) return
+      if (val.type === 'slot' && this.$refs.componentsTab) {
+        this.$refs.componentsTab.select()
+      }
       if (val.component.component === 'HbCard') return // don't highlight the whole card
       let component = val.component
       Vue.set(component, 'highlight', true)

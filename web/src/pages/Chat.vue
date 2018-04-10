@@ -194,6 +194,7 @@ export default {
         text: [errormessage],
         avatar: 'statics/icons/icon-192x192.png',
         bgColor: 'red',
+        textColor: 'white',
         stamp: date.formatDate(new Date(), 'HH:mm')
       })
     })
@@ -314,6 +315,7 @@ export default {
         })
 
         this.busy = false
+        this.thinking = false
         if (this.$q.platform.is.mobile) {
           setTimeout(this.$refs.input.blur)
         } else {

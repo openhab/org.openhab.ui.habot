@@ -70,7 +70,7 @@ module.exports = function (ctx) {
           }
         ]))
 
-        cfg.plugins.push(new Visualizer({ filename: '../webpack-stats.html' }))
+        if (!ctx.dev) cfg.plugins.push(new Visualizer({ filename: '../webpack-stats.html' }))
       }
     },
     devServer: {
@@ -157,7 +157,8 @@ module.exports = function (ctx) {
         'QCarouselControl',
         'QStepper',
         'QStep',
-        'QStepperNavigation'
+        'QStepperNavigation',
+        'QScrollArea'
       ],
       directives: [
         'Ripple',
@@ -167,7 +168,8 @@ module.exports = function (ctx) {
         'Notify',
         'Dialog',
         'Loading',
-        'LocalStorage'
+        'LocalStorage',
+        'SessionStorage'
       ]
     },
     // animations: 'all' --- includes all animations

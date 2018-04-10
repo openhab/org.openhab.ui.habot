@@ -31,7 +31,7 @@ export default [
   {
     path: '/designer/:uid',
     component: () => import(
-      /* webpackChunkName: 'carddesigner' */
+      /* webpackChunkName: 'designer' */
       'layouts/designer/CardDesigner'),
     props: true
   },
