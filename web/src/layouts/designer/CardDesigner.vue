@@ -104,7 +104,7 @@
               </q-field>
               <q-field label="suggestcriteria" class="config-field" orientation="vertical"
                       helper="The expression to evaluate in order to determine whether the card will be considered as a suggestion. Leave blank if the card is not to be suggested. Example: items.Temperature.state < 16">
-                <config-expr v-model="selectedNode.config.suggestcriteria" color="secondary"></config-expr>
+                <config-expr v-model="selectedNode.config.suggestcriteria" target-type="boolean" color="secondary"></config-expr>
               </q-field>
               <q-field label="tags" class="config-field" orientation="vertical"
                       helper="The tags attached to the card - use object:<tag> and location:<tag> to make HABot present this card instead of the default generated one when asked about those tags (unless notReuseableInChat below is set). At least one object tag or one location tag is required.">
@@ -134,6 +134,7 @@
               <config-option-group v-else-if="configDesc.type === 'optiongroup'" v-model="selectedNode.config[prop]" :options="configDesc.options"></config-option-group>
               <config-item v-else-if="configDesc.type === 'item'" v-model="selectedNode.config[prop]" :multiple="configDesc.multiple"></config-item>
               <config-array v-else-if="configDesc.type === 'array'" v-model="selectedNode.config[prop]"></config-array>
+              <config-expr v-else-if="configDesc.type === 'expr'" v-model="selectedNode.config[prop]" :target-type="configDesc.targetType"></config-expr>
               <config-text v-else v-model="selectedNode.config[prop]"></config-text>
             </q-field>
           </q-tab-pane>

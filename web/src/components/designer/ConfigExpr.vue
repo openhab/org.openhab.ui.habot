@@ -5,11 +5,14 @@
 <script>
 export default {
   name: 'ConfigExpr',
-  props: ['value'],
+  props: ['value', 'targetType'],
   computed: {
     isError () {
       if (!this.value) return false
-      return (this.exprResult && this.exprResult.toString().indexOf('Error') === 0) || (this.exprResult !== true && this.exprResult !== false)
+      if (this.exprResult && this.exprResult.toString().indexOf('Error') === 0) return true
+      if (this.targetType === 'array' && !Array.isArray(this.exprResult)) return true
+      if (this.targetType === 'boolean' && (this.exprResult !== true && this.exprResult !== false)) return true
+      return false
     },
     exprError () {
       if (!this.value) return ''
@@ -19,10 +22,13 @@ export default {
       if (this.exprResult && this.exprResult.toString().indexOf('Error:') === 0) {
         return this.exprResult.toString()
       }
-      if (this.exprResult !== true && this.exprResult !== false) {
+      if (this.targetType === 'boolean' && this.exprResult !== true && this.exprResult !== false) {
         return 'Result not boolean: ' + this.exprResult.toString()
       }
-      return 'OK - result is ' + this.exprResult.toString()
+      if (this.targetType === 'array' && !Array.isArray(this.exprResult)) {
+        return 'Result is not an array'
+      }
+      return (this.targetType === 'boolean') ? 'OK - result is ' + this.exprResult.toString() : 'OK'
     }
   },
   asyncComputed: {

@@ -8,6 +8,7 @@ import HbTabs from './HbTabs.vue'
 import HbCollapsible from './HbCollapsible.vue'
 import HbSlider from './HbSlider.vue'
 import HbKnob from './HbKnob.vue'
+import HbSelect from './HbSelect.vue'
 import HbSwitch from './HbSwitch.vue'
 import HbColorPicker from './HbColorPicker.vue'
 import HbPlayer from './HbPlayer.vue'
@@ -23,6 +24,7 @@ Vue.component('HbCollapsible', HbCollapsible)
 Vue.component('HbKnob', HbKnob)
 Vue.component('HbList', HbList)
 Vue.component('HbTabs', HbTabs)
+Vue.component('HbSelect', HbSelect)
 Vue.component('HbSlider', HbSlider)
 Vue.component('HbSwitch', HbSwitch)
 Vue.component('HbColorPicker', HbColorPicker)
@@ -41,6 +43,7 @@ export default {
   HbSlider,
   HbKnob,
   HbSwitch,
+  HbSelect,
   HbColorPicker,
   HbPlayer,
   HbChartImage,

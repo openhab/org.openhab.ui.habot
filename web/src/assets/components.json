@@ -62,6 +62,7 @@
             },
             "disabled": {
                 "type": "expr",
+                "targetType": "boolean",
                 "description": "The button will be disabled when this expression evaluates to true"
             },
             "item": {
@@ -115,10 +116,12 @@
             },
             "classesExpr": {
                 "type": "expr",
+                "targetType": "array",
                 "description": "Optional expression which should evaluate to an array with additional CSS classes to apply; for example: [\"bg-\" + (items.Temperature.state > 16 ? \"positive\" : \"negative\"]"
             },
             "visible": {
                 "type": "expr",
+                "targetType": "boolean",
                 "description": "Optional boolean expression to control the visibility of the container (hidden if false); for example: items.Temperature.state <= 16"
             },
             "text": {
@@ -633,6 +636,7 @@
             },
             "disabled": {
                 "type": "expr",
+                "targetType": "boolean",
                 "description": "The button is disabled when this expression is true"
             },
             "color": {
@@ -740,6 +744,134 @@
             "buttons": {
                 "description": "The buttons in the button group",
                 "allowedComponents": [ "HbBtn" ]
+            }
+        }
+    },
+
+    "HbSelect": {
+        "description": "A selection control to switch an item's state",
+        "configDescriptions": {
+            "item": {
+                "type": "item",
+                "description": "The item to control - server-provided options will be used if available and if the options slot is absent or empty"
+            },
+            "stackLabel": {
+                "type": "text",
+                "description": "Label to display above the control"
+            },
+            "color": {
+                "type": "color",
+                "description": "Color of the control's content (accepts expressions)"
+            },
+            "inverted": {
+                "type": "boolean",
+                "description": "Invert the background"
+            },
+            "hideUnderline": {
+                "type": "boolean",
+                "description": "Hide the line under the control"
+            },
+            "dark": {
+                "type": "boolean",
+                "description": "Select to optimize the display if the control is on a dark background"
+            },
+            "separator": {
+                "type": "boolean",
+                "description": "Draw separators between options"
+            },
+            "filter": {
+                "type": "boolean",
+                "description": "Offers a filter field for long lists of options"
+            },
+            "radio": {
+                "type": "boolean",
+                "description": "Displays radio buttons alongside options"
+            },
+            "disable": {
+                "type": "expr",
+                "targetType": "boolean",
+                "description": "The control will be disabled if this expression evaluates to true"
+            }
+        },
+        "slotDescriptions": {
+            "options": {
+                "description": "The collection of options for the HbSelect control; replaces the server-provided options",
+                "allowedComponents": [ "HbSelectOption" ]
+            }
+        }
+    },
+
+    "HbSelectOption": {
+        "description": "A selection option for the HbSelect component",
+        "availableByDefault": false,
+        "configDescriptions": {
+            "value": {
+                "type": "text",
+                "description": "The value to send as a command to the item configured for the parent HbSelect"
+            },
+            "label": {
+                "type": "text",
+                "description": "The display label of option"
+            },
+            "sublabel": {
+                "type": "text",
+                "description": "The sublabel of the option"
+            },
+            "leftColor": {
+                "type": "color",
+                "description": "The color of the icon or letter on the left"
+            },
+            "icon": {
+                "type": "icon",
+                "description": "The icon of the left"
+            },
+            "letter": {
+                "type": "text",
+                "description": "The letter on the left"
+            },
+            "leftInverted": {
+                "type": "boolean",
+                "description": "Invert the color of the background of the icon/letter on the left"
+            },
+            "leftTextColor": {
+                "type": "text",
+                "description": "Override the white color of the text or icon (for inverted icons or letter)"
+            },
+            "labelLines": {
+                "type": "text",
+                "description": "Number of lines the label can expand to"
+            },
+            "sublabelLines": {
+                "type": "text",
+                "description": "Number of lines the sublabel can expand to"
+            },
+            "inset": {
+                "type": "boolean",
+                "description": "Inset the label if no left-side icon or letter is specified"
+            },
+            "rightColor": {
+                "type": "color",
+                "description": "The color of the icon or letter on the right"
+            },
+            "rightIcon": {
+                "type": "icon",
+                "description": "The icon of the right"
+            },
+            "rightLetter": {
+                "type": "text",
+                "description": "The letter on the right"
+            },
+            "rightInverted": {
+                "type": "boolean",
+                "description": "Invert the color of the background of the icon/letter on the right"
+            },
+            "rightTextColor": {
+                "type": "text",
+                "description": "Override the white color of the text or icon (for inverted icons or letter on the right)"
+            },
+            "stamp": {
+                "type": "text",
+                "description": "Short text to use as a 'stamp' on the right side"
             }
         }
     },
