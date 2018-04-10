@@ -6,11 +6,12 @@
         style="width:30vw;max-width:150px;"
       >
     </p>
-    <p class="text-faded">Sorry, nothing here...<strong>(404)</strong></p>
+    <p class="text-faded" v-if="$route.meta.reason === 'offline'">openHAB is offline</p>
+    <p class="text-faded" v-else>Sorry, nothing here...<strong>(404)</strong></p>
     <q-btn
       color="secondary"
       style="width:200px;"
       @click="$router.push('/')"
-    >Go back</q-btn>
+    >{{ $route.meta.reason === 'offline' ? 'Try again' : 'Go back' }}</q-btn>
   </div>
 </template>

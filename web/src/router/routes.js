@@ -6,7 +6,7 @@ import CardDeckPage from 'pages/CardDeck'
 import CardSuggestionsPage from 'pages/CardSuggestions'
 import CardRecentPage from 'pages/CardRecent'
 import CardBookmarksPage from 'pages/CardBookmarks'
-import ErrorPage from 'pages/404'
+import ErrorPage from 'pages/Error'
 
 export default [
   {
@@ -36,6 +36,11 @@ export default [
     props: true
   },
 
+  {
+    path: '/offline',
+    component: ErrorPage,
+    meta: { reason: 'offline' }
+  },
   { // Always leave this as last one
     path: '*',
     component: ErrorPage

@@ -32,12 +32,12 @@ Router.beforeEach((to, from, next) => {
     // try to retrieve previously stored credentials
     navigator.credentials.get({ password: true }).then((creds) => {
       console.log('Using stored credentials to sign in')
-      store.dispatch('initialLoad', creds).then(() => next())
+      store.dispatch('initialLoad', creds).then(() => next()).catch(() => next('/offline'))
     }).catch(() => {
-      store.dispatch('initialLoad').then(() => next())
+      store.dispatch('initialLoad').then(() => next()).catch(() => next('/offline'))
     })
   } else {
-    store.dispatch('initialLoad').then(() => next())
+    store.dispatch('initialLoad').then(() => next()).catch(() => next('/offline'))
   }
 })
 
