@@ -12,8 +12,7 @@ import java.util.Locale;
 
 /**
  * This exception is thrown when the particular language is not supported by a {@link Skill} - for instance, if it has
- * no
- * training data for that language.
+ * no training data for that language.
  *
  * @author Yannick Schaus
  */

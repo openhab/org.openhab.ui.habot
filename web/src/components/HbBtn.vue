@@ -91,7 +91,7 @@ export default {
       }
     },
     sendCmd () {
-      this.$store.dispatch('items/sendCmd', { itemName: this.model.config.item, command: this.$expr(this.model.config.command) })
+      this.$store.dispatch('items/sendCmd', { itemName: this.model.config.item, command: this.command })
     }
   },
   computed: {
@@ -106,6 +106,9 @@ export default {
   asyncComputed: {
     label () {
       return this.$expr(this.model.config.label)
+    },
+    command () {
+      return this.$expr(this.model.config.command)
     },
     disabled () {
       return (this.model.config.disabled) ? this.$expr('=' + this.model.config.disabled) : false

@@ -27,7 +27,7 @@ import org.osgi.service.component.annotations.Reference;
  *
  * @author Yannick Schaus
  */
-@Component(service = ModuleHandlerFactory.class)
+@Component(service = ModuleHandlerFactory.class, enabled = false)
 public class WebPushNotificationModuleHandlerFactory extends BaseModuleHandlerFactory {
 
     private NotificationService notificationService;

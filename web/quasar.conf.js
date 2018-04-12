@@ -1,9 +1,7 @@
 // Configuration for your app
 var
   path = require('path'),
-  CopyWebpackPlugin = require('copy-webpack-plugin'),
-  Visualizer = require('webpack-visualizer-plugin')
-  // webpack = require('webpack')
+  CopyWebpackPlugin = require('copy-webpack-plugin')
 
 module.exports = function (ctx) {
   return {
@@ -31,8 +29,8 @@ module.exports = function (ctx) {
       scopeHoisting: true,
       vueRouterMode: 'hash',
       devtool: 'source-map',
-      // gzip: true,
-      // analyze: true,
+      gzip: true,
+      analyze: false,
       // extractCSS: false,
       // useNotifier: false,
       extendWebpack (cfg) {
@@ -69,8 +67,6 @@ module.exports = function (ctx) {
             to: '.'
           }
         ]))
-
-        if (!ctx.dev) cfg.plugins.push(new Visualizer({ filename: '../webpack-stats.html' }))
       }
     },
     devServer: {
@@ -211,11 +207,6 @@ module.exports = function (ctx) {
           {
             'src': 'statics/icons/icon-512x512.png',
             'sizes': '512x512',
-            'type': 'image/png'
-          },
-          {
-            'src': 'statics/icons/icon-1024x1024.png',
-            'sizes': '1024x1024',
             'type': 'image/png'
           }
         ]

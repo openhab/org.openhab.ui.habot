@@ -20,7 +20,7 @@ import org.eclipse.smarthome.core.items.ItemRegistry;
 import org.openhab.ui.habot.nlp.internal.AnswerFormatter;
 
 /**
- * An abstract implmentation of a @link {@link Skill} with helper methods to find items matching an @link {@link Intent}
+ * An abstract implmentation of a {@link Skill} with helper methods to find items matching an {@link Intent}
  * object and location entities.
  *
  * It also contains a default implementation of the training data sourcing (text file in train/(language)/(intent).txt).

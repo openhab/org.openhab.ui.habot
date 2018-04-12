@@ -39,7 +39,7 @@ import opennlp.tools.util.TrainingParameters;
 
 /**
  * This class is used both for training the OpenNLP document categorizer and token extractor, and for doing the actual
- * natural language understanding - it converts a natural query into an @{link {@link Intent}.
+ * natural language understanding - it converts a natural query into an {@link Intent}.
  *
  * @author Yannick Schaus
  */

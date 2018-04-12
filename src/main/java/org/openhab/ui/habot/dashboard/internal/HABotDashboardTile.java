@@ -8,11 +8,15 @@
  */
 package org.openhab.ui.habot.dashboard.internal;
 
+import java.util.Map;
+
 import org.openhab.ui.dashboard.DashboardTile;
+import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.http.HttpContext;
 import org.osgi.service.http.HttpService;
 import org.osgi.service.http.NamespaceException;
 import org.slf4j.Logger;
@@ -55,9 +59,15 @@ public class HABotDashboardTile implements DashboardTile {
     protected HttpService httpService;
 
     @Activate
-    protected void activate() {
+    protected void activate(Map<String, Object> configProps, BundleContext context) {
         try {
-            httpService.registerResources(HABOT_ALIAS, "web/dist/pwa-mat", null);
+            Object useGzipCompression = configProps.get("useGzipCompression");
+            HttpContext httpContext = (useGzipCompression != null
+                    && Boolean.parseBoolean(useGzipCompression.toString()))
+                            ? new HABotHttpContext(httpService.createDefaultHttpContext())
+                            : null;
+
+            httpService.registerResources(HABOT_ALIAS, "web/dist/pwa-mat", httpContext);
             logger.info("Started HABot at " + HABOT_ALIAS);
         } catch (NamespaceException e) {
             logger.error("Error during HABot startup: {}", e.getMessage());
