@@ -199,7 +199,7 @@ export default {
       })
     })
 
-    if (this.$q.platform.is.chrome && this.$q.platform.is.android &&
+    if (this.$q.platform.is.chrome && this.$q.platform.is.android && !this.$q.platform.is.cordova &&
         window.matchMedia && !window.matchMedia('(display-mode: standalone)').matches) {
       this.showPWAPrompt = true
     }
