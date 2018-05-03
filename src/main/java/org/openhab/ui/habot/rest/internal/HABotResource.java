@@ -180,6 +180,7 @@ public class HABotResource implements RESTResource {
                 "{ \"body\": \"Congratulations, push notifications are working properly! 🎉👌\" }").get();
 
         logger.debug("Test notification response: {}", testNotificationResponse.toString());
+        logger.debug("Test notification response headers: {}", testNotificationResponse.getStringHeaders());
         logger.debug("Test notification response body: {}", testNotificationResponse.readEntity(String.class));
 
         return Response.ok(testNotificationResponse.getStatusInfo()).build();

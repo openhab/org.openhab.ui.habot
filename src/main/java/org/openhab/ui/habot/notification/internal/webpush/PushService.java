@@ -156,8 +156,8 @@ public class PushService {
         if (notification.hasPayload()) {
             headers.add("Content-Type", "application/octet-stream");
             headers.add("Content-Encoding", "aesgcm");
-            headers.add("Encryption", "keyid=p256dh;salt=" + base64url.omitPadding().encode(salt));
-            headers.add("Crypto-Key", "keyid=p256dh;dh=" + base64url.encode(dh));
+            headers.add("Encryption", "salt=" + base64url.omitPadding().encode(salt));
+            headers.add("Crypto-Key", "dh=" + base64url.encode(dh));
         }
 
         if (notification.isGcm()) {
@@ -187,8 +187,8 @@ public class PushService {
             byte[] pk = Utils.savePublicKey((ECPublicKey) publicKey);
 
             if (headers.containsKey("Crypto-Key")) {
-                headers.add("Crypto-Key",
-                        headers.get("Crypto-Key") + ";p256ecdsa=" + base64url.omitPadding().encode(pk));
+                headers.putSingle("Crypto-Key",
+                        headers.getFirst("Crypto-Key") + ";p256ecdsa=" + base64url.omitPadding().encode(pk));
             } else {
                 headers.add("Crypto-Key", "p256ecdsa=" + base64url.encode(pk));
             }
