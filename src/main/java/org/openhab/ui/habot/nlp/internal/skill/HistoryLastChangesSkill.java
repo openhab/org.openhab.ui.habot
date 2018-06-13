@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 import org.eclipse.smarthome.core.items.Item;
 import org.eclipse.smarthome.core.items.ItemRegistry;
 import org.eclipse.smarthome.core.persistence.HistoricItem;
+import org.eclipse.smarthome.core.transform.TransformationException;
 import org.eclipse.smarthome.core.transform.TransformationHelper;
 import org.eclipse.smarthome.core.types.State;
 import org.eclipse.smarthome.core.types.StateDescription;
@@ -120,7 +121,7 @@ public class HistoryLastChangesSkill extends AbstractItemIntentInterpreter {
                     } else {
                         return transformedState;
                     }
-                } catch (NoClassDefFoundError ex) {
+                } catch (NoClassDefFoundError | TransformationException ex) {
                     // TransformationHelper is optional dependency, so ignore if class not found
                     // return state as it is without transformation
                     return state.toString();

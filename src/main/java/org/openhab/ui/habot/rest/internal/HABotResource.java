@@ -126,8 +126,7 @@ public class HABotResource implements RESTResource {
             @ApiResponse(code = 500, message = "There is no support for the configured language") })
     public Response greet(
             @HeaderParam(HttpHeaders.ACCEPT_LANGUAGE) @ApiParam(value = "language (will use the default if omitted)") String language) {
-        final Locale locale = (this.localeProvider != null && this.localeProvider.getLocale() != null)
-                ? this.localeProvider.getLocale()
+        final Locale locale = (this.localeProvider != null) ? this.localeProvider.getLocale()
                 : LocaleUtil.getLocale(language);
 
         AnswerFormatter answerFormatter = new AnswerFormatter(locale);
@@ -149,8 +148,7 @@ public class HABotResource implements RESTResource {
             @ApiResponse(code = 500, message = "An interpretation error occured") })
     public Response chat(@HeaderParam(HttpHeaders.ACCEPT_LANGUAGE) @ApiParam(value = "language") String language,
             @ApiParam(value = "human language query", required = true) String query) throws Exception {
-        final Locale locale = (this.localeProvider != null && this.localeProvider.getLocale() != null)
-                ? this.localeProvider.getLocale()
+        final Locale locale = (this.localeProvider != null) ? this.localeProvider.getLocale()
                 : LocaleUtil.getLocale(language);
 
         // interpret

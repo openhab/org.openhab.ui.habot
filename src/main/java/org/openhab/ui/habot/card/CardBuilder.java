@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 import org.eclipse.smarthome.core.items.Item;
 import org.eclipse.smarthome.core.items.ItemRegistry;
 import org.eclipse.smarthome.core.library.CoreItemFactory;
+import org.eclipse.smarthome.core.transform.TransformationException;
 import org.eclipse.smarthome.core.transform.TransformationHelper;
 import org.eclipse.smarthome.core.types.State;
 import org.eclipse.smarthome.core.types.StateDescription;
@@ -165,7 +166,12 @@ public class CardBuilder {
                          * Try to get a formatted state to determine whether it's small enough to display
                          * in the "right" slot - otherwise add it to the "main" slot
                          */
-                        String formattedState = formatState(item, item.getState());
+                        String formattedState;
+                        try {
+                            formattedState = formatState(item, item.getState());
+                        } catch (TransformationException e1) {
+                            formattedState = item.getState().toString();
+                        }
                         Component singleItemComponent = new Component("HbSingleItemValue");
                         singleItemComponent.addConfig("item", item.getName());
                         if (formattedState.length() < 10) {
@@ -253,7 +259,7 @@ public class CardBuilder {
         }
     }
 
-    private String formatState(Item item, State state) {
+    private String formatState(Item item, State state) throws TransformationException {
         if (item.getStateDescription() != null) {
             StateDescription stateDescription = item.getStateDescription();
             if (stateDescription != null && stateDescription.getPattern() != null) {
