@@ -17,7 +17,6 @@ import java.util.stream.Collectors;
 
 import org.eclipse.smarthome.core.events.EventPublisher;
 import org.eclipse.smarthome.core.items.Item;
-import org.eclipse.smarthome.core.items.ItemRegistry;
 import org.eclipse.smarthome.core.items.events.ItemEventFactory;
 import org.eclipse.smarthome.core.library.types.DecimalType;
 import org.eclipse.smarthome.core.library.types.HSBType;
@@ -27,6 +26,7 @@ import org.openhab.ui.habot.nlp.AbstractItemIntentInterpreter;
 import org.openhab.ui.habot.nlp.Intent;
 import org.openhab.ui.habot.nlp.IntentInterpretation;
 import org.openhab.ui.habot.nlp.Skill;
+import org.openhab.ui.habot.nlp.internal.ItemNamedAttributesResolver;
 import org.osgi.service.component.annotations.Reference;
 
 import com.google.common.collect.ImmutableMap;
@@ -159,12 +159,12 @@ public class SetValueSkill extends AbstractItemIntentInterpreter {
     }
 
     @Reference
-    protected void setItemRegistry(ItemRegistry itemRegistry) {
-        this.itemRegistry = itemRegistry;
+    protected void setItemNamedAttributesResolver(ItemNamedAttributesResolver itemNamedAttributesResolver) {
+        this.itemNamedAttributesResolver = itemNamedAttributesResolver;
     }
 
-    protected void unsetItemRegistry(ItemRegistry itemRegistry) {
-        this.itemRegistry = null;
+    protected void unsetItemNamedAttributesResolver(ItemNamedAttributesResolver itemNamedAttributesResolver) {
+        this.itemNamedAttributesResolver = null;
     }
 
     @Reference

@@ -31,8 +31,12 @@ public class UnsupportedLanguageException extends Exception {
         this.language = Locale.forLanguageTag(language);
     }
 
+    public UnsupportedLanguageException(Locale locale) {
+        this.language = locale;
+    }
+
     @Override
     public String getMessage() {
-        return "Unsupported language: " + language.toString();
+        return String.format("Unsupported language: %s", language.toString());
     }
 }

@@ -10,7 +10,6 @@ package org.openhab.ui.habot.nlp.internal;
 
 import java.io.InputStream;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -19,6 +18,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.io.IOUtils;
 import org.eclipse.jdt.annotation.NonNull;
@@ -31,7 +31,9 @@ import org.eclipse.smarthome.core.voice.text.InterpretationException;
 import org.openhab.ui.habot.nlp.ChatReply;
 import org.openhab.ui.habot.nlp.Intent;
 import org.openhab.ui.habot.nlp.IntentInterpretation;
+import org.openhab.ui.habot.nlp.ItemNamedAttribute;
 import org.openhab.ui.habot.nlp.Skill;
+import org.openhab.ui.habot.nlp.UnsupportedLanguageException;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -51,7 +53,7 @@ import org.osgi.service.component.annotations.ReferencePolicy;
         "service.config.category=voice" })
 public class OpenNLPInterpreter implements HumanLanguageInterpreter {
 
-    private static final Set<Locale> SUPPORTED_LOCALES = Collections
+    public static final Set<Locale> SUPPORTED_LOCALES = Collections
             .unmodifiableSet(new HashSet<>(Arrays.asList(Locale.ENGLISH, Locale.FRENCH, Locale.GERMAN)));
 
     private IntentTrainer intentTrainer = null;
@@ -59,6 +61,7 @@ public class OpenNLPInterpreter implements HumanLanguageInterpreter {
     private String tokenizerId = null;
 
     private ItemRegistry itemRegistry;
+    private ItemNamedAttributesResolver itemNamedAttributesResolver;
     private EventPublisher eventPublisher;
 
     private HashMap<String, Skill> skills = new HashMap<String, Skill>();
@@ -66,25 +69,17 @@ public class OpenNLPInterpreter implements HumanLanguageInterpreter {
     private @NonNull RegistryChangeListener<Item> registryChangeListener = new RegistryChangeListener<Item>() {
         @Override
         public void added(Item element) {
-            // Only invalidate the trainer if the new item has tags
-            if (element.getTags().stream().anyMatch(tag -> tag.startsWith("object:") || tag.startsWith("location:"))) {
-                intentTrainer = null;
-            }
+            intentTrainer = null;
         }
 
         @Override
         public void removed(Item element) {
-            // Only invalidate the trainer if the removed item had tags
-            if (element.getTags().stream().anyMatch(tag -> tag.startsWith("object:") || tag.startsWith("location:"))) {
-                intentTrainer = null;
-            }
+            intentTrainer = null;
         }
 
         @Override
         public void updated(Item oldElement, Item element) {
-            if (!element.getTags().equals(oldElement.getTags())) {
-                intentTrainer = null;
-            }
+            intentTrainer = null;
         }
     };
 
@@ -108,18 +103,20 @@ public class OpenNLPInterpreter implements HumanLanguageInterpreter {
         return reply.getAnswer();
     }
 
-    private InputStream getNameFinderTrainingDataFromTags() {
+    private InputStream getNameSamplesFromItems(Locale locale) throws UnsupportedLanguageException {
         StringBuilder nameSamplesDoc = new StringBuilder();
-        Collection<Item> items = itemRegistry.getItems();
-        for (Item item : items) {
-            for (String tag : item.getTags()) {
-                if (tag.startsWith("object:")) {
-                    nameSamplesDoc.append(String.format("<START:object> %s <END>%n", tag.split(":")[1]));
-                } else if (tag.startsWith("location:")) {
-                    nameSamplesDoc.append(String.format("<START:location> %s <END>%n", tag.split(":")[1]));
-                }
+        itemNamedAttributesResolver.setLocale(locale);
+        Map<Item, Set<ItemNamedAttribute>> itemAttributes = itemNamedAttributesResolver.getAllItemNamedAttributes();
+
+        Stream<ItemNamedAttribute> attributes = itemAttributes.values().stream().flatMap(a -> a.stream());
+
+        attributes.forEach(attribute -> {
+            if (attribute.getType() == "location") {
+                nameSamplesDoc.append(String.format("<START:location> %s <END>%n", attribute.getValue()));
+            } else {
+                nameSamplesDoc.append(String.format("<START:object> %s <END>%n", attribute.getValue()));
             }
-        }
+        });
 
         return IOUtils.toInputStream(nameSamplesDoc.toString());
     }
@@ -149,7 +146,7 @@ public class OpenNLPInterpreter implements HumanLanguageInterpreter {
                                 return o1.getIntentId().compareTo(o2.getIntentId());
                             }
 
-                        }).collect(Collectors.toList()), getNameFinderTrainingDataFromTags(), this.tokenizerId);
+                        }).collect(Collectors.toList()), getNameSamplesFromItems(locale), this.tokenizerId);
                 currentLocale = locale;
             } catch (Exception e) {
                 InterpretationException fe = new InterpretationException(
@@ -163,10 +160,10 @@ public class OpenNLPInterpreter implements HumanLanguageInterpreter {
 
         Intent intent;
 
-        // Shortcut: if there are any items whose object: or location: tags match the query (case insensitive), consider
-        // it a "get-status" intent with this tags as the corresponding entity.
-        // This allows the user to query a tag quickly by simply stating it - and avoid a misinterpretation by the
-        // categorizer.
+        // Shortcut: if there are any items whose named attributes match the query (case insensitive), consider
+        // it a "get-status" intent with this attribute as the corresponding entity.
+        // This allows the user to query a named attribute quickly by simply stating it - and avoid a
+        // misinterpretation by the categorizer.
         if (!this.itemRegistry.getItemsByTag("object:" + text.toLowerCase()).isEmpty()) {
             intent = new Intent("get-status");
             intent.setEntities(new HashMap<String, String>());
@@ -230,6 +227,15 @@ public class OpenNLPInterpreter implements HumanLanguageInterpreter {
             this.itemRegistry.removeRegistryChangeListener(registryChangeListener);
             this.itemRegistry = null;
         }
+    }
+
+    @Reference
+    protected void setItemNamedAttributesResolver(ItemNamedAttributesResolver itemNamedAttributesResolver) {
+        this.itemNamedAttributesResolver = itemNamedAttributesResolver;
+    }
+
+    protected void unsetItemNamedAttributesResolver(ItemNamedAttributesResolver itemNamedAttributesResolver) {
+        this.itemNamedAttributesResolver = null;
     }
 
     @Reference

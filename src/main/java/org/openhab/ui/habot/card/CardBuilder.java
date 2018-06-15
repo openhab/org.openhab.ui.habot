@@ -9,6 +9,7 @@
 package org.openhab.ui.habot.card;
 
 import java.util.Collection;
+import java.util.IllegalFormatConversionException;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -184,7 +185,8 @@ public class CardBuilder {
             }
 
         } else {
-            card.setTitle(getCardTitleFromGroupLabels(tags));
+            card.setTitle(String.join(", ", intent.getEntities().values()));
+            // card.setTitle(getCardTitleFromGroupLabels(tags));
             card.setSubtitle(matchedItems.size() + " items"); // TODO: i18n
 
             // TODO: detect images and build a HbCarousel with them - for webcams etc.
@@ -229,7 +231,8 @@ public class CardBuilder {
             card.setTitle(item.getLabel());
             card.setSubtitle(item.getName());
         } else {
-            card.setTitle(getCardTitleFromGroupLabels(tags));
+            card.setTitle(String.join(", ", intent.getEntities().values()));
+            // card.setTitle(getCardTitleFromGroupLabels(tags));
             card.setSubtitle(matchedItems.size() + " items"); // TODO: i18n
         }
 
@@ -261,18 +264,22 @@ public class CardBuilder {
 
     private String formatState(Item item, State state) throws TransformationException {
         if (item.getStateDescription() != null) {
-            StateDescription stateDescription = item.getStateDescription();
-            if (stateDescription != null && stateDescription.getPattern() != null) {
-                String transformedState = TransformationHelper.transform(
-                        FrameworkUtil.getBundle(HistoryLastChangesSkill.class).getBundleContext(),
-                        stateDescription.getPattern(), state.toString());
-                if (transformedState.equals(state.toString())) {
-                    return state.format(stateDescription.getPattern());
-                } else {
-                    return transformedState;
-                }
+            try {
+                StateDescription stateDescription = item.getStateDescription();
+                if (stateDescription != null && stateDescription.getPattern() != null) {
+                    String transformedState = TransformationHelper.transform(
+                            FrameworkUtil.getBundle(HistoryLastChangesSkill.class).getBundleContext(),
+                            stateDescription.getPattern(), state.toString());
+                    if (transformedState.equals(state.toString())) {
+                        return state.format(stateDescription.getPattern());
+                    } else {
+                        return transformedState;
+                    }
 
-            } else {
+                } else {
+                    return state.toString();
+                }
+            } catch (IllegalFormatConversionException e) {
                 return state.toString();
             }
         } else {

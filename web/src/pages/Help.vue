@@ -10,7 +10,7 @@
     <h5 class="q-body text-grey">Essential information</h5>
     <div class="row">
       <help-topic title="Meet HABot" subtitle="Get to know HABot and discover what it can do" topic="getting-started" @launch="launch" />
-      <help-topic title="Tag your items" subtitle="Learn how to prepare your openHAB items for HABot" topic="tagging-items" @launch="launch" />
+      <!-- <help-topic title="Tag your items" subtitle="Learn how to prepare your openHAB items for HABot" topic="tagging-items" @launch="launch" /> -->
       <help-topic title="Get the full experience" subtitle="Make sure you get all the features of this web app" topic="enhanced-features" @launch="launch" />
     </div>
     <h5 class="q-body text-grey">Work with cards</h5>
@@ -23,14 +23,14 @@
 <script>
 import HelpTopic from 'components/help/HelpTopic.vue'
 import GettingStarted from 'layouts/help/GettingStarted.vue'
-import TaggingItems from 'layouts/help/TaggingItems.vue'
+// import TaggingItems from 'layouts/help/TaggingItems.vue'
 import EnhancedFeatures from 'layouts/help/EnhancedFeatures.vue'
 
 export default {
   components: {
     HelpTopic,
     GettingStarted,
-    TaggingItems,
+    // TaggingItems,
     EnhancedFeatures
   },
   data () {
