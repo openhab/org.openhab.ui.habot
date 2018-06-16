@@ -8,6 +8,13 @@
  */
 package org.openhab.ui.habot.nlp;
 
+/**
+ * This class repesents a named attribute, which be used for matching entities
+ * extracted from the natural language query to items. They originate from
+ * semantic tags and additional monikers defined in the item's "habot" namespace.
+ *
+ * @author Yannick Schaus
+ */
 public class ItemNamedAttribute {
     public enum AttributeSource {
         TAG,
@@ -27,34 +34,74 @@ public class ItemNamedAttribute {
     boolean inherited;
     AttributeSource source;
 
+    /**
+     * Retrieves the type of the named attribute - "object" or "location"
+     *
+     * @return the type - "object" or "location"
+     */
     public String getType() {
         return type;
     }
 
+    /**
+     * Sets the type of the named attribute
+     *
+     * @param type the type
+     */
     public void setType(String type) {
         this.type = type;
     }
 
+    /**
+     * Retrieves the value of the named attribute
+     *
+     * @return the value
+     */
     public String getValue() {
         return value;
     }
 
+    /**
+     * Sets the value of the named attribute
+     *
+     * @param value the value
+     */
     public void setValue(String value) {
         this.value = value;
     }
 
+    /**
+     * Returns whether this named attribute is inherited or not
+     *
+     * @return whether the named attribute is inherited
+     */
     public boolean isInherited() {
         return inherited;
     }
 
+    /**
+     * Specifies whether this named attribute is inherited
+     *
+     * @param inherited whether the named attribute is inherited
+     */
     public void setInherited(boolean inherited) {
         this.inherited = inherited;
     }
 
+    /**
+     * Returns whether the named attribute comes from a tag or metadata
+     *
+     * @return the source of the named attribute
+     */
     public AttributeSource getSource() {
         return source;
     }
 
+    /**
+     * Specifies whether the named attribute comes from a tag or metadata
+     *
+     * @param source the source the named attribute
+     */
     public void setSource(AttributeSource source) {
         this.source = source;
     }

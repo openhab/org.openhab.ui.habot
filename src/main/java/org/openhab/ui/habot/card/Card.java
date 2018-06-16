@@ -35,6 +35,9 @@ public class Card extends Component implements Identifiable<String> {
     String title;
     String subtitle;
 
+    Set<String> objects = new HashSet<String>();
+    Set<String> locations = new HashSet<String>();
+
     Set<String> tags = new HashSet<String>();
 
     boolean bookmarked;
@@ -114,6 +117,24 @@ public class Card extends Component implements Identifiable<String> {
      * @return the card tags
      */
     public Set<String> getTags() {
+        return tags;
+    }
+
+    /**
+     * Gets the set of object attributes attached to the card
+     *
+     * @return the card object attributes
+     */
+    public Set<String> getObjectAttributes() {
+        return objects;
+    }
+
+    /**
+     * Gets the set of location attributes attached to the card
+     *
+     * @return the card location attributes
+     */
+    public Set<String> getLocationAttributes() {
         return tags;
     }
 
@@ -199,7 +220,7 @@ public class Card extends Component implements Identifiable<String> {
      * @return the timestamp
      */
     public Date getTimestamp() {
-        return this.timestamp;
+        return timestamp;
     }
 
     /**
@@ -234,7 +255,7 @@ public class Card extends Component implements Identifiable<String> {
      * @param tag the tag to add
      */
     public void addTag(String tag) {
-        tags.add(tag);
+        this.tags.add(tag);
     }
 
     /**
@@ -261,14 +282,110 @@ public class Card extends Component implements Identifiable<String> {
      * @param tag the tag to remove
      */
     public void removeTag(String tag) {
-        tags.remove(tag);
+        this.tags.remove(tag);
     }
 
     /**
      * Removes all tags on the card
      */
     public void removeAllTags() {
-        tags.clear();
+        this.tags.clear();
+    }
+
+    /**
+     * Adds an object attribute to the card
+     *
+     * @param tag the tag to add
+     */
+    public void addObjectAttribute(String object) {
+        this.objects.add(object);
+    }
+
+    /**
+     * Adds several object attributes to the card
+     *
+     * @param tags the tags to add
+     */
+    public void addObjectAttributes(Collection<String> objects) {
+        this.objects.addAll(objects);
+    }
+
+    /**
+     * Adds several object attributes to the card
+     *
+     * @param tags the tags to add
+     */
+    public void addObjectAttributes(String... objects) {
+        this.objects.addAll(Arrays.asList(objects));
+    }
+
+    /**
+     * Removes an object attribute on a card
+     *
+     * @param tag the tag to remove
+     */
+    public void removeObjectAttribute(String object) {
+        this.objects.remove(object);
+    }
+
+    /**
+     * Returns whether the card has the specified object attribute (case insensitive)
+     *
+     * @param object
+     */
+    public boolean hasObjectAttribute(String object) {
+        if (this.objects == null || object == null || object.isEmpty()) {
+            return false;
+        }
+        return this.objects.stream().anyMatch(o -> o.equalsIgnoreCase(object));
+    }
+
+    /**
+     * Adds an location attribute to the card
+     *
+     * @param tag the tag to add
+     */
+    public void addLocationAttribute(String location) {
+        this.locations.add(location);
+    }
+
+    /**
+     * Adds several object attributes to the card
+     *
+     * @param tags the tags to add
+     */
+    public void addLocationAttributes(Collection<String> locations) {
+        this.locations.addAll(locations);
+    }
+
+    /**
+     * Adds several object attributes to the card
+     *
+     * @param tags the tags to add
+     */
+    public void addLocationAttributes(String... locations) {
+        this.locations.addAll(Arrays.asList(locations));
+    }
+
+    /**
+     * Removes an object attribute on a card
+     *
+     * @param tag the tag to remove
+     */
+    public void removeLocationAttribute(String location) {
+        this.locations.remove(location);
+    }
+
+    /**
+     * Returns whether the card has the specified location attribute
+     *
+     * @param object
+     */
+    public boolean hasLocationAttribute(String location) {
+        if (this.locations == null || location == null || location.isEmpty()) {
+            return false;
+        }
+        return this.locations.stream().anyMatch(o -> o.equalsIgnoreCase(location));
     }
 
     @Override

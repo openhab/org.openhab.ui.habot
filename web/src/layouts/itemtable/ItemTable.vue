@@ -9,7 +9,7 @@
         icon="arrow_back"
       />
       <q-toolbar-title>
-        Item tags review
+        Item attributes review
       </q-toolbar-title>
     </q-toolbar>
 
@@ -79,23 +79,6 @@ export default {
     }
   },
   methods: {
-    addInheritedTags (item, taglist, leaf) {
-      if (!leaf) {
-        for (var tag of item.tags) {
-          if (tag.startsWith('object:') || tag.startsWith('location:')) {
-            taglist.push(tag)
-          }
-        }
-      }
-      for (var groupName of item.groupNames) {
-        let group = this.$store.state.items.map[groupName]
-        if (group) {
-          this.addInheritedTags(group, taglist)
-        } else {
-          console.warn(`Cannot find ${item.name} parent group: ${groupName}!`)
-        }
-      }
-    },
     processItems () {
       this.$http.get('/rest/habot/attributes').then((response) => {
         let items = extend(true, [], this.$store.state.items.items).map(i => {
@@ -105,10 +88,6 @@ export default {
             label: i.label,
             attributes: response.data[i.name]
           }
-
-          let inheritedTags = []
-          this.addInheritedTags(i, inheritedTags, true)
-          ret.inheritedTags = inheritedTags
           return ret
         })
         this.items = items

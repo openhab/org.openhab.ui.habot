@@ -4,42 +4,43 @@ const unique = a => [...new Set(a)]
 
 export const objectSet = (state) => {
   if (!state.cards.length) return []
-  const tags = state.cards.map((card) => {
-    return card.tags || []
-  }).reduce((acc, tags) => {
-    return acc.concat(tags)
-  }).filter((tag) => {
-    return tag.indexOf('object:') === 0
+  const objects = state.cards.map((card) => {
+    return card.objects || []
+  }).reduce((acc, objects) => {
+    return acc.concat(objects)
   })
-  return unique(tags)
+  return unique(objects)
 }
 
 export const locationSet = (state) => {
   if (!state.cards.length) return []
-  const tags = state.cards.map((card) => {
-    return card.tags || []
-  }).reduce((acc, tags) => {
-    return acc.concat(tags)
-  }).filter((tag) => {
-    return tag.indexOf('location:') === 0
+  const locations = state.cards.map((card) => {
+    return card.locations || []
+  }).reduce((acc, locations) => {
+    return acc.concat(locations)
   })
-  return unique(tags)
+  return unique(locations)
 }
 
-export const tag = (state) => (tag) => {
+export const object = (state) => (object) => {
   if (!state.cards.length) return []
-  return state.cards.filter((card) => card.tags && card.tags.indexOf(tag) >= 0)
+  return state.cards.filter((card) => card.objects.indexOf(object) >= 0)
 }
 
-export const tags = (state) => (objects, locations) => {
+export const location = (state) => (location) => {
+  if (!state.cards.length) return []
+  return state.cards.filter((card) => card.objects.indexOf(location) >= 0)
+}
+
+export const filter = (state) => (objects, locations) => {
   if (!objects.length && !locations.length) return []
   if (!state.cards.length) return []
   let filtered = state.cards.slice()
   if (objects.length) {
-    filtered = filtered.filter((card) => card.tags && objects.some((t) => card.tags.indexOf(t) >= 0))
+    filtered = filtered.filter((card) => objects.some((t) => card.objects.indexOf(t) >= 0))
   }
   if (locations.length) {
-    filtered = filtered.filter((card) => card.tags && locations.some((t) => card.tags.indexOf(t) >= 0))
+    filtered = filtered.filter((card) => locations.some((t) => card.locations.indexOf(t) >= 0))
   }
   return filtered
 }

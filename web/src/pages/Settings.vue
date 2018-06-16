@@ -46,11 +46,11 @@
         </q-item-main>
       </q-item>
 
-      <q-list-header>Item tagging</q-list-header>
+      <q-list-header>Information used for item matching</q-list-header>
       <q-item @click.native="showItemTagger = true">
         <q-item-main>
-          <q-item-tile label>View item tags</q-item-tile>
-          <q-item-tile sublabel>Review and set the tags used to identify items in conversations.</q-item-tile>
+          <q-item-tile label>View item attributes</q-item-tile>
+          <q-item-tile sublabel>Review the named attributes attached to items, used to identify them in conversations.</q-item-tile>
         </q-item-main>
       </q-item>
       <q-modal v-model="showItemTagger" :content-css="{minWidth: '80vw', minHeight: '80vh'}" @show="$refs.itemtable.processItems()">

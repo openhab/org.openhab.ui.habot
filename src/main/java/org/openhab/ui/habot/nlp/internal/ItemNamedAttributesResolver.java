@@ -102,12 +102,10 @@ public class ItemNamedAttributesResolver {
             boolean objectMatch = false;
             boolean locationMatch = false;
 
-            if (object != null && entry.getValue().stream()
-                    .anyMatch(a -> a.getValue().toLowerCase().equals(object.toLowerCase()))) {
+            if (object != null && entry.getValue().stream().anyMatch(a -> a.getValue().equalsIgnoreCase(object))) {
                 objectMatch = true;
             }
-            if (location != null && entry.getValue().stream()
-                    .anyMatch(a -> a.getValue().toLowerCase().equals(location.toLowerCase()))) {
+            if (location != null && entry.getValue().stream().anyMatch(a -> a.getValue().equalsIgnoreCase(location))) {
                 locationMatch = true;
             }
 

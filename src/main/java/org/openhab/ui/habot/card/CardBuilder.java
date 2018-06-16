@@ -10,9 +10,11 @@ package org.openhab.ui.habot.card;
 
 import java.util.Collection;
 import java.util.IllegalFormatConversionException;
-import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import org.eclipse.smarthome.core.items.GroupItem;
 import org.eclipse.smarthome.core.items.Item;
 import org.eclipse.smarthome.core.items.ItemRegistry;
 import org.eclipse.smarthome.core.library.CoreItemFactory;
@@ -53,11 +55,14 @@ public class CardBuilder {
      * @return the card (either retrieved or built)
      */
     public Card buildCard(Intent intent, Collection<Item> matchedItems) {
-        Set<String> tags = intent.getEntities().entrySet().stream()
-                .filter(e -> e.getKey().equals("object") || e.getKey().equals("location"))
-                .map(e -> e.getKey() + ":" + e.getValue()).collect(Collectors.toSet());
+        // Set<String> tags = intent.getEntities().entrySet().stream()
+        // .filter(e -> e.getKey().equals("object") || e.getKey().equals("location"))
+        // .map(e -> e.getKey() + ":" + e.getValue()).collect(Collectors.toSet());
 
-        Collection<Card> cardsInRegistry = this.cardRegistry.getCardByTags(tags).stream()
+        String object = intent.getEntities().get("object");
+        String location = intent.getEntities().get("location");
+
+        Collection<Card> cardsInRegistry = this.cardRegistry.getCardMatchingAttributes(object, location).stream()
                 .filter(c -> !c.isNotReuseableInChat() && !c.isEphemeral()).collect(Collectors.toList());
         if (cardsInRegistry.size() > 0) {
             // don't handle multiple cards, just return the first one
@@ -68,13 +73,16 @@ public class CardBuilder {
         }
 
         Card card = new Card("HbCard");
-        card.addTags(tags);
+        // card.addTags(tags);
         card.setEphemeral(true);
         card.addConfig("bigger", true);
         card.updateTimestamp();
 
-        if (matchedItems.size() == 1) {
-            Item item = matchedItems.stream().findFirst().get();
+        Supplier<Stream<Item>> matchingNonGroupItems = () -> matchedItems.stream()
+                .filter(i -> !(i instanceof GroupItem));
+
+        if (matchingNonGroupItems.get().count() == 1) {
+            Item item = matchingNonGroupItems.get().findFirst().get();
             card.setTitle(item.getLabel());
             card.setSubtitle(item.getName());
 
@@ -187,18 +195,18 @@ public class CardBuilder {
         } else {
             card.setTitle(String.join(", ", intent.getEntities().values()));
             // card.setTitle(getCardTitleFromGroupLabels(tags));
-            card.setSubtitle(matchedItems.size() + " items"); // TODO: i18n
+            card.setSubtitle(matchingNonGroupItems.get().count() + " items"); // TODO: i18n
 
             // TODO: detect images and build a HbCarousel with them - for webcams etc.
 
             Component list = new Component("HbList");
-            for (Item item : matchedItems) {
+            matchingNonGroupItems.get().forEach(item -> {
                 Component listItem = new Component("HbListItem");
                 listItem.addConfig("item", item.getName());
                 listItem.addConfig("label", item.getLabel());
 
                 list.addComponent("items", listItem);
-            }
+            });
 
             card.addComponent("list", list);
         }
@@ -217,28 +225,31 @@ public class CardBuilder {
      * @return the card
      */
     public Card buildChartCard(Intent intent, Collection<Item> matchedItems, String period) {
-        Set<String> tags = intent.getEntities().entrySet().stream().map(e -> e.getKey() + ":" + e.getValue())
-                .collect(Collectors.toSet());
+        // Set<String> tags = intent.getEntities().entrySet().stream().map(e -> e.getKey() + ":" + e.getValue())
+        // .collect(Collectors.toSet());
 
         Card card = new Card("HbCard");
-        card.addTags(tags);
+        // card.addTags(tags);
         card.setEphemeral(true);
         card.addConfig("bigger", true);
         card.updateTimestamp();
 
-        if (matchedItems.size() == 1) {
-            Item item = matchedItems.stream().findFirst().get();
+        Supplier<Stream<Item>> matchingNonGroupItems = () -> matchedItems.stream()
+                .filter(i -> !(i instanceof GroupItem));
+
+        if (matchingNonGroupItems.get().count() == 1) {
+            Item item = matchingNonGroupItems.get().findFirst().get();
             card.setTitle(item.getLabel());
             card.setSubtitle(item.getName());
         } else {
             card.setTitle(String.join(", ", intent.getEntities().values()));
             // card.setTitle(getCardTitleFromGroupLabels(tags));
-            card.setSubtitle(matchedItems.size() + " items"); // TODO: i18n
+            card.setSubtitle(matchingNonGroupItems.get().count() + " items"); // TODO: i18n
         }
 
         Component chart = new Component("HbChartImage");
         chart.addConfig("items",
-                matchedItems.stream().map(i -> i.getName()).collect(Collectors.toList()).toArray(new String[0]));
+                matchingNonGroupItems.get().map(i -> i.getName()).collect(Collectors.toList()).toArray(new String[0]));
         chart.addConfig("period", period);
 
         Component analyzeButton = new Component("HbAnalyzeActionButton");
@@ -252,15 +263,15 @@ public class CardBuilder {
         return card;
     }
 
-    @SuppressWarnings("null")
-    private String getCardTitleFromGroupLabels(Set<String> tags) {
-        Collection<Item> groups = this.itemRegistry.getItemsByTagAndType("Group", tags.stream().toArray(String[]::new));
-        if (groups.isEmpty()) {
-            return "";
-        } else {
-            return groups.stream().map(i -> i.getLabel()).collect(Collectors.joining(", "));
-        }
-    }
+    // @SuppressWarnings("null")
+    // private String getCardTitleFromGroupLabels(Set<String> tags) {
+    // Collection<Item> groups = this.itemRegistry.getItemsByTagAndType("Group", tags.stream().toArray(String[]::new));
+    // if (groups.isEmpty()) {
+    // return "";
+    // } else {
+    // return groups.stream().map(i -> i.getLabel()).collect(Collectors.joining(", "));
+    // }
+    // }
 
     private String formatState(Item item, State state) throws TransformationException {
         if (item.getStateDescription() != null) {

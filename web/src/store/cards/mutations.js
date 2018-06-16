@@ -2,7 +2,19 @@ import { extend } from 'quasar'
 
 export const updateAll = (state, cards) => {
   console.log('Loaded ' + cards.length + ' cards')
-  state.cards = cards
+
+  // for backward compatibility - convert old object: and location: tags
+  // to attributes on the cards
+  state.cards = cards.map((c) => {
+    if (!c.objects) c.objects = []
+    if (!c.locations) c.locations = []
+    c.tags.forEach((t) => {
+      if (t.indexOf('object:') === 0 && c.objects.indexOf(t.replace('object:', '')) < 0) c.objects.push(t.replace('object:', ''))
+      if (t.indexOf('location:') === 0 && c.locations.indexOf(t.replace('object:', '')) < 0) c.locations.push(t.replace('location:', ''))
+    })
+
+    return c
+  })
 }
 
 export const createCard = (state, card) => {
