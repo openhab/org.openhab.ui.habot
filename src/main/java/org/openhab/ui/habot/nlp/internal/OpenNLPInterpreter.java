@@ -164,11 +164,11 @@ public class OpenNLPInterpreter implements HumanLanguageInterpreter {
         // it a "get-status" intent with this attribute as the corresponding entity.
         // This allows the user to query a named attribute quickly by simply stating it - and avoid a
         // misinterpretation by the categorizer.
-        if (!this.itemRegistry.getItemsByTag("object:" + text.toLowerCase()).isEmpty()) {
+        if (this.itemNamedAttributesResolver.getMatchingItems(text, null).findAny().isPresent()) {
             intent = new Intent("get-status");
             intent.setEntities(new HashMap<String, String>());
             intent.getEntities().put("object", text.toLowerCase());
-        } else if (!this.itemRegistry.getItemsByTag("location:" + text.toLowerCase()).isEmpty()) {
+        } else if (this.itemNamedAttributesResolver.getMatchingItems(null, text).findAny().isPresent()) {
             intent = new Intent("get-status");
             intent.setEntities(new HashMap<String, String>());
             intent.getEntities().put("location", text.toLowerCase());
