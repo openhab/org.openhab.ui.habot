@@ -193,7 +193,7 @@ export default {
           },
           axisLabel: {
             inside: false,
-            formatter: '{value} °C\n'
+            formatter: '{value}\n'
           }
           // z: 10
         },
