@@ -22,6 +22,16 @@ export const locationSet = (state) => {
   return unique(locations)
 }
 
+export const tagSet = (state) => {
+  if (!state.cards.length) return []
+  const tags = state.cards.map((card) => {
+    return card.tags || []
+  }).reduce((acc, tags) => {
+    return acc.concat(tags)
+  })
+  return unique(tags)
+}
+
 export const object = (state) => (object) => {
   if (!state.cards.length) return []
   return state.cards.filter((card) => card.objects.indexOf(object) >= 0)
@@ -47,6 +57,12 @@ export const filter = (state) => (objects, locations) => {
 
 export const all = (state) => {
   return state.cards
+}
+
+export const tagged = (state) => (tags) => {
+  return state.cards.filter((c) => {
+    return c.tags && tags.every((t) => c.tags.indexOf(t) >= 0)
+  })
 }
 
 export const bookmarked = (state) => {

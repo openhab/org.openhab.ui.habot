@@ -247,10 +247,7 @@ export default {
         currentChat.finished = true
         currentChat.card = card
       } else if (notification.data && notification.data.tags) {
-        let objects = notification.data.tags.filter(t => t.indexOf('object:') === 0)
-        let locations = notification.data.tags.filter(t => t.indexOf('location:') === 0)
-        let cardCandidates = this.$store.getters['cards/filter'](objects, locations)
-        let matchingCards = cardCandidates.filter(c => c.tags.every(t => notification.data.tags.indexOf(t) >= 0))
+        let matchingCards = this.$store.getters['cards/tagged'](notification.data.tags)
 
         // if more than one match, tough luck, just take the first one
         if (matchingCards.length > 0) {

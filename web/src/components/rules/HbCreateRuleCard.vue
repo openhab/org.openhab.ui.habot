@@ -88,13 +88,13 @@
       <q-field v-if="actionNotify.length > 0" icon="message" label="Message" orientation="vertical">
         <q-input v-model="actionNotifyMessage" />
       </q-field>
-      <q-field v-if="actionNotify.indexOf('webpush') >= 0" icon="label_outline" label="Attributes" orientation="vertical"
-        helper="Optional. The first card matching these attributes will be shown when opening the notification.">
+      <q-field v-if="actionNotify.indexOf('webpush') >= 0" icon="label_outline" label="Tags" orientation="vertical"
+        helper="Optional. The first card matching these tags will be shown when opening the notification.">
         <q-select
           multiple chips secondary
           color="secondary"
           v-model="actionNotifyTags"
-          :options="attributes" />
+          :options="tags" />
       </q-field>
       <q-stepper-navigation v-if="!globalNavigation">
         <q-btn color="primary" :disabled="thenSubtitle === ''" @click="createRule()">Create</q-btn>
@@ -161,8 +161,7 @@ export default {
           stamp: item.type
         }
       }),
-      attributes: this.$store.getters['cards/objectSet']
-        .concat(this.$store.getters['cards/locationSet'])
+      tags: this.$store.getters['cards/tagSet']
         .map((t) => {
           return {
             value: t,
