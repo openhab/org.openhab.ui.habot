@@ -10,6 +10,7 @@ package org.openhab.ui.habot.card;
 
 import java.util.Collection;
 import java.util.IllegalFormatConversionException;
+import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -55,10 +56,6 @@ public class CardBuilder {
      * @return the card (either retrieved or built)
      */
     public Card buildCard(Intent intent, Collection<Item> matchedItems) {
-        // Set<String> tags = intent.getEntities().entrySet().stream()
-        // .filter(e -> e.getKey().equals("object") || e.getKey().equals("location"))
-        // .map(e -> e.getKey() + ":" + e.getValue()).collect(Collectors.toSet());
-
         String object = intent.getEntities().get("object");
         String location = intent.getEntities().get("location");
 
@@ -73,7 +70,12 @@ public class CardBuilder {
         }
 
         Card card = new Card("HbCard");
-        // card.addTags(tags);
+        if (object != null) {
+            card.addObjectAttribute(object);
+        }
+        if (location != null) {
+            card.addLocationAttribute(location);
+        }
         card.setEphemeral(true);
         card.addConfig("bigger", true);
         card.updateTimestamp();
@@ -93,7 +95,7 @@ public class CardBuilder {
                     card.addComponent("right", switchComponent);
                     break;
                 case CoreItemFactory.DIMMER:
-                    if (item.hasTag("habot:switchable")) {
+                    if (item.hasTag("capability:Switchable")) {
                         Component dimmerSwitchComponent = new Component("HbSwitch");
                         dimmerSwitchComponent.addConfig("item", item.getName());
                         card.addComponent("right", dimmerSwitchComponent);
@@ -194,8 +196,22 @@ public class CardBuilder {
 
         } else {
             card.setTitle(String.join(", ", intent.getEntities().values()));
-            // card.setTitle(getCardTitleFromGroupLabels(tags));
-            card.setSubtitle(matchingNonGroupItems.get().count() + " items"); // TODO: i18n
+            GroupItem commonGroup = getMatchingGroup(matchedItems);
+            if (commonGroup != null) {
+                card.setTitle(commonGroup.getLabel());
+                if (commonGroup.getBaseItem() != null
+                        && commonGroup.getBaseItem().getType() == CoreItemFactory.SWITCH) {
+                    Component switchComponent = new Component("HbSwitch");
+                    switchComponent.addConfig("item", commonGroup.getName());
+                    card.addComponent("right", switchComponent);
+                } else if (!commonGroup.getState().toString().isEmpty()) {
+                    Component singleItemComponent = new Component("HbSingleItemValue");
+                    singleItemComponent.addConfig("item", commonGroup.getName());
+                    card.addComponent("right", singleItemComponent);
+                }
+            } else {
+                card.setTitle(String.join(", ", intent.getEntities().values()));
+            }
 
             // TODO: detect images and build a HbCarousel with them - for webcams etc.
 
@@ -225,11 +241,16 @@ public class CardBuilder {
      * @return the card
      */
     public Card buildChartCard(Intent intent, Collection<Item> matchedItems, String period) {
-        // Set<String> tags = intent.getEntities().entrySet().stream().map(e -> e.getKey() + ":" + e.getValue())
-        // .collect(Collectors.toSet());
+        String object = intent.getEntities().get("object");
+        String location = intent.getEntities().get("location");
 
         Card card = new Card("HbCard");
-        // card.addTags(tags);
+        if (object != null) {
+            card.addObjectAttribute(object);
+        }
+        if (location != null) {
+            card.addLocationAttribute(location);
+        }
         card.setEphemeral(true);
         card.addConfig("bigger", true);
         card.updateTimestamp();
@@ -242,8 +263,22 @@ public class CardBuilder {
             card.setTitle(item.getLabel());
             card.setSubtitle(item.getName());
         } else {
-            card.setTitle(String.join(", ", intent.getEntities().values()));
-            // card.setTitle(getCardTitleFromGroupLabels(tags));
+            GroupItem commonGroup = getMatchingGroup(matchedItems);
+            if (commonGroup != null) {
+                card.setTitle(commonGroup.getLabel());
+                if (commonGroup.getBaseItem() != null
+                        && commonGroup.getBaseItem().getType() == CoreItemFactory.SWITCH) {
+                    Component switchComponent = new Component("HbSwitch");
+                    switchComponent.addConfig("item", commonGroup.getName());
+                    card.addComponent("right", switchComponent);
+                } else if (!commonGroup.getState().toString().isEmpty()) {
+                    Component singleItemComponent = new Component("HbSingleItemValue");
+                    singleItemComponent.addConfig("item", commonGroup.getName());
+                    card.addComponent("right", singleItemComponent);
+                }
+            } else {
+                card.setTitle(String.join(", ", intent.getEntities().values()));
+            }
             card.setSubtitle(matchingNonGroupItems.get().count() + " items"); // TODO: i18n
         }
 
@@ -261,6 +296,17 @@ public class CardBuilder {
 
         cardRegistry.add(card);
         return card;
+    }
+
+    /**
+     * Checks whether a Group item is included in the provided collection and returns it
+     *
+     * @param items
+     * @return the first Group item in the collection
+     */
+    private GroupItem getMatchingGroup(Collection<Item> items) {
+        Optional<Item> groupItem = items.stream().filter(i -> i instanceof GroupItem).findFirst();
+        return groupItem.isPresent() ? (GroupItem) groupItem.get() : null;
     }
 
     // @SuppressWarnings("null")
