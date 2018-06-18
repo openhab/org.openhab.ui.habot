@@ -16,6 +16,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.eclipse.smarthome.core.events.EventPublisher;
+import org.eclipse.smarthome.core.items.GroupItem;
 import org.eclipse.smarthome.core.items.Item;
 import org.eclipse.smarthome.core.items.events.ItemEventFactory;
 import org.eclipse.smarthome.core.library.types.DecimalType;
@@ -78,7 +79,8 @@ public class SetValueSkill extends AbstractItemIntentInterpreter {
 
         // filter out the items which can't receive an HSB command
         List<Item> filteredItems = matchedItems.stream()
-                .filter(i -> i.getAcceptedCommandTypes().contains(HSBType.class)).collect(Collectors.toList());
+                .filter(i -> !(i instanceof GroupItem) && i.getAcceptedCommandTypes().contains(HSBType.class))
+                .collect(Collectors.toList());
 
         String hsbValue;
         try {
@@ -120,7 +122,7 @@ public class SetValueSkill extends AbstractItemIntentInterpreter {
 
         // only consider items which can receive an DecimalType command - includes PercentType, HSBType
         List<Item> filteredItems = matchedItems.stream()
-                .filter(i -> i.getAcceptedCommandTypes().contains(DecimalType.class)
+                .filter(i -> !(i instanceof GroupItem) && i.getAcceptedCommandTypes().contains(DecimalType.class)
                         || i.getAcceptedCommandTypes().contains(PercentType.class))
                 .collect(Collectors.toList());
 

@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.eclipse.smarthome.core.events.EventPublisher;
+import org.eclipse.smarthome.core.items.GroupItem;
 import org.eclipse.smarthome.core.items.Item;
 import org.eclipse.smarthome.core.items.events.ItemEventFactory;
 import org.eclipse.smarthome.core.library.types.OnOffType;
@@ -56,7 +57,8 @@ public class ActivateObjectSkill extends AbstractItemIntentInterpreter {
 
             // filter out the items which can't receive an ON command
             List<Item> filteredItems = matchedItems.stream()
-                    .filter(i -> i.getAcceptedCommandTypes().contains(OnOffType.class)).collect(Collectors.toList());
+                    .filter(i -> !(i instanceof GroupItem) && i.getAcceptedCommandTypes().contains(OnOffType.class))
+                    .collect(Collectors.toList());
 
             interpretation.setCard(cardBuilder.buildCard(intent, filteredItems));
 
