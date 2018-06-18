@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
  * This class retrieves and caches sets of {@link ItemNamedAttribute} mapped to items.
  * It uses semantic tags and additional monikers defined in metadata ("habot" namespace).
  * The named attributes sourced from tags will be translated to the current language as
- * specified. Inheritance is always applied for metadata, while for tags it can be preventing
+ * specified. Inheritance is always applied for metadata, while for tags it can be prevented
  * with the "inheritTags" configuration property in the "habot" metadata namespace.
  *
  * @author Yannick Schaus
@@ -87,6 +87,25 @@ public class ItemNamedAttributesResolver {
         }
 
         return itemAttributes;
+    }
+
+    /**
+     * Returns the set of named attributes associated to the provided item
+     *
+     * @param item the item to look up
+     * @return a set of named attributes or null if the item doesn't have any named attributes
+     * @throws UnsupportedLanguageException
+     */
+    public Set<ItemNamedAttribute> getItemNamedAttributes(Item item) throws UnsupportedLanguageException {
+        if (currentLocale == null) {
+            throw new UnsupportedLanguageException(currentLocale);
+        }
+
+        if (itemAttributes == null) {
+            updateItemNamedAttributes();
+        }
+
+        return itemAttributes.get(item);
     }
 
     /**

@@ -93,7 +93,7 @@ public class IntentInterpretation {
     }
 
     /**
-     * Gets the {@link Card} presented as part of the answer.
+     * Sets the {@link Card} presented as part of the answer.
      *
      * @param card the card
      */
