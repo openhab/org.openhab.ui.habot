@@ -186,8 +186,8 @@ public class HABotResource implements RESTResource {
     @ApiOperation(value = "Gets all item named attributes.")
     @ApiResponses(value = { @ApiResponse(code = 200, message = "OK", response = ChatReply.class),
             @ApiResponse(code = 500, message = "An interpretation error occured") })
-    public Response chat(@HeaderParam(HttpHeaders.ACCEPT_LANGUAGE) @ApiParam(value = "language") String language)
-            throws Exception {
+    public Response getAttributes(
+            @HeaderParam(HttpHeaders.ACCEPT_LANGUAGE) @ApiParam(value = "language") String language) throws Exception {
         final Locale locale = (this.localeProvider != null) ? this.localeProvider.getLocale()
                 : LocaleUtil.getLocale(language);
 
