@@ -60,8 +60,10 @@ public class AnswerFormatter {
 
     public String getStandardTagHint(Map<String, String> entities) {
         return getRandomAnswer("standard_hint",
-                ImmutableMap.of("tags", String.join(" & ", entities.entrySet().stream()
-                        .filter(e -> e.getKey().equals("object") || e.getKey().equals("location"))
-                        .map(e -> String.format("\"%s:%s\"", e.getKey(), e.getValue())).toArray(String[]::new))));
+                ImmutableMap.of("attributes",
+                        String.join(" & ",
+                                entities.entrySet().stream()
+                                        .filter(e -> e.getKey().equals("object") || e.getKey().equals("location"))
+                                        .map(e -> String.format("\"%s\"", e.getValue())).toArray(String[]::new))));
     }
 }
