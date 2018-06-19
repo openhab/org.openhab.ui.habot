@@ -46,11 +46,12 @@ export default {
     },
     retrieveImageUrl () {
       if (!this.item) return Promise.resolve(null)
-      if (this.item.tags && this.item.tags.find(t => t.indexOf('habot:image:sitemap:') === 0)) {
-        let sitemapName = this.item.tags.find(t => t.indexOf('habot:image:sitemap:') === 0).split(':')[3]
+      if (this.item.metadata && this.item.metadata.habot &&
+          this.item.metadata.habot.config && this.item.metadata.habot.config.imageSitemap) {
+        let sitemapName = this.item.metadata.habot.config.imageSitemap
         if (!sitemapName) {
-          this.error = 'Cannot retrieve sitemap name from tag'
-          return Promise.reject(new Error('Cannot retrieve sitemap name from tag'))
+          this.error = 'Cannot retrieve sitemap name from metadata'
+          return Promise.reject(new Error('Cannot retrieve sitemap name from metadata'))
         }
 
         return this.$http.get('/rest/sitemaps/' + sitemapName).then((resp) => {
@@ -65,7 +66,7 @@ export default {
           return Promise.reject(new Error('Cannot retrieve sitemap: ' + err))
         })
       } else {
-        return Promise.reject(new Error('Cannot find tag habot:image:sitemap:<sitemapname> on item'))
+        return Promise.reject(new Error('Cannot find imageSitemap metadata config on item'))
       }
     }
   },

@@ -510,12 +510,12 @@
     },
 
     "HbImage": {
-        "description": "Displays an item as an image. Requires a sitemap and a 'habot:image:sitemap:<sitemapname>' tag on the item",
+        "description": "Displays an item as an image. Requires a sitemap and a 'imageSitemap=<sitemapname>' property in the item's 'habot' metadata namespace",
         "availableByDefault": false,
         "configDescriptions": {
             "item": {
                 "type": "item",
-                "description": "The item to display; either an Image item or a String item with an associated sitemap referenced in a 'habot:image:sitemap:<sitemapname> tag"
+                "description": "The item to display; either an Image item or a String item with an associated sitemap referenced in the 'imageSitemap' property of the 'habot' item metadata namespace"
             },
             "aspectRatio": {
                 "type": "optiongroup",

@@ -8,6 +8,7 @@
  */
 package org.openhab.ui.habot.card;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.IllegalFormatConversionException;
 import java.util.Optional;
@@ -17,7 +18,9 @@ import java.util.stream.Stream;
 
 import org.eclipse.smarthome.core.items.GroupItem;
 import org.eclipse.smarthome.core.items.Item;
-import org.eclipse.smarthome.core.items.ItemRegistry;
+import org.eclipse.smarthome.core.items.Metadata;
+import org.eclipse.smarthome.core.items.MetadataKey;
+import org.eclipse.smarthome.core.items.MetadataRegistry;
 import org.eclipse.smarthome.core.library.CoreItemFactory;
 import org.eclipse.smarthome.core.transform.TransformationException;
 import org.eclipse.smarthome.core.transform.TransformationHelper;
@@ -25,20 +28,19 @@ import org.eclipse.smarthome.core.types.State;
 import org.eclipse.smarthome.core.types.StateDescription;
 import org.openhab.ui.habot.card.internal.CardRegistry;
 import org.openhab.ui.habot.nlp.Intent;
-import org.openhab.ui.habot.nlp.internal.skill.HistoryLastChangesSkill;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.service.component.annotations.Reference;
 
 /**
  * Retrieves a {@link Card} to present as part of HABot's reply from a provided {@link Intent}.
  *
- * First, tries to look up in the registry ("card deck") for a card previously saved and having tags matching the
- * entities (for example: "object:temperature" + "location:kitchen").
+ * First, try to look up in the card registry ("card deck") for a card previously saved and having attributes (object
+ * and location if both are provided) matching the recognized entities.
  *
- * If so, simply use that {@link Card} - this allows the user to design new customized cards and control exactly what
- * they want to see. If no card was found, build one on the fly using the provided matching items. Note that the user
- * will be allowed the opportunity in the chat UI to add those generated cards to the card deck, with the appropriate
- * tags, and from there edit them so that they would appear with the eventual customizations the next time.
+ * If there's a match, simply use that {@link Card} - this allows the user to design new customized cards and control
+ * exactly what they want to see. If no card was found, build one on the fly using the provided matching items. Note
+ * that the user will be allowed the opportunity in the chat UI to add those generated cards to the card deck, with the
+ * appropriate tags, and from there edit them so that they would appear with the eventual customizations the next time.
  *
  * @author Yannick Schaus - Initial contribution
  */
@@ -46,7 +48,7 @@ import org.osgi.service.component.annotations.Reference;
 public class CardBuilder {
 
     private CardRegistry cardRegistry;
-    private ItemRegistry itemRegistry;
+    private MetadataRegistry metadataRegistry;
 
     /**
      * Retrieves or build a card for the specified intent and matched items
@@ -85,6 +87,8 @@ public class CardBuilder {
 
         if (matchingNonGroupItems.get().count() == 1) {
             Item item = matchingNonGroupItems.get().findFirst().get();
+            Metadata metadata = this.metadataRegistry.get(new MetadataKey("habot", item.getName()));
+
             card.setTitle(item.getLabel());
             card.setSubtitle(item.getName());
 
@@ -95,11 +99,13 @@ public class CardBuilder {
                     card.addComponent("right", switchComponent);
                     break;
                 case CoreItemFactory.DIMMER:
+                    boolean buildKnob = (metadata != null && metadata.getConfiguration().containsKey("control")
+                            && metadata.getConfiguration().get("control").equals("knob"));
                     if (item.hasTag("capability:Switchable")) {
                         Component dimmerSwitchComponent = new Component("HbSwitch");
                         dimmerSwitchComponent.addConfig("item", item.getName());
                         card.addComponent("right", dimmerSwitchComponent);
-                    } else if (!item.hasTag("habot:control:knob")) {
+                    } else if (!buildKnob) {
                         Component dimmerValueComponent = new Component("HbSingleItemValue");
                         dimmerValueComponent.addConfig("item", item.getName());
                         card.addComponent("right", dimmerValueComponent);
@@ -107,7 +113,7 @@ public class CardBuilder {
 
                     Component dimmerContainerComponent = new Component("HbContainer");
                     dimmerContainerComponent.addConfig("classes", new String[] { "full-width", "text-center" });
-                    if (item.hasTag("habot:control:knob")) {
+                    if (buildKnob) {
                         Component knobComponent = new Component("HbKnob");
                         knobComponent.addConfig("item", item.getName());
                         knobComponent.addConfig("size", "200px");
@@ -164,7 +170,7 @@ public class CardBuilder {
                     break;
                 default:
                     if (item.getType() == CoreItemFactory.IMAGE
-                            || item.getTags().stream().anyMatch(t -> t.startsWith("habot:image:sitemap:"))) {
+                            || (metadata != null && metadata.getConfiguration().containsKey("imageSitemap"))) {
                         /*
                          * If the item is an image (or a String with a tag indicating it's an image), build a
                          * HbImage component in the "media" slot
@@ -195,12 +201,12 @@ public class CardBuilder {
             }
 
         } else {
-            card.setTitle(String.join(", ", intent.getEntities().values()));
             GroupItem commonGroup = getMatchingGroup(matchedItems);
+
             if (commonGroup != null) {
                 card.setTitle(commonGroup.getLabel());
-                if (commonGroup.getBaseItem() != null
-                        && commonGroup.getBaseItem().getType() == CoreItemFactory.SWITCH) {
+                Item baseItem = commonGroup.getBaseItem();
+                if (baseItem != null && baseItem.getType() == CoreItemFactory.SWITCH) {
                     Component switchComponent = new Component("HbSwitch");
                     switchComponent.addConfig("item", commonGroup.getName());
                     card.addComponent("right", switchComponent);
@@ -212,14 +218,25 @@ public class CardBuilder {
             } else {
                 card.setTitle(String.join(", ", intent.getEntities().values()));
             }
+            card.setSubtitle(matchingNonGroupItems.get().count() + " items"); // TODO: i18n
 
             // TODO: detect images and build a HbCarousel with them - for webcams etc.
 
             Component list = new Component("HbList");
             matchingNonGroupItems.get().forEach(item -> {
+                Metadata metadata = this.metadataRegistry.get(new MetadataKey("habot", item.getName()));
+
                 Component listItem = new Component("HbListItem");
                 listItem.addConfig("item", item.getName());
                 listItem.addConfig("label", item.getLabel());
+                if (metadata != null) {
+                    // Use selected keys from data as configuration for the HbListItem component
+                    for (String configKey : Arrays.asList("label", "sublabel", "leftIcon", "leftLetter", "leftColor")) {
+                        if (metadata.getConfiguration().containsKey(configKey)) {
+                            listItem.addConfig(configKey, metadata.getConfiguration().get(configKey));
+                        }
+                    }
+                }
 
                 list.addComponent("items", listItem);
             });
@@ -266,8 +283,8 @@ public class CardBuilder {
             GroupItem commonGroup = getMatchingGroup(matchedItems);
             if (commonGroup != null) {
                 card.setTitle(commonGroup.getLabel());
-                if (commonGroup.getBaseItem() != null
-                        && commonGroup.getBaseItem().getType() == CoreItemFactory.SWITCH) {
+                Item baseItem = commonGroup.getBaseItem();
+                if (baseItem != null && baseItem.getType() == CoreItemFactory.SWITCH) {
                     Component switchComponent = new Component("HbSwitch");
                     switchComponent.addConfig("item", commonGroup.getName());
                     card.addComponent("right", switchComponent);
@@ -309,23 +326,13 @@ public class CardBuilder {
         return groupItem.isPresent() ? (GroupItem) groupItem.get() : null;
     }
 
-    // @SuppressWarnings("null")
-    // private String getCardTitleFromGroupLabels(Set<String> tags) {
-    // Collection<Item> groups = this.itemRegistry.getItemsByTagAndType("Group", tags.stream().toArray(String[]::new));
-    // if (groups.isEmpty()) {
-    // return "";
-    // } else {
-    // return groups.stream().map(i -> i.getLabel()).collect(Collectors.joining(", "));
-    // }
-    // }
-
     private String formatState(Item item, State state) throws TransformationException {
         if (item.getStateDescription() != null) {
             try {
                 StateDescription stateDescription = item.getStateDescription();
                 if (stateDescription != null && stateDescription.getPattern() != null) {
                     String transformedState = TransformationHelper.transform(
-                            FrameworkUtil.getBundle(HistoryLastChangesSkill.class).getBundleContext(),
+                            FrameworkUtil.getBundle(CardBuilder.class).getBundleContext(),
                             stateDescription.getPattern(), state.toString());
                     if (transformedState.equals(state.toString())) {
                         return state.format(stateDescription.getPattern());
@@ -354,11 +361,11 @@ public class CardBuilder {
     }
 
     @Reference
-    protected void setItemRegistry(ItemRegistry itemRegistry) {
-        this.itemRegistry = itemRegistry;
+    protected void setMetadataRegistry(MetadataRegistry metadataRegistry) {
+        this.metadataRegistry = metadataRegistry;
     }
 
-    protected void unsetItemRegistry(ItemRegistry itemRegistry) {
-        this.itemRegistry = null;
+    protected void unsetMetadataRegistry(MetadataRegistry metadataRegistry) {
+        this.metadataRegistry = null;
     }
 }
