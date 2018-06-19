@@ -37,7 +37,7 @@ A table of named attributes for each item can be displayed by selecting the "Vie
 
 Named attributes can be added to items in several ways:
 
-1. Using tags from the Eclipse SmartHome [semantic tag library](https://github.com/eclipse/smarthome/wiki/Semantic-Tag-Library). Example of those tags include `object:Camera`, `property:Temperature`, `purpose:Heating` or `location:FirstFloor`. If a semantic tag is applied on an item, will translate it into one of several named attributes (including synonyms and plurals) for you using an internal dictionary, available in 3 languages. Semantic tags can be added on items through .items files, or they may be set automatically by bindings or other means in the future. Multiple tags, even of the same type (for instance both `location:GroundFloor` and `location:Kitchen`), are allowed on a item.
+1. Using tags from the Eclipse SmartHome [semantic tag library](https://github.com/eclipse/smarthome/wiki/Semantic-Tag-Library). Examples of those tags include `object:Camera`, `property:Temperature`, `purpose:Heating` or `location:FirstFloor`. If a semantic tag is applied on an item, HABot will translate it into one of several named attributes (including synonyms and plurals) for you using an internal dictionary, available in 3 languages. Semantic tags can be added on items through .items files, or they may be set automatically by bindings or other means in the future. Multiple tags, even of the same type (for instance both `location:GroundFloor` and `location:Kitchen`), are allowed on a item.
 
 2. Using a comma-separated list of monikers in the item's `habot` [metadata namespace](http://www.eclipse.org/smarthome/documentation/concepts/items.html#item-metadata) - this is especially useful for very specific names or items not corresponding to any known concept in the semantic tag library. Monikers added though metadata in this way are supposed to be of the "object" ("what") type unless you specify `type="location"` in the additional metadata configuration:
 
@@ -50,7 +50,9 @@ In the "View item attributes" setting dialog, named attributes added through sem
 
 #### Group inheritance principle
 
-To avoid adding the same attributes individually to similar items one by one, either via tags or metadata, HABot will by default consider that a semantic tag or metadata specified on a Group item applies implicitely to all direct or indirect members of the group too. This is shown on the "View item attributes" setting dialog: attributes inherited from a parent group are shown in a faded color.
+To avoid adding the same attributes individually to similar items one by one, either via tags or metadata, HABot will by default consider that a semantic tag or metadata specified on a Group item applies implicitely to all direct or indirect members of the group too. This is shown on the "View item attributes" setting dialog: attributes inherited from a parent group are shown in a faded color:
+
+![Attributes review example](https://i.imgur.com/Uf7FHiO.png)
 
 You can however prevent this behavior for a specific group, and for tags only, with a special property in the item's "habot" metadata namespace configuration:
 
