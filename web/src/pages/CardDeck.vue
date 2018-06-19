@@ -19,7 +19,7 @@
         <p>Change the filters or use the button below to create one.</p>
       </div>
       <div v-else-if="nofilters" class="fit text-center q-pt-xl q-pl-lg q-pr-lg text-grey">
-        <h4 class="q-display-1">Select tags to show cards</h4>
+        <h4 class="q-display-1">Select attributes to show cards</h4>
         <p>Use the filters above to display the corresponding cards, or create one.</p>
         <q-btn flat icon="bookmark" @click="$router.push('/cards/bookmarks')" style="margin-top: -1px" label="Bookmarks" />
         <q-btn flat icon="star" @click="$router.push('/cards/suggestions')" style="margin-top: -1px" label="Suggestions" />
@@ -114,13 +114,13 @@ export default {
   },
   methods: {
     addCard () {
-      this.$router.push({ path: '/designer/' + uid(), query: { tags: this.currentFilterTags.join(',') } })
+      this.$router.push({ path: '/designer/' + uid(), query: { objects: this.currentObjects.join(','), locations: this.currentLocations.join(',') } })
     },
     addListCard () {
-      this.$router.push({ path: '/designer/' + uid(), query: { type: 'list', tags: this.currentFilterTags.join(',') } })
+      this.$router.push({ path: '/designer/' + uid(), query: { type: 'list', objects: this.currentObjects.join(','), locations: this.currentLocations.join(',') } })
     },
     addTabbedCard () {
-      this.$router.push({ path: '/designer/' + uid(), query: { type: 'tabs', tags: this.currentFilterTags.join(',') } })
+      this.$router.push({ path: '/designer/' + uid(), query: { type: 'tabs', objects: this.currentObjects.join(','), locations: this.currentLocations.join(',') } })
     }
   },
   watch: {
@@ -141,22 +141,22 @@ export default {
     },
     objectSet: {
       get () {
-        return this.$store.getters['cards/objectSet'].map((tag) => {
+        return this.$store.getters['cards/objectSet'].map((object) => {
           return {
-            value: tag,
-            label: tag.replace('object:', ''),
-            stamp: '(' + this.$store.getters['cards/tag'](tag).length + ')'
+            value: object,
+            label: object,
+            stamp: '(' + this.$store.getters['cards/object'](object).length + ')'
           }
         })
       }
     },
     locationSet: {
       get () {
-        return this.$store.getters['cards/locationSet'].map((tag) => {
+        return this.$store.getters['cards/locationSet'].map((location) => {
           return {
-            value: tag,
-            label: tag.replace('location:', ''),
-            stamp: '(' + this.$store.getters['cards/tag'](tag).length + ')'
+            value: location,
+            label: location.replace('location:', ''),
+            stamp: '(' + this.$store.getters['cards/location'](location).length + ')'
           }
         })
       }
@@ -165,18 +165,14 @@ export default {
       get () {
         let objects = (this.multiple) ? this.objects : (this.objects) ? [this.objects] : []
         let locations = (this.multiple) ? this.locations : (this.locations) ? [this.locations] : []
-        return this.$store.getters['cards/tags'](objects, locations)
+        return this.$store.getters['cards/filter'](objects, locations)
       }
     },
-    currentFilterTags () {
-      let tags = []
-      if (!this.multiple) {
-        if (this.objects) tags.push(this.objects)
-        if (this.locations) tags.push(this.locations)
-      } else {
-        tags = tags.concat(this.objects).concat(this.locations)
-      }
-      return tags
+    currentObjects () {
+      return (this.multiple) ? this.objects : [this.objects]
+    },
+    currentLocations () {
+      return (this.multiple) ? this.locations : [this.locations]
     }
   }
 }

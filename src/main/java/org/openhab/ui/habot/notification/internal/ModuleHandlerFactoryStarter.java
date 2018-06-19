@@ -33,8 +33,7 @@ public class ModuleHandlerFactoryStarter {
             logger.info("WebPushNotificationModuleHandlerFactory started by ModuleHandlerFactoryStarter");
         } catch (NoClassDefFoundError e) {
             logger.info(
-                    "Not registering WebPushNotificationModuleHandlerFactory - make sure the automation engine add-on is installed",
-                    e);
+                    "Not registering WebPushNotificationModuleHandlerFactory - make sure the automation engine add-on is installed");
         }
     }
 
@@ -44,8 +43,7 @@ public class ModuleHandlerFactoryStarter {
             context.disableComponent(WebPushNotificationModuleHandlerFactory.class.getName());
         } catch (NoClassDefFoundError e) {
             logger.info(
-                    "Not unregistering WebPushNotificationModuleHandlerFactory - make sure the automation engine add-on is installed",
-                    e);
+                    "Not unregistering WebPushNotificationModuleHandlerFactory - make sure the automation engine add-on is installed");
         }
     }
 }

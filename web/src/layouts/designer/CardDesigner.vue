@@ -102,18 +102,31 @@
                       helper="The subtitle of the card">
                 <config-text v-model="selectedNode.component.subtitle"></config-text>
               </q-field>
+              <q-field label="attributes" class="config-field" orientation="vertical"
+                      helper="The attributes of the card (objects & locations); used for filtering the Card deck and to override the default generated card during the chat">
+                <q-search class="q-body-1 search-tags" color="secondary" v-model="searchAttribute"
+                      placeholder="Search from items">
+                    <q-autocomplete :static-data="attributesSuggestions" @selected="addAttribute" />
+                </q-search>
+                <q-chips-input v-model="selectedNode.component.objects" color="secondary"
+                      :error="!hasAtLeastOneAttribute" placeholder="Objects">
+                </q-chips-input>
+                <q-chips-input v-model="selectedNode.component.locations" color="secondary"
+                      :error="!hasAtLeastOneAttribute" placeholder="Locations" style="margin-top: 0.5rem">
+                </q-chips-input>
+              </q-field>
               <q-field label="suggestcriteria" class="config-field" orientation="vertical"
                       helper="The expression to evaluate in order to determine whether the card will be considered as a suggestion. Leave blank if the card is not to be suggested. Example: items.Temperature.state < 16">
                 <config-expr v-model="selectedNode.config.suggestcriteria" target-type="boolean" color="secondary"></config-expr>
               </q-field>
               <q-field label="tags" class="config-field" orientation="vertical"
-                      helper="The tags attached to the card - use object:<tag> and location:<tag> to make HABot present this card instead of the default generated one when asked about those tags (unless notReuseableInChat below is set). At least one object tag or one location tag is required.">
-                <q-search class="q-body-1 search-tags" color="secondary" v-model="searchTag"
+                      helper="The tags attached to the card">
+                <!-- <q-search class="q-body-1 search-tags" color="secondary" v-model="searchTag"
                       :error="!hasValidTags"  placeholder="Search from items">
                     <q-autocomplete :static-data="tagSuggestions" @selected="addTag" />
-                </q-search>
+                </q-search> -->
                 <q-chips-input v-model="selectedNode.component.tags" color="secondary"
-                      :error="!hasValidTags" placeholder="Type more">
+                      placeholder="Add tags">
                 </q-chips-input>
               </q-field>
               <q-field label="notReuseableInChat" class="config-field" orientation="vertical"
@@ -336,10 +349,18 @@ export default {
       treeModel: null,
       selectedNodeId: 'card',
       newCard: false,
-      searchTag: null,
+      searchAttribute: null,
       showJsonEditor: false,
-      tagSuggestions: {
-        field: 'label',
+      attributesSuggestions: {
+        field: 'value',
+        list: []
+      },
+      objectSuggestions: {
+        field: 'value',
+        list: []
+      },
+      locationSuggestions: {
+        field: 'value',
         list: []
       }
     }
@@ -350,8 +371,8 @@ export default {
       this.$router.back()
     },
     save () {
-      if (!this.hasValidTags) {
-        this.$q.dialog({ title: 'Tags missing', message: 'The card must have at least one object or one location tag' })
+      if (!this.hasAtLeastOneAttribute) {
+        this.$q.dialog({ title: 'Object and/or location required', message: 'The card must have at least one object or one location attribute' })
         return
       }
       this.card.uid = this.uid
@@ -449,6 +470,14 @@ export default {
       this.searchTag = null
       this.card.tags.push(tag.value)
     },
+    addAttribute (attribute) {
+      this.searchAttribute = null
+      if (attribute.type === 'location') {
+        this.card.locations.push(attribute.value)
+      } else {
+        this.card.objects.push(attribute.value)
+      }
+    },
     copyCutComponent (type) {
       if (!this.selectedNode) return
       if (this.selectedNode.type === 'slot') {
@@ -536,9 +565,8 @@ export default {
       if (!this.selectedNode) return null
       return this.components[this.selectedNode.component.component]
     },
-    hasValidTags () {
-      if (!this.card.tags) return false
-      return this.card.tags.some(tag => tag.startsWith('object:') || tag.startsWith('location:'))
+    hasAtLeastOneAttribute () {
+      return this.card.objects.length > 0 || this.card.locations.length > 0
     },
     jsonEditorModel () {
       // if (this.selectedNode.label === 'HbCard') return this.selectedNode.component
@@ -550,16 +578,6 @@ export default {
     let vm = this
     let card = vm.$store.getters['cards/copy'](this.uid)
 
-    vm.tagSuggestions.list = vm.$store.getters['items/objectSet']
-      .concat(vm.$store.getters['items/locationSet'])
-      .map((t) => {
-        return {
-          value: t,
-          label: t.split(':')[1],
-          stamp: t.split(':')[0]
-        }
-      })
-
     if (card) {
       vm.card = card
       if (!vm.card.tags) vm.card.tags = [] // temp
@@ -570,7 +588,9 @@ export default {
         title: 'New Card',
         subtitle: 'Subtitle',
         component: 'HbCard',
-        tags: (vm.$route.query.tags) ? vm.$route.query.tags.split(',') : [],
+        objects: (vm.$route.query.objects) ? vm.$route.query.objects.split(',') : [],
+        locations: (vm.$route.query.locations) ? vm.$route.query.locations.split(',') : [],
+        tags: [],
         bookmarked: false,
         config: {},
         slots: {}
@@ -653,6 +673,27 @@ export default {
     document.addEventListener('cut', this.copyCutEvent)
     document.addEventListener('copy', this.copyCutEvent)
     document.addEventListener('paste', this.pasteEvent)
+  },
+  mounted () {
+    const vm = this
+    // Populate the attribute suggestions
+    this.$http.get('/rest/habot/attributes').then((resp) => {
+      for (let item of Object.values(resp.data)) {
+        for (let attr of item) {
+          let suggestion = {
+            type: attr.type,
+            label: attr.value,
+            value: attr.value,
+            icon: attr.type === 'location' ? 'mdi-map-marker-outline' : 'mdi-cube-outline'
+          }
+          if (!vm.attributesSuggestions.list.some((a) => a.value === suggestion.value)) {
+            vm.attributesSuggestions.list.push(suggestion)
+          }
+        }
+      }
+    }).catch((err) => {
+      this.$q.notify('Cannot get the attribute suggestions: ' + err)
+    })
   },
   destroyed () {
     // document.removeEventListener('keyup', this.keyPressed)

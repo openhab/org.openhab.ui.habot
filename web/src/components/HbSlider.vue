@@ -12,15 +12,16 @@ export default {
   props: ['model'],
   data () {
     let item = this.$store.getters['items/name'](this.model.config.item)
+    let metadata = (item && item.metadata && item.metadata.habot && item.metadata.habot.config) ? item.metadata.habot.config : null
     /* min/step/values considered in that order:
        1. explicit component config (model.config)
-       2. those items tags: habot:slider:min:<value>, habot:slider:max:<value>, habot:slider:step:<value>
+       2. those metadata config in the item's "habot" metadata namespace: min, max, step
        3. values found in the item's stateDescription
        4. defaults (min=0, max=100, step=1)
     */
     let min
-    if (!min && item && item.tags.find(t => t.indexOf('habot:slider:min:') === 0)) {
-      min = parseFloat(item.tags.find(t => t.indexOf('habot:slider:min:') === 0).split(':')[3])
+    if (!min && item && metadata && metadata.min) {
+      min = metadata.min
     }
     if (!min && item && item.stateDescription && item.stateDescription.minimum) {
       min = item.stateDescription.minimum
@@ -28,8 +29,8 @@ export default {
     if (!min) min = 0
 
     let max
-    if (!max && item && item.tags.find(t => t.indexOf('habot:slider:max:') === 0)) {
-      max = parseFloat(item.tags.find(t => t.indexOf('habot:slider:max:') === 0).split(':')[3])
+    if (!max && item && metadata && metadata.max) {
+      max = metadata.max
     }
     if (!max && item && item.stateDescription && item.stateDescription.maximum) {
       max = item.stateDescription.minimum
@@ -37,8 +38,8 @@ export default {
     if (!max) max = 100
 
     let step
-    if (!step && item && item.tags.find(t => t.indexOf('habot:slider:step:') === 0)) {
-      step = parseFloat(item.tags.find(t => t.indexOf('habot:slider:step:') === 0).split(':')[3])
+    if (!step && item && metadata && metadata.step) {
+      step = metadata.step
     }
     if (!step && item && item.stateDescription && item.stateDescription.step) {
       step = item.stateDescription.step
@@ -47,6 +48,7 @@ export default {
 
     return {
       item: item,
+      metadata: metadata,
       defaultMin: min,
       defaultMax: max,
       defaultStep: step,
@@ -88,8 +90,8 @@ export default {
   },
   asyncComputed: {
     color () {
-      if (!this.model.config.color && this.item && this.item.tags && this.item.tags.find(t => t.indexOf('habot:slider:color:') === 0)) {
-        return this.item.tags.find(t => t.indexOf('habot:slider:color:') === 0).split(':')[3]
+      if (!this.model.config.color && this.metadata && this.metadata.color) {
+        return this.$expr(this.metadata.color)
       }
       return this.$expr(this.model.config.color)
     },

@@ -16,7 +16,7 @@ export default {
   },
   methods: {
     onChange (val) {
-      this.$store.dispatch('items/sendCmd', { itemName: this.model.config.item, command: val })
+      this.$store.dispatch('items/sendCmd', { itemName: this.model.config.item, command: val, updateState: true })
     }
   },
   computed: {
@@ -26,7 +26,7 @@ export default {
     itemState: {
       get () {
         if (!this.model.config.item) return 'OFF'
-        let state = this.$store.getters['items/itemState'](this.model.config.item)
+        let state = this.$store.getters['items/itemState'](this.model.config.item, true) // use the raw value
         if (state === 'ON' || state === 'OFF') return state
         if (this.item.type === 'Dimmer' || (this.item.type === 'Color' && state.split(',').length === 1)) {
           return (parseFloat(state) > 0) ? 'ON' : 'OFF'

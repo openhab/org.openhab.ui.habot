@@ -11,12 +11,12 @@ package org.openhab.ui.habot.nlp.internal.skill;
 import java.util.Set;
 
 import org.eclipse.smarthome.core.items.Item;
-import org.eclipse.smarthome.core.items.ItemRegistry;
 import org.openhab.ui.habot.card.CardBuilder;
 import org.openhab.ui.habot.nlp.AbstractItemIntentInterpreter;
 import org.openhab.ui.habot.nlp.Intent;
 import org.openhab.ui.habot.nlp.IntentInterpretation;
 import org.openhab.ui.habot.nlp.Skill;
+import org.openhab.ui.habot.nlp.internal.ItemNamedAttributesResolver;
 import org.osgi.service.component.annotations.Reference;
 
 /**
@@ -68,11 +68,11 @@ public class HistoryHourlyGraphSkill extends AbstractItemIntentInterpreter {
     }
 
     @Reference
-    protected void setItemRegistry(ItemRegistry itemRegistry) {
-        this.itemRegistry = itemRegistry;
+    protected void setItemNamedAttributesResolver(ItemNamedAttributesResolver itemNamedAttributesResolver) {
+        this.itemNamedAttributesResolver = itemNamedAttributesResolver;
     }
 
-    protected void unsetItemRegistry(ItemRegistry itemRegistry) {
-        this.itemRegistry = null;
+    protected void unsetItemNamedAttributesResolver(ItemNamedAttributesResolver itemNamedAttributesResolver) {
+        this.itemNamedAttributesResolver = null;
     }
 }

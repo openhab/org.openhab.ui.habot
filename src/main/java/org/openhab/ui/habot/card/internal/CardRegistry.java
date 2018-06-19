@@ -57,6 +57,24 @@ public class CardRegistry extends AbstractRegistry<Card, String, CardProvider> {
         return filteredCards;
     }
 
+    /**
+     * Returns cards matching the specified object and/or location attribute(s)
+     *
+     * @param object optional object attribute
+     * @param location optional location attribute
+     * @return matching cards - if one of the 2 arguments is not or empty, matching cards do NOT have the attribute. If
+     *         both are provided, matching cards have both.
+     */
+    public Collection<Card> getCardMatchingAttributes(String object, String location) {
+        List<Card> filteredCards = new ArrayList<Card>();
+        for (Card card : getAll()) {
+            if (cardMatchesAttributes(card, object, location)) {
+                filteredCards.add(card);
+            }
+        }
+        return filteredCards;
+    }
+
     @Override
     public @NonNull Card add(@NonNull Card element) {
         // Remove old ephemeral cards
@@ -102,6 +120,13 @@ public class CardRegistry extends AbstractRegistry<Card, String, CardProvider> {
      */
     private boolean cardHasTags(Card card, Set<String> tags) {
         return (tags != null && card.getTags() != null && card.getTags().equals(tags));
+    }
+
+    private boolean cardMatchesAttributes(Card card, String object, String location) {
+        boolean objectMatches = (object == null || object.isEmpty()) ^ card.hasObjectAttribute(object);
+        boolean locationMatches = (location == null || location.isEmpty()) ^ card.hasLocationAttribute(location);
+
+        return objectMatches && locationMatches;
     }
 
     @Reference(cardinality = ReferenceCardinality.OPTIONAL, policy = ReferencePolicy.DYNAMIC)

@@ -247,10 +247,7 @@ export default {
         currentChat.finished = true
         currentChat.card = card
       } else if (notification.data && notification.data.tags) {
-        let objects = notification.data.tags.filter(t => t.indexOf('object:') === 0)
-        let locations = notification.data.tags.filter(t => t.indexOf('location:') === 0)
-        let cardCandidates = this.$store.getters['cards/tags'](objects, locations)
-        let matchingCards = cardCandidates.filter(c => c.tags.every(t => notification.data.tags.indexOf(t) >= 0))
+        let matchingCards = this.$store.getters['cards/tagged'](notification.data.tags)
 
         // if more than one match, tough luck, just take the first one
         if (matchingCards.length > 0) {
@@ -323,7 +320,7 @@ export default {
         }
 
         currentChat.intent = response.data.intent
-      }).catch(function (error) {
+      }).catch((error) => {
         let errormessage = (error.response && error.response.data && error.response.data.error && error.response.data.error.message) ? error.response.data.error.message
           : (error.response && error.response.statusText) ? error.response.statusText : error.message
 
@@ -334,9 +331,12 @@ export default {
           avatar: 'statics/icons/icon-192x192.png',
           bgColor: 'negative',
           textColor: 'white',
-          stamp: date.formatDate(new Date(), 'HH:mm')
+          stamp: date.formatDate(new Date(), 'HH:mm'),
+          finished: true
         })
 
+        this.busy = false
+        this.thinking = false
         if (this.$q.platform.is.mobile) {
           setTimeout(this.$refs.input.blur)
         } else {
@@ -370,9 +370,10 @@ export default {
         this.stickToBottom = true
       }
       if (!this.stickToBottom) return
-      var appEl = document.getElementById('q-app')
-      appEl.scrollTop = appEl.scrollHeight
+      // var appEl = document.getElementById('q-app')
+      // appEl.scrollTop = appEl.scrollHeight
       document.body.scrollTop = document.body.scrollHeight
+      document.documentElement.scrollTop = document.documentElement.scrollHeight
     },
 
     startSpeech () {

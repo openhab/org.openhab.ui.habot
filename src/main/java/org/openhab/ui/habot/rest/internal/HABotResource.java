@@ -11,6 +11,9 @@ package org.openhab.ui.habot.rest.internal;
 import java.security.InvalidParameterException;
 import java.util.Collection;
 import java.util.Locale;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.Consumes;
@@ -38,7 +41,9 @@ import org.eclipse.smarthome.io.rest.RESTResource;
 import org.openhab.ui.habot.card.Card;
 import org.openhab.ui.habot.card.internal.CardRegistry;
 import org.openhab.ui.habot.nlp.ChatReply;
+import org.openhab.ui.habot.nlp.ItemNamedAttribute;
 import org.openhab.ui.habot.nlp.internal.AnswerFormatter;
+import org.openhab.ui.habot.nlp.internal.ItemNamedAttributesResolver;
 import org.openhab.ui.habot.nlp.internal.OpenNLPInterpreter;
 import org.openhab.ui.habot.notification.internal.NotificationService;
 import org.openhab.ui.habot.notification.internal.webpush.Subscription;
@@ -54,6 +59,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import javafx.util.Pair;
 
 /**
  * This class describes the /habot resource of the REST API.
@@ -78,6 +84,8 @@ public class HABotResource implements RESTResource {
     private NotificationService notificationService;
 
     private CardRegistry cardRegistry;
+
+    private ItemNamedAttributesResolver itemNamedAttributesResolver;
 
     @Reference
     public void setVoiceManager(VoiceManager voiceManager) {
@@ -113,6 +121,15 @@ public class HABotResource implements RESTResource {
 
     public void unsetCardRegistry(CardRegistry cardRegistry) {
         this.cardRegistry = null;
+    }
+
+    @Reference
+    protected void setItemNamedAttributesResolver(ItemNamedAttributesResolver itemNamedAttributesResolver) {
+        this.itemNamedAttributesResolver = itemNamedAttributesResolver;
+    }
+
+    protected void unsetItemNamedAttributesResolver(ItemNamedAttributesResolver itemNamedAttributesResolver) {
+        this.itemNamedAttributesResolver = null;
     }
 
     public static final String PATH_HABOT = "habot";
@@ -159,6 +176,27 @@ public class HABotResource implements RESTResource {
         ChatReply reply = hli.reply(locale, query);
 
         return Response.ok(reply).build();
+    }
+
+    @GET
+    @RolesAllowed({ Role.USER, Role.ADMIN })
+    @Path("/attributes")
+    @Consumes(MediaType.TEXT_PLAIN)
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Gets all item named attributes.")
+    @ApiResponses(value = { @ApiResponse(code = 200, message = "OK", response = ChatReply.class),
+            @ApiResponse(code = 500, message = "An interpretation error occured") })
+    public Response getAttributes(
+            @HeaderParam(HttpHeaders.ACCEPT_LANGUAGE) @ApiParam(value = "language") String language) throws Exception {
+        final Locale locale = (this.localeProvider != null) ? this.localeProvider.getLocale()
+                : LocaleUtil.getLocale(language);
+
+        this.itemNamedAttributesResolver.setLocale(locale);
+        Stream<Pair<String, Set<ItemNamedAttribute>>> attributes = this.itemNamedAttributesResolver
+                .getAllItemNamedAttributes().entrySet().stream()
+                .map(entry -> new Pair<String, Set<ItemNamedAttribute>>(entry.getKey().getName(), entry.getValue()));
+
+        return Response.ok(attributes.collect(Collectors.toMap(Pair::getKey, Pair::getValue))).build();
     }
 
     @POST

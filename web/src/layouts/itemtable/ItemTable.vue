@@ -9,7 +9,7 @@
         icon="arrow_back"
       />
       <q-toolbar-title>
-        Item tags review
+        Item attributes review
       </q-toolbar-title>
     </q-toolbar>
 
@@ -41,14 +41,13 @@
           @click="props.toggleFullscreen"
         />
       </template>
-      <q-td slot="body-cell-tags" slot-scope="props" :props="props">
-        <q-chip small color="secondary" v-for="tag in props.value" :key="tag" class="q-mr-sm">{{ tag }}</q-chip>
-      </q-td>
-      <q-td slot="body-cell-inheritedTags" slot-scope="props" :props="props">
-        <q-chip small color="secondary" style="opacity: 0.7" v-for="tag in props.value" :key="tag" class="q-mr-sm">{{ tag }}</q-chip>
-      </q-td>
-      <q-td slot="body-cell-groups" slot-scope="props" :props="props">
-        <q-chip small color="green" v-for="group in props.value" :key="group" class="q-mr-sm">{{ group }}</q-chip>
+      <q-td slot="body-cell-attributes" slot-scope="props" :props="props">
+        <q-chip small dense :color="attribute.source === 'TAG' ? 'secondary' : 'tertiary'"
+          :style="{ opacity: attribute.inherited ? 0.4 : 1 }"
+          v-for="attribute in props.value"
+          :key="attribute" class="q-mr-sm">
+            <q-icon :name="attribute.type === 'location' ? 'mdi-map-marker-outline' : 'mdi-cube-outline'" /> {{ attribute.value }}
+        </q-chip>
       </q-td>
     </q-table>
   </q-modal-layout>
@@ -71,50 +70,28 @@ export default {
         { name: 'name', field: 'name', label: 'Name', align: 'left', sortable: true, required: true },
         { name: 'type', field: 'type', label: 'Type', align: 'center', sortable: true },
         { name: 'label', field: 'label', label: 'Label', align: 'left', sortable: true },
-        { name: 'groups', field: 'groupNames', label: 'Groups', align: 'left', sortable: true },
-        { name: 'tags', field: 'tags', label: 'Direct Tags', align: 'left', sortable: true, required: true },
-        { name: 'inheritedTags', field: 'inheritedTags', label: 'Inherited Tags', align: 'left', sortable: true, required: true }
+        { name: 'attributes', field: 'attributes', label: 'Attributes', sortable: true }
       ],
       items: [],
       filter: '',
-      visibleColumns: ['name', 'type', 'label', 'groups', 'tags'],
+      visibleColumns: ['name', 'type', 'label', 'attributes'],
       selected: []
     }
   },
   methods: {
-    addInheritedTags (item, taglist, leaf) {
-      if (!leaf) {
-        for (var tag of item.tags) {
-          if (tag.startsWith('object:') || tag.startsWith('location:')) {
-            taglist.push(tag)
-          }
-        }
-      }
-      for (var groupName of item.groupNames) {
-        let group = this.$store.state.items.map[groupName]
-        if (group) {
-          this.addInheritedTags(group, taglist)
-        } else {
-          console.warn(`Cannot find ${item.name} parent group: ${groupName}!`)
-        }
-      }
-    },
     processItems () {
-      let items = extend(true, [], this.$store.state.items.items).map(i => {
-        let ret = {
-          name: i.name,
-          type: i.type,
-          label: i.label,
-          groupNames: i.groupNames,
-          tags: i.tags
-        }
-
-        let inheritedTags = []
-        this.addInheritedTags(i, inheritedTags, true)
-        ret.inheritedTags = inheritedTags
-        return ret
+      this.$http.get('/rest/habot/attributes').then((response) => {
+        let items = extend(true, [], this.$store.state.items.items).map(i => {
+          let ret = {
+            name: i.name,
+            type: i.type,
+            label: i.label,
+            attributes: response.data[i.name]
+          }
+          return ret
+        })
+        this.items = items
       })
-      this.items = items
     }
   },
   created () {

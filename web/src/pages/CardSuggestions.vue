@@ -1,20 +1,19 @@
 <template>
-  <q-pull-to-refresh :handler="computeSuggestions">
+  <!-- <q-pull-to-refresh :handler="computeSuggestions"> -->
     <div class="row">
       <div class="hb-cards">
         <component :is="'HbCard'" :model="card" menu="deck" v-for="card in cards" :key="card.uid"></component>
       </div>
       <div v-if="cards.length === 0" class="fit text-center q-pt-xl q-pl-lg q-pr-lg text-grey">
         <h4 class="q-display-1">No suggestions at this time</h4>
-        <p>Edit cards from the
-        <q-btn flat icon="dashboard" @click="$router.push('/cards/deck')" style="margin-top: -1px" label="Card deck" />
-        and add criteria in the designer to make them appear here when relevant.</p>
+        <p>Edit stored cards and add criteria in the designer to make them appear here when relevant.</p>
+        <q-btn flat icon="dashboard" @click="$router.push('/cards/deck')" style="margin-top: -1px;" label="Card deck" />
       </div>
       <div class="full-width q-ma-lg text-center">
         <q-btn outline color="secondary" @click="computeSuggestions()" icon="refresh">Refresh suggestions</q-btn>
       </div>
     </div>
-  </q-pull-to-refresh>
+  <!-- </q-pull-to-refresh> -->
 </template>
 
 <style lang="stylus">

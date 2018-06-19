@@ -17,7 +17,7 @@ export const initialLoad = (context) => {
   console.log('Fetching initial state of all items...')
 
   return new Promise((resolve, reject) => {
-    axios.get('/rest/items').then((resp) => {
+    axios.get('/rest/items?metadata=habot').then((resp) => {
       context.commit('updateAll', resp.data)
       context.commit('setReady')
       resolve()

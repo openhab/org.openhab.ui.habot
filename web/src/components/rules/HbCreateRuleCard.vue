@@ -89,7 +89,7 @@
         <q-input v-model="actionNotifyMessage" />
       </q-field>
       <q-field v-if="actionNotify.indexOf('webpush') >= 0" icon="label_outline" label="Tags" orientation="vertical"
-        helper="Optional. The first card matching these tags will be shown when clicking the notification.">
+        helper="Optional. The first card matching these tags will be shown when opening the notification.">
         <q-select
           multiple chips secondary
           color="secondary"
@@ -161,13 +161,11 @@ export default {
           stamp: item.type
         }
       }),
-      tags: this.$store.getters['cards/objectSet']
-        .concat(this.$store.getters['cards/locationSet'])
+      tags: this.$store.getters['cards/tagSet']
         .map((t) => {
           return {
             value: t,
-            label: t.split(':')[1],
-            stamp: t.split(':')[0]
+            label: t
           }
         })
     }
