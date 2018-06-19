@@ -10,10 +10,10 @@ package org.openhab.ui.habot.rest.internal;
 
 import java.security.InvalidParameterException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.Consumes;
@@ -59,7 +59,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import javafx.util.Pair;
 
 /**
  * This class describes the /habot resource of the REST API.
@@ -192,11 +191,11 @@ public class HABotResource implements RESTResource {
                 : LocaleUtil.getLocale(language);
 
         this.itemNamedAttributesResolver.setLocale(locale);
-        Stream<Pair<String, Set<ItemNamedAttribute>>> attributes = this.itemNamedAttributesResolver
-                .getAllItemNamedAttributes().entrySet().stream()
-                .map(entry -> new Pair<String, Set<ItemNamedAttribute>>(entry.getKey().getName(), entry.getValue()));
+        Map<String, Set<ItemNamedAttribute>> attributesByItemName = new HashMap<String, Set<ItemNamedAttribute>>();
+        this.itemNamedAttributesResolver.getAllItemNamedAttributes().entrySet().stream()
+                .forEach(entry -> attributesByItemName.put(entry.getKey().getName(), entry.getValue()));
 
-        return Response.ok(attributes.collect(Collectors.toMap(Pair::getKey, Pair::getValue))).build();
+        return Response.ok(attributesByItemName).build();
     }
 
     @POST
