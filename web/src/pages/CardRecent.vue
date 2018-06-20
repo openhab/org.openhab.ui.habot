@@ -12,7 +12,7 @@
   </div>
   <q-timeline v-else class="recent-cards">
     <q-timeline-entry v-for="card in cards" :key="card.uid"
-      :subtitle="new Date(card.timestamp) | moment('from')" class="recent-card">
+      :subtitle="timeAgo(new Date(card.timestamp))" class="recent-card">
       <hb-card :model="card" menu="recent" @forgotten="cardForgotten" />
     </q-timeline-entry>
   </q-timeline>
@@ -47,6 +47,8 @@
 </style>
 
 <script>
+import distanceInWordsToNow from 'date-fns/distance_in_words_to_now'
+
 import HbCard from 'components/HbCard.vue'
 
 export default {
@@ -67,6 +69,9 @@ export default {
           this.cards = resp.data
         }
       })
+    },
+    timeAgo (date) {
+      return distanceInWordsToNow(date, { includeSeconds: true, addSuffix: true })
     },
     cardForgotten (uid) {
       let card = this.cards.find((card) => card.uid === uid)

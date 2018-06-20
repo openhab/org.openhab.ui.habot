@@ -125,9 +125,7 @@ const today = new Date()
 
 export default {
   components: {
-    'chart': () => import(
-      /* webpackChunkName: 'chart' */
-      'components/charts/Chart.vue') // lazy load the component with its dependencies (echart)
+    'chart': () => import('components/charts/Chart.vue')
   },
   props: ['model'],
   data () {

@@ -7,8 +7,7 @@ module.exports = function (ctx) {
   return {
     plugins: [
       'axios',
-      'jexl',
-      'moment'
+      'jexl'
     ],
     css: [
       'app.styl'
@@ -21,16 +20,13 @@ module.exports = function (ctx) {
       // 'fontawesome'
     ],
     supportIE: false,
-    vendor: {
-      add: ['node_modules/event-source-polyfill/src/eventsource.min.js'],
-      remove: []
-    },
     build: {
       scopeHoisting: true,
-      vueRouterMode: 'hash',
+      vueRouterMode: 'history',
+      publicPath: '/habot/',
       devtool: 'source-map',
-      gzip: true,
-      analyze: false,
+      gzip: { minRatio: 0 },
+      // analyze: true,
       // extractCSS: false,
       // useNotifier: false,
       extendWebpack (cfg) {
@@ -42,31 +38,32 @@ module.exports = function (ctx) {
         })
 
         // console.log(JSON.stringify(cfg, null, 2))
-        if (cfg.output) cfg.output.chunkFilename = 'js/[name].[chunkhash].js'
+        // if (cfg.output) cfg.output.chunkFilename = 'js/[name].[chunkhash].js'
+        cfg.output.chunkFilename = cfg.output.chunkFilename.replace('[id]', '[name]-[id]')
+
+        cfg.optimization.splitChunks.cacheGroups['echarts'] = {
+          test: /echarts|zrender/,
+          name: 'charts',
+          chunks: 'all',
+          priority: 1000
+        }
+        cfg.optimization.splitChunks.cacheGroups['moment'] = {
+          test: /moment/,
+          name: 'moment',
+          chunks: 'all',
+          priority: 999
+        }
 
         // Adding importScripts to the sw-precache plugin config
         for (let plugin of cfg.plugins) {
           if (plugin.options && plugin.options.uglifyOptions) {
             plugin.options.uglifyOptions.mangle = { reserved: ['self'] }
           }
-          if (plugin.options && plugin.options.cacheId) {
-            // console.log('Adding importScripts to ' + JSON.stringify(plugin.options))
-            plugin.options.importScripts = ['sw-webpush.js']
-            // fix wrong path separator when building on Windows
-            plugin.options.stripPrefix = plugin.options.stripPrefix.replace('\\', '/')
-          }
 
           if (plugin.definitions && plugin.definitions['process.env']) {
             plugin.definitions['process.env']['BUILD_TIMESTAMP'] = Date.now().toString()
           }
         }
-
-        cfg.plugins.push(new CopyWebpackPlugin([
-          {
-            from: path.resolve(__dirname, 'src-pwa/sw-webpush.js'),
-            to: '.'
-          }
-        ]))
       }
     },
     devServer: {
@@ -174,7 +171,11 @@ module.exports = function (ctx) {
       'fadeOut'
     ],
     pwa: {
-      cacheExt: 'js,html,css,ttf,eot,otf,woff,woff2,json,svg,gif,jpg,jpeg,png,wav,ogg,webm,flac,aac,mp4,mp3',
+      workboxPluginMode: 'InjectManifest',
+      workboxOptions: {
+        importWorkboxFrom: 'local'
+      },
+      // cacheExt: 'js,html,css,ttf,eot,otf,woff,woff2,json,svg,gif,jpg,jpeg,png,wav,ogg,webm,flac,aac,mp4,mp3',
       manifest: {
         name: 'HABot',
         short_name: 'HABot',
@@ -182,10 +183,10 @@ module.exports = function (ctx) {
         display: 'standalone',
         background_color: '#ffffff',
         theme_color: '#ff6600',
-        start_url: '/habot/index.html',
+        start_url: '/habot/',
         icons: [
           {
-            'src': 'statics/icons/icon-96x96.png',
+            'src': 'statics/icons/icon-72x72.png',
             'sizes': '72x72',
             'type': 'image/png'
           },
@@ -200,7 +201,7 @@ module.exports = function (ctx) {
             'type': 'image/png'
           },
           {
-            'src': 'statics/icons/icon-340x340.png',
+            'src': 'statics/icons/icon-384x384.png',
             'sizes': '384x384',
             'type': 'image/png'
           },

@@ -18,6 +18,8 @@ import javax.ws.rs.core.HttpHeaders;
 
 import org.osgi.service.http.HttpContext;
 import org.osgi.service.http.HttpService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An implementation of {@link HttpContext} which will handle the gzip-compressed assets.
@@ -25,8 +27,11 @@ import org.osgi.service.http.HttpService;
  * @author Yannick Schaus
  */
 public class HABotHttpContext implements HttpContext {
+    private final Logger logger = LoggerFactory.getLogger(HABotHttpContext.class);
 
     private HttpContext defaultHttpContext;
+    private String resourcesBase;
+    private boolean useGzipCompression;
 
     /**
      * Constructs an {@link HABotHttpContext} with will another {@link HttpContext} as a base.
@@ -34,16 +39,18 @@ public class HABotHttpContext implements HttpContext {
      * @param defaultHttpContext the base {@link HttpContext} - use {@link HttpService#createDefaultHttpContext()} to
      *            create a default one
      */
-    public HABotHttpContext(HttpContext defaultHttpContext) {
+    public HABotHttpContext(HttpContext defaultHttpContext, String resourcesBase, boolean useGzipCompression) {
         this.defaultHttpContext = defaultHttpContext;
+        this.resourcesBase = resourcesBase;
+        this.useGzipCompression = useGzipCompression;
     }
 
     @Override
     public boolean handleSecurity(HttpServletRequest request, HttpServletResponse response) throws IOException {
         // Add the Content-Encoding: gzip header to the response for selected resources
         // (Disclaimer: I know, this is not the intended purpose of this method...)
-        if (request.getRequestURI().endsWith(".css")
-                || (request.getRequestURI().endsWith(".js") && request.getRequestURI().contains("/js/"))) {
+        if (useGzipCompression && (request.getRequestURI().endsWith(".css")
+                || (request.getRequestURI().endsWith(".js") && request.getRequestURI().contains("/js/")))) {
             response.addHeader(HttpHeaders.CONTENT_ENCODING, "gzip");
         }
         return defaultHttpContext.handleSecurity(request, response);
@@ -51,15 +58,19 @@ public class HABotHttpContext implements HttpContext {
 
     @Override
     public URL getResource(String name) {
+        logger.debug("Requesting resource " + name);
         // Get the gzipped version for selected resources, built as static resources by webpack
         URL defaultResource = defaultHttpContext.getResource(name);
-        if (name.endsWith(".css") || (name.endsWith(".js") && name.contains("/js/"))) {
+        if (useGzipCompression && (name.endsWith(".css") || (name.endsWith(".js") && name.contains("/js/")))) {
             try {
                 return new URL(defaultResource.toString() + ".gz");
             } catch (MalformedURLException e) {
                 return defaultResource;
             }
         } else {
+            if (name.equals(resourcesBase) || name.equals(resourcesBase + "/") || !name.contains(".")) {
+                return defaultHttpContext.getResource(resourcesBase + "/index.html");
+            }
             return defaultResource;
         }
     }
