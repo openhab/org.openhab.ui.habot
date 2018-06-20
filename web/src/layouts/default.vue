@@ -29,7 +29,7 @@
         link
         inset-delimiter
       >
-        <q-item ripple to="/chat">
+        <q-item ripple to="/" exact>
           <q-item-side icon="chat" />
           <q-item-main label="Chat with HABot" />
         </q-item>

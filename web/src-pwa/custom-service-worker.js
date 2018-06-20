@@ -1,4 +1,22 @@
+/*
+ * This file (which will be your service worker)
+ * is picked up by the build system if BOTH conditions are met:
+ *  - You are building for production
+ *  - quasar.conf > pwa > workboxPluginMode is set to "InjectManifest"
+ */
+
 'use strict'
+
+workbox.core.setCacheNameDetails({prefix: "habot"});
+
+/**
+ * The workboxSW.precacheAndRoute() method efficiently caches and responds to
+ * requests for URLs in the manifest.
+ * See https://goo.gl/S9QRab
+ */
+self.__precacheManifest = [].concat(self.__precacheManifest || []);
+workbox.precaching.suppressWarnings();
+workbox.precaching.precacheAndRoute(self.__precacheManifest, {});
 
 /* eslint-env browser, serviceworker */
 
@@ -75,7 +93,7 @@ self.addEventListener('notificationclick', function (event) {
         actions: event.notification.actions,
         timestamp: event.notification.timestamp
       })
-      let url = 'index.html#/notification#' + btoa(encodeURIComponent(payload))
+      let url = '/habot/notification#' + btoa(encodeURIComponent(payload))
       if (clientList.length > 0) {
         for (let client of clientList) {
           client.navigate(url)

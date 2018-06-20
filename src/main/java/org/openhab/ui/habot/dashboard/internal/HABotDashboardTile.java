@@ -39,7 +39,7 @@ public class HABotDashboardTile implements DashboardTile {
 
     @Override
     public String getUrl() {
-        return "../habot/index.html";
+        return "../habot/";
     }
 
     @Override
@@ -53,6 +53,7 @@ public class HABotDashboardTile implements DashboardTile {
     }
 
     public static final String HABOT_ALIAS = "/habot";
+    public static final String RESOURCES_BASE = "web/dist/pwa-mat";
 
     private final Logger logger = LoggerFactory.getLogger(HABotDashboardTile.class);
 
@@ -62,12 +63,10 @@ public class HABotDashboardTile implements DashboardTile {
     protected void activate(Map<String, Object> configProps, BundleContext context) {
         try {
             Object useGzipCompression = configProps.get("useGzipCompression");
-            HttpContext httpContext = (useGzipCompression != null
-                    && Boolean.parseBoolean(useGzipCompression.toString()))
-                            ? new HABotHttpContext(httpService.createDefaultHttpContext())
-                            : null;
+            HttpContext httpContext = new HABotHttpContext(httpService.createDefaultHttpContext(), RESOURCES_BASE,
+                    (useGzipCompression != null && Boolean.parseBoolean(useGzipCompression.toString())));
 
-            httpService.registerResources(HABOT_ALIAS, "web/dist/pwa-mat", httpContext);
+            httpService.registerResources(HABOT_ALIAS, RESOURCES_BASE, httpContext);
             logger.info("Started HABot at " + HABOT_ALIAS);
         } catch (NamespaceException e) {
             logger.error("Error during HABot startup: {}", e.getMessage());
