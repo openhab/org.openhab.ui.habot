@@ -1,8 +1,3 @@
-// Configuration for your app
-var
-  path = require('path'),
-  CopyWebpackPlugin = require('copy-webpack-plugin')
-
 module.exports = function (ctx) {
   return {
     plugins: [
@@ -38,23 +33,23 @@ module.exports = function (ctx) {
         })
 
         // console.log(JSON.stringify(cfg, null, 2))
-        // if (cfg.output) cfg.output.chunkFilename = 'js/[name].[chunkhash].js'
-        cfg.output.chunkFilename = cfg.output.chunkFilename.replace('[id]', '[name]-[id]')
+        if (cfg.output) {
+          cfg.output.chunkFilename = cfg.output.chunkFilename.replace('[id]', '[name]-[id]')
 
-        cfg.optimization.splitChunks.cacheGroups['echarts'] = {
-          test: /echarts|zrender/,
-          name: 'charts',
-          chunks: 'all',
-          priority: 1000
-        }
-        cfg.optimization.splitChunks.cacheGroups['moment'] = {
-          test: /moment/,
-          name: 'moment',
-          chunks: 'all',
-          priority: 999
+          cfg.optimization.splitChunks.cacheGroups['echarts'] = {
+            test: /echarts|zrender/,
+            name: 'charts',
+            chunks: 'all',
+            priority: 1000
+          }
+          cfg.optimization.splitChunks.cacheGroups['moment'] = {
+            test: /moment/,
+            name: 'moment',
+            chunks: 'all',
+            priority: 999
+          }
         }
 
-        // Adding importScripts to the sw-precache plugin config
         for (let plugin of cfg.plugins) {
           if (plugin.options && plugin.options.uglifyOptions) {
             plugin.options.uglifyOptions.mangle = { reserved: ['self'] }
@@ -175,7 +170,6 @@ module.exports = function (ctx) {
       workboxOptions: {
         importWorkboxFrom: 'local'
       },
-      // cacheExt: 'js,html,css,ttf,eot,otf,woff,woff2,json,svg,gif,jpg,jpeg,png,wav,ogg,webm,flac,aac,mp4,mp3',
       manifest: {
         name: 'HABot',
         short_name: 'HABot',
