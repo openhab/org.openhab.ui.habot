@@ -370,10 +370,13 @@ export default {
         this.stickToBottom = true
       }
       if (!this.stickToBottom) return
-      // var appEl = document.getElementById('q-app')
-      // appEl.scrollTop = appEl.scrollHeight
-      document.body.scrollTop = document.body.scrollHeight
-      document.documentElement.scrollTop = document.documentElement.scrollHeight
+      if (this.$q.platform.is.android) {
+        var appEl = document.getElementById('q-app')
+        appEl.scrollTop = appEl.scrollHeight
+      } else {
+        document.body.scrollTop = document.body.scrollHeight
+        document.documentElement.scrollTop = document.documentElement.scrollHeight
+      }
     },
 
     startSpeech () {
