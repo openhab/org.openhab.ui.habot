@@ -38,26 +38,45 @@ A table of named attributes for each item can be displayed by selecting the "Vie
 Named attributes can be added to items in several ways:
 
 1. Using tags from the Eclipse SmartHome [semantic tag library](https://github.com/eclipse/smarthome/wiki/Semantic-Tag-Library). Examples of those tags include `object:Camera`, `property:Temperature`, `purpose:Heating` or `location:FirstFloor`. If a semantic tag is applied on an item, HABot will translate it into one of several named attributes (including synonyms and plurals) for you using an internal dictionary, available in 3 languages. Semantic tags can be added on items through .items files, or they may be set automatically by bindings or other means in the future. Multiple tags, even of the same type (for instance both `location:GroundFloor` and `location:Kitchen`), are allowed on a item.
+```
+Group  LivingRoom    "Living Room"    ["location:LivingRoom"]
+Group  Windows       "Windows"        ["object:Window"]
+Switch Light_FF_Bed  "Bedroom Lights" ["purpose:Lighting"]
+```
 
 2. Using a comma-separated list of monikers in the item's `habot` [metadata namespace](http://www.eclipse.org/smarthome/documentation/concepts/items.html#item-metadata) - this is especially useful for very specific names or items not corresponding to any known concept in the semantic tag library. Monikers added though metadata in this way are supposed to be of the "object" ("what") type unless you specify `type="location"` in the additional metadata configuration:
+```
+Switch Bedside_Lamp     <light>     { habot="Bedside Lamp" }
+Group  FF_Child_Bedroom <bedroom>   { habot="Amelia's Room,Amy's Room" [ type="location" ] }
 
 ```
-Switch Bedside_Lamp <bedroom> ["purpose:Lighting"] { habot="Bedside Lamp" }
-Group FF_Child_Bedroom <bedroom> ["location:Bedroom"] { habot="Amelia's Room,Amy's Room" [ type="location" ] }
+
+3. If (and only if) no semantic tag was found on the item, HABot will look up the [category](https://www.eclipse.org/smarthome/documentation/concepts/categories.html) of the item, specified between brackets in the .items files (also used to specify a default [icon for the Classic set](https://www.openhab.org/docs/configuration/iconsets/classic/)), and will translate it to one or several named attributes in the same manner as semantic tags:
+```
+Group           gFF                  <firstfloor>
+Group           Lights               <light>
+Number          Outside_Temperature  <temperature>
+Rollershutter   Living_GF_Living     <rollershutter>
+```
+Tags are preferred over categories, but in many cases they will already be present in existing item configurations, and they may be assigned automatically by default when linking Channels to Items, which minimizes the needed changes to the configuration. If a category leads to incorrect named attributes on a item, you can prevent using it altogether with a special variable in the "habot" item metadata namespace:
+```
+// useCategory=false in the metadata means the "whitegood" category won't be used to derive attributes
+Group GF_Laundry "Laundry Room"     <whitegood> ["location:cellar"] { habot="Laundry Room" [ useCategory=false ] }
 ```
 
-In the "View item attributes" setting dialog, named attributes added through semantic tags appear as blue chips, while attributes added through the "habot" metadata namespace appear as dark gray chips. Both methods may be used on a single item.
+
+In the "View item attributes" setting dialog, named attributes added through categories appears as orange chips, while those added through semantic tags appear as blue chips, and those added through the "habot" metadata namespace appear as dark gray chips.
 
 #### Group inheritance principle
 
-To avoid adding the same attributes individually to similar items one by one, either via tags or metadata, HABot will by default consider that a semantic tag or metadata specified on a Group item applies implicitely to all direct or indirect members of the group too. This is shown on the "View item attributes" setting dialog: attributes inherited from a parent group are shown in a faded color:
+To avoid adding the same attributes individually to similar items one by one, HABot will by default consider that attributes added to Group items, whether through a semantic tag, the group category, or metadata, applies implicitely to all direct or indirect members of the group too. This is shown on the "View item attributes" setting dialog: attributes inherited from a parent group are shown in a faded color:
 
-![Attributes review example](https://i.imgur.com/Uf7FHiO.png)
+![Attributes review example](https://i.imgur.com/ymCmGmb.png)
 
 You can however prevent this behavior for a specific group, and for tags only, with a special property in the item's "habot" metadata namespace configuration:
 
 ```
-Group GF_Kitchen "Kitchen Beacon" ["object:room"] { habot="" [ inheritTags=false ] }
+Group GF_Kitchen "Kitchen Beacon" ["object:room"] { habot="" [ inheritAttributes=false ] }
 ```
 
 Attributes added though metadata are always inherited to group members.
@@ -65,30 +84,30 @@ Attributes added though metadata are always inherited to group members.
 #### Complete example
 
 ```
-Group gFF           "First Floor"   <firstfloor> ["location:FirstFloor"]
-Group gGF           "Ground Floor"  <groundfloor> ["location:GroundFloor"]
-Group gC            "Cellar"        <cellar> ["location:Cellar"]
-Group Garden        "Garden"        <garden> ["location:Garden"]
+Group gFF           "First Floor"   <firstfloor>
+Group gGF           "Ground Floor"  <groundfloor>
+Group gC            "Cellar"        <cellar>
+Group Garden        "Garden"        <garden>
 
-Group GF_Living     "Living Room"   <video>     (gGF) ["location:LivingRoom"]
-Group GF_Kitchen    "Kitchen"       <kitchen>   (gGF) ["location:Kitchen"]
+Group GF_Living     "Living Room"   <video>     (gGF) ["location:LivingRoom"] { habot="Family Room" [ useCategory=false ]}
+Group GF_Kitchen    "Kitchen"       <kitchen>   (gGF)
 Group GF_Toilet     "Toilet"        <bath>      (gGF) ["location:Toilet"]
-Group GF_Corridor   "Corridor"      <corridor>  (gGF) ["location:Corridor"]
+Group GF_Corridor   "Corridor"      <corridor>  (gGF)
 
-Group FF_Bath       "Bathroom"      <bath>      (gFF) ["location:Bathroom"]
-Group FF_Office     "Office"        <office>    (gFF) ["location:Office"]
+Group FF_Bath       "Bathroom"      <bath>      (gFF)
+Group FF_Office     "Office"        <office>    (gFF)
 
 Group FF_Son        "Oliver's Room" <boy_1>     (gFF) ["location:Bedroom"] { habot="Oli's Room,Oliver's Room" [ type="location" ] }
 Group FF_Daughter   "Amelia's Room" <girl_1>    (gFF) ["location:Bedroom"] { habot="Amy's Room,Amelia's Room" [ type="location" ] }
-Group FF_Bed        "Bedroom"       <bedroom>   (gFF) ["location:Bedroom"] { habot="Master bedroom" [ type="location" ] }
-Group FF_Corridor   "Corridor"      <corridor>  (gFF) ["location:Corridor"]
+Group FF_Bed        "Bedroom"       <bedroom>   (gFF) { habot="Master Bedroom, Parents' Room" [ type="location" ] }
+Group FF_Corridor   "Corridor"      <corridor>  (gFF)
 
-Group:Switch:OR(ON, OFF)        Lights      "All Lights [(%d)]"     ["purpose:Lighting"]
-Group:Switch:OR(ON, OFF)        Heating     "No. of Active Heatings [(%d)]"     <heating>   ["purpose:Heating"]
-Group:Number:AVG                Temperature "Avg. Room Temperature [%.1f °C]"   <temperature>   (Status)    ["property:temperature"]
+Group:Switch:OR(ON, OFF)        Lights      "All Lights [(%d)]"     <light>
+Group:Switch:OR(ON, OFF)        Heating     "No. of Active Heatings [(%d)]"     <heating>
+Group:Number:AVG                Temperature "Avg. Room Temperature [%.1f °C]"   <temperature>
 Group:Contact:OR(OPEN, CLOSED)  Windows     "Open windows [(%d)]"               <contact>   ["object:Window"]
 
-Dimmer Light_GF_Living_Table        "Table"     (GF_Living, Lights)
+Dimmer Light_GF_Living_Table        "Table"         (GF_Living, Lights)
 Switch Light_GF_Corridor_Ceiling    "Ceiling"       (GF_Corridor, Lights)
 Switch Light_GF_Kitchen_Ceiling     "Ceiling"       (GF_Kitchen, Lights)
 Switch Light_GF_Kitchen_Table       "Table"         (GF_Kitchen, Lights)
@@ -118,7 +137,7 @@ Number Temperature_FF_Bed       "Temperature [%.1f °C]" <temperature>   (Temper
 
 ...
 
-Contact Window_GF_Frontdoor     "Frontdoor [MAP(en.map):%s]"        (GF_Corridor, Windows) ["object:FrontDoor"]
+Contact Window_GF_Frontdoor     "Frontdoor [MAP(en.map):%s]"        <frontdoor> (GF_Corridor, Windows)
 Contact Window_GF_Kitchen       "Kitchen [MAP(en.map):%s]"          (GF_Kitchen, Windows)
 Contact Window_GF_Living        "Terrace door [MAP(en.map):%s]"     (GF_Living, Windows)
 Contact Window_GF_Toilet        "Toilet [MAP(en.map):%s]"           (GF_Toilet, Windows)
@@ -126,7 +145,7 @@ Contact Window_GF_Toilet        "Toilet [MAP(en.map):%s]"           (GF_Toilet, 
 Contact Window_FF_Bath          "Bath [MAP(en.map):%s]"             (FF_Bath, Windows)
 Contact Window_FF_Bed           "Bedroom [MAP(en.map):%s]"          (FF_Bed, Windows)
 Contact Window_FF_Office_Window "Office Window [MAP(en.map):%s]"    (FF_Office, Windows)
-Contact Window_FF_Office_Door   "Balcony Door [MAP(en.map):%s]"     (FF_Office, Windows) ["object:Door"] { habot="Balcony" }
+Contact Window_FF_Office_Door   "Balcony Door [MAP(en.map):%s]"     <door>          (FF_Office, Windows) { habot="Balcony Door" }
 
 ```
 
@@ -138,7 +157,7 @@ Cards in HABot also have objects and locations attributes, and **if there is alr
 
 The Card Designer will eventually be properly documented but is quite easy to use; just remember the card is a tree of _components_, each having its own configuration and sometimes also _slots_, which are placeholders in certain locations within the component where other subcomponents may be added. Certain components can only be added to certain slots; when selecting a slot, the designer only lets you add components valid for that slot. The HABot components are mostly mapped to their [Quasar framework counterparts](http://quasar-framework.org/components/), often with the same property names, so their accepted values might also be found in the Quasar docs.
 
-Some components also accept expressions in certain config properties, for instance the HbCard title and subtitle, or the HbListItem label and sublabel. Simply prefix the expression with '=' (example: `=2+3` or `="Desired temperature: " + items.Temperature_Setpoing.state + "°C"` and it will be considered an expression/formula rather than literal text - much like Excel! The [jexl](https://github.com/TomFrost/Jexl) library (not Apache JEXL) is used to evaluate expressions. Stay tuned for a more complete description of what they can do. You can for instance a ternary operator to change a color property dynamically: `=items.Alarm.state == 'ON' > "red" : "green"`
+Some components also accept expressions in certain config properties, for instance the HbCard title and subtitle, or the HbListItem label and sublabel. Simply prefix the expression with '=' (example: `=2+3` or `="Desired temperature: " + items.Temperature_Setpoing.state + "°C"` and it will be considered an expression/formula rather than literal text - much like Excel! The [jexl](https://github.com/TomFrost/Jexl) library (not Apache JEXL) is used to evaluate expressions. Stay tuned for a more complete description of what they can do. You can for instance use a ternary operator to change a color property dynamically: `=items.Alarm.state == 'ON' > "red" : "green"`
 
 Finally, certain rendering features for specific items can be specified though the item's tags and metadata:
 

@@ -42,7 +42,7 @@
         />
       </template>
       <q-td slot="body-cell-attributes" slot-scope="props" :props="props">
-        <q-chip small dense :color="attribute.source === 'TAG' ? 'secondary' : 'tertiary'"
+        <q-chip small dense :color="attribute.source === 'CATEGORY' ? 'primary' : attribute.source === 'TAG' ? 'secondary' : 'tertiary'"
           :style="{ opacity: attribute.inherited ? 0.4 : 1 }"
           v-for="attribute in props.value"
           :key="attribute" class="q-mr-sm">
