@@ -157,7 +157,7 @@ public class Card extends Component implements Identifiable<String> {
     }
 
     /**
-     * Returns whether the card should be ignored during the chat sessions, even if its tags match an @link
+     * Returns whether the card should be ignored during the chat sessions, even if its attributes match an @link
      * {@link Intent}'s extracted entities.
      *
      * @return true if the card is not be considered during chat sessions, false (default) otherwise
@@ -167,7 +167,7 @@ public class Card extends Component implements Identifiable<String> {
     }
 
     /**
-     * Specifies whether the card should be ignored during the chat sessions, even if its tags match an @link
+     * Specifies whether the card should be ignored during the chat sessions, even if its attributes match an @link
      * {@link Intent}'s extracted entities.
      *
      * @param notReuseableInChat true if the card is not be considered during chat sessions, false (default) otherwise

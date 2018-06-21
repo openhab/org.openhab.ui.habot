@@ -8,6 +8,8 @@
  */
 package org.openhab.ui.habot.nlp.internal;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
@@ -46,6 +48,11 @@ import org.slf4j.LoggerFactory;
 public class ItemNamedAttributesResolver {
 
     private final Logger logger = LoggerFactory.getLogger(ItemNamedAttributesResolver.class);
+
+    private static final Set<String> LOCATION_CATEGORIES = Collections
+            .unmodifiableSet(new HashSet<>(Arrays.asList("cellar", "livingroom", "kitchen", "bedroom", "bath", "toilet",
+                    "closet", "dressing", "office", "groundfloor", "firstfloor", "attic", "corridor", "garage",
+                    "garden", "terrace", "greenhouse", "pantry")));
 
     private ItemRegistry itemRegistry;
     private MetadataRegistry metadataRegistry;
@@ -137,27 +144,49 @@ public class ItemNamedAttributesResolver {
         for (Item item : itemRegistry.getAll()) {
 
             Metadata metadata = metadataRegistry.get(new MetadataKey("habot", item.getName()));
+            boolean inheritAttributes = true;
+            if (metadata != null && metadata.getConfiguration().containsKey("inheritAttributes")) {
+                inheritAttributes = (boolean) metadata.getConfiguration().get("inheritAttributes");
+            }
 
             // look for semantic tags
-            for (String tag : item.getTags()) {
-                if (tag.split(":").length != 2) {
-                    continue;
+            if (!item.getTags().isEmpty()) {
+                for (String tag : item.getTags()) {
+                    if (tag.split(":").length != 2) {
+                        continue;
+                    }
+
+                    String type = tag.startsWith("location:") ? "location" : "object";
+
+                    String semanticTagNamedAttributes;
+                    try {
+                        semanticTagNamedAttributes = this.tagAttributes.getString(tag.split(":")[1].toLowerCase());
+                        for (String tagAttribute : semanticTagNamedAttributes.split(",")) {
+                            addItemAttribute(item, type, tagAttribute.trim(), AttributeSource.TAG, false,
+                                    inheritAttributes);
+                        }
+                    } catch (MissingResourceException e) {
+                        logger.debug("No named attributes found for tag {}", tag);
+                    }
                 }
-
-                String type = tag.startsWith("location:") ? "location" : "object";
-
-                String semanticTagNamedAttributes;
-                try {
-                    boolean inheritTag = true;
-                    if (metadata != null && metadata.getConfiguration().containsKey("inheritTags")) {
-                        inheritTag = (boolean) metadata.getConfiguration().get("inheritTags");
+            } else {
+                if (item.getCategory() != null) {
+                    if (metadata != null && metadata.getConfiguration().containsKey("useCategory")
+                            && metadata.getConfiguration().get("useCategory").equals(false)) {
+                        logger.info("Ignoring category for item {}", item.getName());
+                    } else {
+                        String category = item.getCategory().toLowerCase();
+                        String categoryNamedAttributes;
+                        try {
+                            categoryNamedAttributes = this.tagAttributes.getString(category);
+                            for (String tagAttribute : categoryNamedAttributes.split(",")) {
+                                addItemAttribute(item, LOCATION_CATEGORIES.contains(category) ? "location" : "object",
+                                        tagAttribute.trim(), AttributeSource.CATEGORY, false, inheritAttributes);
+                            }
+                        } catch (MissingResourceException e) {
+                            logger.debug("No named attributes found for category {}", category);
+                        }
                     }
-                    semanticTagNamedAttributes = this.tagAttributes.getString(tag.split(":")[1].toLowerCase());
-                    for (String tagAttribute : semanticTagNamedAttributes.split(",")) {
-                        addItemAttribute(item, type, tagAttribute.trim(), AttributeSource.TAG, false, inheritTag);
-                    }
-                } catch (MissingResourceException e) {
-                    logger.debug("No named attributes found for tag {}", tag);
                 }
             }
 
@@ -173,8 +202,7 @@ public class ItemNamedAttributesResolver {
                 }
 
                 for (String moniker : metadata.getValue().split(",")) {
-                    // monikers in metadata ARE inherited
-                    addItemAttribute(item, type, moniker.trim(), AttributeSource.METADATA, false, true);
+                    addItemAttribute(item, type, moniker.trim(), AttributeSource.METADATA, false, inheritAttributes);
                 }
             }
         }

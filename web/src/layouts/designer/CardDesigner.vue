@@ -130,7 +130,7 @@
                 </q-chips-input>
               </q-field>
               <q-field label="notReuseableInChat" class="config-field" orientation="vertical"
-                      helper="The card will not be considered when chatting with HABot even if the tags match">
+                      helper="The card will not be considered when chatting with HABot even if the attributes match">
                 <config-bool v-model="selectedNode.component.notReuseableInChat" color="secondary"></config-bool>
               </q-field>
             </div>

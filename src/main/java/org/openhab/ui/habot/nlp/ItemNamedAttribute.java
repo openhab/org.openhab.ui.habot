@@ -17,6 +17,7 @@ package org.openhab.ui.habot.nlp;
  */
 public class ItemNamedAttribute {
     public enum AttributeSource {
+        CATEGORY,
         TAG,
         METADATA
     }

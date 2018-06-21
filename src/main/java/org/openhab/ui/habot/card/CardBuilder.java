@@ -316,13 +316,17 @@ public class CardBuilder {
     }
 
     /**
-     * Checks whether a Group item is included in the provided collection and returns it
+     * Tries to find a Group item to act as the card title.
+     * It should contain all other members of the provided collection except itself
      *
-     * @param items
-     * @return the first Group item in the collection
+     * @param items the group of matching items including an eventual GroupItem to find
+     * @return an optional group eligible for the card's title, or null if none was found
      */
     private GroupItem getMatchingGroup(Collection<Item> items) {
-        Optional<Item> groupItem = items.stream().filter(i -> i instanceof GroupItem).findFirst();
+        Optional<Item> groupItem = items.stream().filter(i -> i instanceof GroupItem)
+                .filter(g -> items.stream().allMatch(i -> i.getName().equals(g.getName())
+                        || ((GroupItem) g).getAllMembers().stream().anyMatch(i2 -> i2.getName().contains(i.getName()))))
+                .findFirst();
         return groupItem.isPresent() ? (GroupItem) groupItem.get() : null;
     }
 
