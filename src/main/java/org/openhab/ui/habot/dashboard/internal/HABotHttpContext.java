@@ -49,8 +49,7 @@ public class HABotHttpContext implements HttpContext {
     public boolean handleSecurity(HttpServletRequest request, HttpServletResponse response) throws IOException {
         // Add the Content-Encoding: gzip header to the response for selected resources
         // (Disclaimer: I know, this is not the intended purpose of this method...)
-        if (useGzipCompression && (request.getRequestURI().endsWith(".css")
-                || (request.getRequestURI().endsWith(".js") && request.getRequestURI().contains("/js/")))) {
+        if (useGzipCompression && isGzipVersionAvailable(request.getRequestURI())) {
             response.addHeader(HttpHeaders.CONTENT_ENCODING, "gzip");
         }
         return defaultHttpContext.handleSecurity(request, response);
@@ -61,7 +60,7 @@ public class HABotHttpContext implements HttpContext {
         logger.debug("Requesting resource " + name);
         // Get the gzipped version for selected resources, built as static resources by webpack
         URL defaultResource = defaultHttpContext.getResource(name);
-        if (useGzipCompression && (name.endsWith(".css") || (name.endsWith(".js") && name.contains("/js/")))) {
+        if (useGzipCompression && isGzipVersionAvailable(name)) {
             try {
                 return new URL(defaultResource.toString() + ".gz");
             } catch (MalformedURLException e) {
@@ -78,6 +77,20 @@ public class HABotHttpContext implements HttpContext {
     @Override
     public String getMimeType(String name) {
         return defaultHttpContext.getMimeType(name);
+    }
+
+    private boolean isGzipVersionAvailable(String name) {
+        if (!name.endsWith(".css") && !name.contains("/js/")) {
+            return false;
+        }
+        if ((name.contains("app.") || name.contains("vendor.")) || name.contains("charts.")) {
+            return true;
+        }
+        if (name.contains("0.") && name.endsWith(".css")) {
+            return true;
+        }
+
+        return false;
     }
 
 }

@@ -20,7 +20,7 @@ module.exports = function (ctx) {
       vueRouterMode: 'history',
       publicPath: '/habot/',
       devtool: 'source-map',
-      gzip: { minRatio: 0 },
+      gzip: { minRatio: 10 },
       // analyze: true,
       // extractCSS: false,
       // useNotifier: false,
