@@ -33,10 +33,9 @@ import javax.ws.rs.core.Response.Status;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.smarthome.core.auth.Role;
-import org.eclipse.smarthome.core.i18n.LocaleProvider;
 import org.eclipse.smarthome.core.voice.VoiceManager;
 import org.eclipse.smarthome.core.voice.text.InterpretationException;
-import org.eclipse.smarthome.io.rest.LocaleUtil;
+import org.eclipse.smarthome.io.rest.LocaleService;
 import org.eclipse.smarthome.io.rest.RESTResource;
 import org.openhab.ui.habot.card.Card;
 import org.openhab.ui.habot.card.internal.CardRegistry;
@@ -49,6 +48,8 @@ import org.openhab.ui.habot.notification.internal.NotificationService;
 import org.openhab.ui.habot.notification.internal.webpush.Subscription;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,9 +67,10 @@ import io.swagger.annotations.ApiResponses;
  * @author Yannick Schaus - Initial contribution
  *
  */
+@Component
+@RolesAllowed({ Role.USER, Role.ADMIN })
 @Path(HABotResource.PATH_HABOT)
 @Api(HABotResource.PATH_HABOT)
-@Component(service = RESTResource.class, immediate = true)
 public class HABotResource implements RESTResource {
 
     private final Logger logger = LoggerFactory.getLogger(HABotResource.class);
@@ -78,7 +80,7 @@ public class HABotResource implements RESTResource {
 
     private VoiceManager voiceManager;
 
-    private LocaleProvider localeProvider;
+    private LocaleService localeService;
 
     private NotificationService notificationService;
 
@@ -86,7 +88,7 @@ public class HABotResource implements RESTResource {
 
     private ItemNamedAttributesResolver itemNamedAttributesResolver;
 
-    @Reference
+    @Reference(cardinality = ReferenceCardinality.OPTIONAL, policy = ReferencePolicy.DYNAMIC)
     public void setVoiceManager(VoiceManager voiceManager) {
         this.voiceManager = voiceManager;
     }
@@ -95,16 +97,16 @@ public class HABotResource implements RESTResource {
         this.voiceManager = null;
     }
 
-    @Reference
-    public void setLocaleProvider(LocaleProvider localeProvider) {
-        this.localeProvider = localeProvider;
+    @Reference(cardinality = ReferenceCardinality.OPTIONAL, policy = ReferencePolicy.DYNAMIC)
+    public void setLocaleService(LocaleService localeService) {
+        this.localeService = localeService;
     }
 
-    public void unsetLocaleProvider(LocaleProvider localeProvider) {
-        this.localeProvider = null;
+    public void unsetLocaleService(LocaleService localeService) {
+        this.localeService = null;
     }
 
-    @Reference
+    @Reference(cardinality = ReferenceCardinality.OPTIONAL, policy = ReferencePolicy.DYNAMIC)
     public void setNotificationService(NotificationService notificationService) {
         this.notificationService = notificationService;
     }
@@ -113,7 +115,7 @@ public class HABotResource implements RESTResource {
         this.notificationService = null;
     }
 
-    @Reference
+    @Reference(cardinality = ReferenceCardinality.OPTIONAL, policy = ReferencePolicy.DYNAMIC)
     public void setCardRegistry(CardRegistry cardRegistry) {
         this.cardRegistry = cardRegistry;
     }
@@ -122,7 +124,7 @@ public class HABotResource implements RESTResource {
         this.cardRegistry = null;
     }
 
-    @Reference
+    @Reference(cardinality = ReferenceCardinality.OPTIONAL, policy = ReferencePolicy.DYNAMIC)
     protected void setItemNamedAttributesResolver(ItemNamedAttributesResolver itemNamedAttributesResolver) {
         this.itemNamedAttributesResolver = itemNamedAttributesResolver;
     }
@@ -142,8 +144,7 @@ public class HABotResource implements RESTResource {
             @ApiResponse(code = 500, message = "There is no support for the configured language") })
     public Response greet(
             @HeaderParam(HttpHeaders.ACCEPT_LANGUAGE) @ApiParam(value = "language (will use the default if omitted)") String language) {
-        final Locale locale = (this.localeProvider != null) ? this.localeProvider.getLocale()
-                : LocaleUtil.getLocale(language);
+        final Locale locale = this.localeService.getLocale(language);
 
         AnswerFormatter answerFormatter = new AnswerFormatter(locale);
 
@@ -164,8 +165,7 @@ public class HABotResource implements RESTResource {
             @ApiResponse(code = 500, message = "An interpretation error occured") })
     public Response chat(@HeaderParam(HttpHeaders.ACCEPT_LANGUAGE) @ApiParam(value = "language") String language,
             @ApiParam(value = "human language query", required = true) String query) throws Exception {
-        final Locale locale = (this.localeProvider != null) ? this.localeProvider.getLocale()
-                : LocaleUtil.getLocale(language);
+        final Locale locale = this.localeService.getLocale(language);
 
         // interpret
         OpenNLPInterpreter hli = (OpenNLPInterpreter) voiceManager.getHLI(OPENNLP_HLI);
@@ -187,8 +187,7 @@ public class HABotResource implements RESTResource {
             @ApiResponse(code = 500, message = "An interpretation error occured") })
     public Response getAttributes(
             @HeaderParam(HttpHeaders.ACCEPT_LANGUAGE) @ApiParam(value = "language") String language) throws Exception {
-        final Locale locale = (this.localeProvider != null) ? this.localeProvider.getLocale()
-                : LocaleUtil.getLocale(language);
+        final Locale locale = this.localeService.getLocale(language);
 
         this.itemNamedAttributesResolver.setLocale(locale);
         Map<String, Set<ItemNamedAttribute>> attributesByItemName = new HashMap<String, Set<ItemNamedAttribute>>();
@@ -417,5 +416,11 @@ public class HABotResource implements RESTResource {
     public Response unsetCardBookmarkCompat(
             @PathParam("cardUID") @ApiParam(value = "cardUID", required = true) @NonNull String cardUID) {
         return this.unsetCardBookmark(cardUID);
+    }
+
+    @Override
+    public boolean isSatisfied() {
+        return localeService != null && voiceManager != null && notificationService != null && cardRegistry != null
+                && itemNamedAttributesResolver != null;
     }
 }

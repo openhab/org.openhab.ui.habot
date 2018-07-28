@@ -33,7 +33,7 @@ public class WebPushNotificationModuleHandlerFactory extends BaseModuleHandlerFa
     private NotificationService notificationService;
 
     @Override
-    public @Nullable Collection<@NonNull String> getTypes() {
+    public Collection<@NonNull String> getTypes() {
         return Collections.singleton(WebPushNotificationActionHandler.TYPE_ID);
     }
 
