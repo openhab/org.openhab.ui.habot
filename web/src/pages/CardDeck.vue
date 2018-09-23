@@ -3,8 +3,12 @@
     <div class="row bg-grey-2 shadow-2">
       <q-checkbox class="multiple-toggle" color="secondary" v-model="multiple" unchecked-icon="done" checked-icon="done_all"></q-checkbox>
       <div :class="['filters', 'row', (multiple) ? 'multiple' : 'single']">
-        <q-select :multiple="multiple" filter clearable chips color="secondary" v-model="objects" class="col-sm-6" :options="objectSet" float-label="Objects"></q-select>
-        <q-select :multiple="multiple" filter clearable chips color="secondary" v-model="locations" class="col-sm-6" :options="locationSet" float-label="Locations"></q-select>
+        <div class="col-12 col-sm-6">
+          <q-select :multiple="multiple" :filter="!$q.platform.is.mobile" clearable chips color="secondary" v-model="objects" :options="objectSet" float-label="Objects"></q-select>
+        </div>
+        <div class="col-12 col-sm-6">
+          <q-select :multiple="multiple" :filter="!$q.platform.is.mobile" clearable chips color="secondary" v-model="locations" :options="locationSet" float-label="Locations"></q-select>
+        </div>
       </div>
       <!-- <q-search v-model="search" color="none" class="col"></q-search> -->
     </div>
@@ -67,7 +71,7 @@
   width 100%
   margin-right 50px
   &.single .q-if-inner
-    min-height 43px !important
+    //min-height 43px !important
     // margin-top 2px !important
     // margin-left 3px !important
     .q-input-target
@@ -76,9 +80,9 @@
     // margin-bottom 3px !important  padding 10px
   .q-select
     .q-if-label
-        top 21px
+        //top 21px
         &.q-if-label-above
-          transform scale(0.75) translate(0, -28px)
+          //transform scale(0.75) translate(0, -28px)
 
 .hb-cards
   padding 10px

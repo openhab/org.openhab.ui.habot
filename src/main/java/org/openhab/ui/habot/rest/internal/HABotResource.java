@@ -144,7 +144,7 @@ public class HABotResource implements RESTResource {
             @ApiResponse(code = 500, message = "There is no support for the configured language") })
     public Response greet(
             @HeaderParam(HttpHeaders.ACCEPT_LANGUAGE) @ApiParam(value = "language (will use the default if omitted)") String language) {
-        final Locale locale = this.localeService.getLocale(language);
+        final Locale locale = this.localeService.getLocale(null);
 
         AnswerFormatter answerFormatter = new AnswerFormatter(locale);
 
@@ -165,7 +165,7 @@ public class HABotResource implements RESTResource {
             @ApiResponse(code = 500, message = "An interpretation error occured") })
     public Response chat(@HeaderParam(HttpHeaders.ACCEPT_LANGUAGE) @ApiParam(value = "language") String language,
             @ApiParam(value = "human language query", required = true) String query) throws Exception {
-        final Locale locale = this.localeService.getLocale(language);
+        final Locale locale = this.localeService.getLocale(null);
 
         // interpret
         OpenNLPInterpreter hli = (OpenNLPInterpreter) voiceManager.getHLI(OPENNLP_HLI);
@@ -187,7 +187,7 @@ public class HABotResource implements RESTResource {
             @ApiResponse(code = 500, message = "An interpretation error occured") })
     public Response getAttributes(
             @HeaderParam(HttpHeaders.ACCEPT_LANGUAGE) @ApiParam(value = "language") String language) throws Exception {
-        final Locale locale = this.localeService.getLocale(language);
+        final Locale locale = this.localeService.getLocale(null);
 
         this.itemNamedAttributesResolver.setLocale(locale);
         Map<String, Set<ItemNamedAttribute>> attributesByItemName = new HashMap<String, Set<ItemNamedAttribute>>();

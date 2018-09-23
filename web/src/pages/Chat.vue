@@ -173,7 +173,7 @@ export default {
     this.$http.get('/rest/habot/greet').then((response) => {
       vm.$store.commit('setLang', response.data.language)
       if (!vm.language) {
-        vm.language = 'en'
+        vm.language = response.data.language || 'en'
       }
       vm.busy = false
       vm.chats[0].messages.push({

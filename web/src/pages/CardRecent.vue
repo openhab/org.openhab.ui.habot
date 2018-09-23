@@ -10,17 +10,23 @@
       <q-btn flat icon="chat" @click="$router.push('/chat')" style="margin-top: -1px" label="Chat with HABot" />
     </div>
   </div>
-  <q-timeline v-else class="recent-cards">
-    <q-timeline-entry v-for="card in cards" :key="card.uid"
-      :subtitle="timeAgo(new Date(card.timestamp))" class="recent-card">
-      <hb-card :model="card" menu="recent" @forgotten="cardForgotten" />
-    </q-timeline-entry>
-  </q-timeline>
+  <div v-else class="recent-cards-container">
+    <q-timeline class="recent-cards">
+      <q-timeline-entry v-for="card in cards" :key="card.uid"
+        :subtitle="timeAgo(new Date(card.timestamp))" class="recent-card">
+        <hb-card :model="card" menu="recent" @forgotten="cardForgotten" />
+      </q-timeline-entry>
+    </q-timeline>
+  </div>
 </template>
 
 <style lang="stylus">
 @import '~variables'
 
+.recent-cards-container
+  display flex
+  flex-direction column
+  align-items center
 .recent-cards
   @media (max-width $breakpoint-xs-max)
     .q-card
@@ -35,11 +41,13 @@
     width calc(100% - 20px)
     margin-left 20px
   @media (min-width $breakpoint-md-min)
-    margin-left -100px
-    width calc(100% + 50px)
+    //margin-left -100px
+    width 500px
+    //width calc(100% - 48px)
   @media (min-width $breakpoint-lg-min)
-    margin-left -250px
-    width calc(100% + 150px)
+    //margin-left -250px
+    width 500px
+    //width calc(100% - 48px)
     .q-card
       // margin-left -2.2rem
       // margin-right -2.2rem

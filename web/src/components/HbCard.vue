@@ -69,15 +69,20 @@
 
 <style lang="stylus">
 @import '~variables'
-.hb-card .q-card-title-extra
-  align-self baseline
+.hb-card
+  .q-card-title
+    line-height 1.5rem
+  .q-card-title-extra
+    align-self baseline
 .corner-bookmark
   position absolute
   top: -20px
   opacity 0.2
 @media (min-width $breakpoint-sm-min)
-  .bigger
-    width 384px !important
+  .hb-card
+    width 300px !important
+    &.bigger
+      width 384px !important
 </style>
 
 <script>

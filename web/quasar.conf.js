@@ -20,10 +20,31 @@ module.exports = function (ctx) {
       vueRouterMode: 'history',
       publicPath: '/habot/',
       devtool: 'source-map',
-      gzip: { minRatio: 10 },
+      // gzip: true,
       // analyze: true,
       // extractCSS: false,
       // useNotifier: false,
+      chainWebpack (chain, { isServer, isClient }) {
+        chain.plugin('manifest-crossorigin').use(class ManifestCrossoriginPlugin {
+          apply (compiler) {
+            compiler.hooks.compilation.tap('webpack-plugin-manifest-crossorigin', compilation => {
+              compilation.hooks.htmlWebpackPluginAlterAssetTags.tapAsync('webpack-plugin-manifest-crossorigin', (data, callback) => {
+                if (data.head) {
+                  for (let tag of data.head) {
+                    // console.log('adding crossorigin to ' + JSON.stringify(tag))
+                    if (tag.tagName === 'link' && tag.attributes.rel === 'manifest') {
+                      tag.attributes.crossorigin = 'use-credentials'
+                      // console.log('done!' + JSON.stringify(tag))
+                    }
+                  }
+                }
+                // finally, inform Webpack that we're ready
+                callback(null, data)
+              })
+            })
+          }
+        }, [])
+      },
       extendWebpack (cfg) {
         cfg.module.rules.push({
           enforce: 'pre',
