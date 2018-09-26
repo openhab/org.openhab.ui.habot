@@ -25,25 +25,26 @@ module.exports = function (ctx) {
       // extractCSS: false,
       // useNotifier: false,
       chainWebpack (chain, { isServer, isClient }) {
-        chain.plugin('manifest-crossorigin').use(class ManifestCrossoriginPlugin {
-          apply (compiler) {
-            compiler.hooks.compilation.tap('webpack-plugin-manifest-crossorigin', compilation => {
-              compilation.hooks.htmlWebpackPluginAlterAssetTags.tapAsync('webpack-plugin-manifest-crossorigin', (data, callback) => {
-                if (data.head) {
-                  for (let tag of data.head) {
-                    // console.log('adding crossorigin to ' + JSON.stringify(tag))
-                    if (tag.tagName === 'link' && tag.attributes.rel === 'manifest') {
-                      tag.attributes.crossorigin = 'use-credentials'
-                      // console.log('done!' + JSON.stringify(tag))
+        if (!ctx.dev) {
+          chain.plugin('manifest-crossorigin').use(class ManifestCrossoriginPlugin {
+            apply (compiler) {
+              compiler.hooks.compilation.tap('webpack-plugin-manifest-crossorigin', compilation => {
+                compilation.hooks.htmlWebpackPluginAlterAssetTags.tapAsync('webpack-plugin-manifest-crossorigin', (data, callback) => {
+                  if (data.head) {
+                    for (let tag of data.head) {
+                      if (tag.tagName === 'link' && tag.attributes.rel === 'manifest') {
+                        tag.attributes.crossorigin = 'use-credentials'
+                        tag.attributes.href = '/habot/statics/manifest.json'
+                      }
                     }
                   }
-                }
-                // finally, inform Webpack that we're ready
-                callback(null, data)
+                  // finally, inform Webpack that we're ready
+                  callback(null, data)
+                })
               })
-            })
-          }
-        }, [])
+            }
+          }, [])
+        }
       },
       extendWebpack (cfg) {
         cfg.module.rules.push({
@@ -188,7 +189,7 @@ module.exports = function (ctx) {
     ],
     pwa: {
       workboxPluginMode: 'InjectManifest',
-      workboxOptions: {
+      workboxOptions: (ctx.dev) ? {} : {
         importWorkboxFrom: 'local'
       },
       manifest: {

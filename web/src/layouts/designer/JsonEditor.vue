@@ -15,9 +15,9 @@
       <q-btn flat round icon="done" @click="validate(false)"><q-tooltip :disable="$q.platform.has.touch">Validate</q-tooltip></q-btn>
       <q-btn flat round icon="system_update_alt" @click="update"><q-tooltip :disable="$q.platform.has.touch">Update</q-tooltip></q-btn>
     </q-toolbar>
-    <q-scroll-area class="fit q-pt-md q-px-sm">
+    <div class="fit">
       <q-input class="json-editor" v-model="json" hide-underline type="textarea" />
-    </q-scroll-area>
+    </div>
     <q-modal position="top" v-model="showValidationReport" :content-css="{padding: '20px'}">
       <div class="q-display-1 q-mb-md">Validation Report</div>
       <p>
