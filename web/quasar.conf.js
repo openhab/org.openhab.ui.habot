@@ -175,6 +175,7 @@ module.exports = function (ctx) {
         'CloseOverlay'
       ],
       plugins: [
+        'ActionSheet',
         'Notify',
         'Dialog',
         'Loading',

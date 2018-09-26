@@ -166,19 +166,22 @@ export default {
         ? ['h', '4h', '8h', '12h', 'D', '2D', '3D', 'W', '2W', 'M', '2M', '4M', 'Y']
         : ['M', '2M', '4M', 'Y']
 
-      this.$q.dialog({
-        title: 'Predefined period',
-        message: 'Select the period to reset the date range',
-        color: 'secondary',
-        ok: true,
-        cancel: true,
-        options: {
-          type: 'radio',
-          model: 'period',
-          items: options.map(o => { return { label: o, value: o } })
-        }
+      this.$q.actionSheet({
+        title: 'Reset to predefined period',
+        grid: true,
+        actions: options.map(o => {
+          return {
+            label: o,
+            icon: (o.indexOf('h') >= 0) ? 'mdi-clock-outline'
+              : (o.indexOf('W') >= 0) ? 'mdi-calendar-week'
+                : (o.indexOf('D') > 0) ? 'mdi-calendar-range'
+                  : (o.indexOf('D') === 0) ? 'mdi-calendar-today'
+                    : (o.indexOf('M') === 0) ? 'mdi-calendar'
+                      : 'mdi-calendar-multiple'
+          }
+        })
       }).then((val) => {
-        this.resetChartPeriod(val)
+        this.resetChartPeriod(val.label)
       })
     },
     resetChartPeriod (period) {
