@@ -71,6 +71,8 @@
   .q-if-label
     width 100%
     cursor pointer !important
+  .q-input-chips
+    margin-bottom -3px
 
 .hb-cards
   padding 10px
