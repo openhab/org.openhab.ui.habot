@@ -21,8 +21,8 @@ import org.openhab.ui.habot.card.CardBuilder;
 import org.openhab.ui.habot.nlp.AbstractItemIntentInterpreter;
 import org.openhab.ui.habot.nlp.Intent;
 import org.openhab.ui.habot.nlp.IntentInterpretation;
+import org.openhab.ui.habot.nlp.ItemResolver;
 import org.openhab.ui.habot.nlp.Skill;
-import org.openhab.ui.habot.nlp.internal.ItemNamedAttributesResolver;
 import org.osgi.service.component.annotations.Reference;
 
 import com.google.common.collect.ImmutableMap;
@@ -95,12 +95,12 @@ public class DeactivateObjectSkill extends AbstractItemIntentInterpreter {
     }
 
     @Reference
-    protected void setItemNamedAttributesResolver(ItemNamedAttributesResolver itemNamedAttributesResolver) {
-        this.itemNamedAttributesResolver = itemNamedAttributesResolver;
+    protected void setItemResolver(ItemResolver itemResolver) {
+        this.itemResolver = itemResolver;
     }
 
-    protected void unsetItemNamedAttributesResolver(ItemNamedAttributesResolver itemNamedAttributesResolver) {
-        this.itemNamedAttributesResolver = null;
+    protected void unsetItemResolver(ItemResolver itemResolver) {
+        this.itemResolver = null;
     }
 
     @Reference

@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 import org.eclipse.smarthome.core.items.Item;
 import org.eclipse.smarthome.core.items.ItemRegistry;
 import org.openhab.ui.habot.nlp.internal.AnswerFormatter;
-import org.openhab.ui.habot.nlp.internal.ItemNamedAttributesResolver;
+import org.openhab.ui.habot.nlp.internal.NamedAttributesItemResolver;
 
 /**
  * An abstract implmentation of a {@link Skill} with helper methods to find items matching an {@link Intent}
@@ -28,24 +28,25 @@ import org.openhab.ui.habot.nlp.internal.ItemNamedAttributesResolver;
 public abstract class AbstractItemIntentInterpreter implements Skill {
 
     protected ItemRegistry itemRegistry;
-    protected ItemNamedAttributesResolver itemNamedAttributesResolver;
+    protected ItemResolver itemResolver;
     protected AnswerFormatter answerFormatter;
 
     /**
      * Returns the items matching the entities in the intent.
-     * It delegates this task to the {@link ItemNamedAttributesResolver} to find named attributes
+     * It delegates this task to the {@link NamedAttributesItemResolver} to find named attributes
      * matching the entities.
      *
      * The resulting items should match the object AND the location if both are provided.
      *
      * @param intent the {@link Intent} containing the entities to match to items' tags.
      * @return the set of matching items
+     * @throws UnsupportedLanguageException
      */
     protected Set<Item> findItems(Intent intent) {
         String object = intent.getEntities().get("object");
         String location = intent.getEntities().get("location");
 
-        return this.itemNamedAttributesResolver.getMatchingItems(object, location).collect(Collectors.toSet());
+        return this.itemResolver.getMatchingItems(object, location).collect(Collectors.toSet());
     }
 
     @Override

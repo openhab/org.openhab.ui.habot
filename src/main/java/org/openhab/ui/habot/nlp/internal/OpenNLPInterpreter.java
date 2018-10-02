@@ -8,7 +8,6 @@
  */
 package org.openhab.ui.habot.nlp.internal;
 
-import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -18,9 +17,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
-import org.apache.commons.io.IOUtils;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.smarthome.core.common.registry.RegistryChangeListener;
 import org.eclipse.smarthome.core.events.EventPublisher;
@@ -31,9 +28,8 @@ import org.eclipse.smarthome.core.voice.text.InterpretationException;
 import org.openhab.ui.habot.nlp.ChatReply;
 import org.openhab.ui.habot.nlp.Intent;
 import org.openhab.ui.habot.nlp.IntentInterpretation;
-import org.openhab.ui.habot.nlp.ItemNamedAttribute;
+import org.openhab.ui.habot.nlp.ItemResolver;
 import org.openhab.ui.habot.nlp.Skill;
-import org.openhab.ui.habot.nlp.UnsupportedLanguageException;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -61,7 +57,7 @@ public class OpenNLPInterpreter implements HumanLanguageInterpreter {
     private String tokenizerId = null;
 
     private ItemRegistry itemRegistry;
-    private ItemNamedAttributesResolver itemNamedAttributesResolver;
+    private ItemResolver itemResolver;
     private EventPublisher eventPublisher;
 
     private HashMap<String, Skill> skills = new HashMap<String, Skill>();
@@ -103,24 +99,6 @@ public class OpenNLPInterpreter implements HumanLanguageInterpreter {
         return reply.getAnswer();
     }
 
-    private InputStream getNameSamplesFromItems(Locale locale) throws UnsupportedLanguageException {
-        StringBuilder nameSamplesDoc = new StringBuilder();
-        itemNamedAttributesResolver.setLocale(locale);
-        Map<Item, Set<ItemNamedAttribute>> itemAttributes = itemNamedAttributesResolver.getAllItemNamedAttributes();
-
-        Stream<ItemNamedAttribute> attributes = itemAttributes.values().stream().flatMap(a -> a.stream());
-
-        attributes.forEach(attribute -> {
-            if (attribute.getType() == "location") {
-                nameSamplesDoc.append(String.format("<START:location> %s <END>%n", attribute.getValue()));
-            } else {
-                nameSamplesDoc.append(String.format("<START:object> %s <END>%n", attribute.getValue()));
-            }
-        });
-
-        return IOUtils.toInputStream(nameSamplesDoc.toString());
-    }
-
     /**
      * This variant of interpret() returns a more complete interpretation result.
      *
@@ -132,6 +110,7 @@ public class OpenNLPInterpreter implements HumanLanguageInterpreter {
     public ChatReply reply(Locale locale, String text) throws InterpretationException {
         if (!locale.equals(currentLocale) || intentTrainer == null) {
             try {
+                itemResolver.setLocale(currentLocale);
                 intentTrainer = new IntentTrainer(locale.getLanguage(),
                         skills.values().stream().sorted(new Comparator<Skill>() {
 
@@ -146,7 +125,7 @@ public class OpenNLPInterpreter implements HumanLanguageInterpreter {
                                 return o1.getIntentId().compareTo(o2.getIntentId());
                             }
 
-                        }).collect(Collectors.toList()), getNameSamplesFromItems(locale), this.tokenizerId);
+                        }).collect(Collectors.toList()), itemResolver.getNameSamples(), this.tokenizerId);
                 currentLocale = locale;
             } catch (Exception e) {
                 InterpretationException fe = new InterpretationException(
@@ -164,11 +143,11 @@ public class OpenNLPInterpreter implements HumanLanguageInterpreter {
         // it a "get-status" intent with this attribute as the corresponding entity.
         // This allows the user to query a named attribute quickly by simply stating it - and avoid a
         // misinterpretation by the categorizer.
-        if (this.itemNamedAttributesResolver.getMatchingItems(text, null).findAny().isPresent()) {
+        if (this.itemResolver.getMatchingItems(text, null).findAny().isPresent()) {
             intent = new Intent("get-status");
             intent.setEntities(new HashMap<String, String>());
             intent.getEntities().put("object", text.toLowerCase());
-        } else if (this.itemNamedAttributesResolver.getMatchingItems(null, text).findAny().isPresent()) {
+        } else if (this.itemResolver.getMatchingItems(null, text).findAny().isPresent()) {
             intent = new Intent("get-status");
             intent.setEntities(new HashMap<String, String>());
             intent.getEntities().put("location", text.toLowerCase());
@@ -230,12 +209,12 @@ public class OpenNLPInterpreter implements HumanLanguageInterpreter {
     }
 
     @Reference
-    protected void setItemNamedAttributesResolver(ItemNamedAttributesResolver itemNamedAttributesResolver) {
-        this.itemNamedAttributesResolver = itemNamedAttributesResolver;
+    protected void setItemResolver(ItemResolver itemResolver) {
+        this.itemResolver = itemResolver;
     }
 
-    protected void unsetItemNamedAttributesResolver(ItemNamedAttributesResolver itemNamedAttributesResolver) {
-        this.itemNamedAttributesResolver = null;
+    protected void unsetItemResolver(ItemResolver itemResolver) {
+        this.itemResolver = null;
     }
 
     @Reference
