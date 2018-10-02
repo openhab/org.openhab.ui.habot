@@ -20,7 +20,7 @@ import opennlp.tools.namefind.NameSample;
 /**
  * This interface is used to find items matching entities extracted from the
  * user natural language query: object - "what" and location - "where". It also acts as a supplemental source of @link
- * {@link NameSample} for the {@link IntentTrainer}
+ * {@link NameSample}s for the {@link IntentTrainer}
  *
  * @author Yannick Schaus
  */
@@ -28,21 +28,20 @@ public interface ItemResolver {
 
     /**
      * Sets the current locale.
-     * Attributes derived from semantic tags will use this locale.
-     * This will invalidate the attribute cache.
+     * The ItemResolver will receive object and location entities in that locale.
      *
      * @param locale
      */
     void setLocale(Locale locale) throws UnsupportedLanguageException;
 
     /**
-     * Returns items matching the provided object and locations in the
-     * current locale.
+     * Resolves items matching the provided object and/or location extracted from user's query using named-entity
+     * recognition in the current locale.
      * If a non-null object and a non-null location are provided,
      * items shall match both.
      *
-     * @param object the object to find
-     * @param location the location to find
+     * @param object the object extracted from the intent (or null)
+     * @param location the location extracted from the intent (or null)
      * @return a stream of matching items (groups included)
      */
     Stream<Item> getMatchingItems(String object, String location);
