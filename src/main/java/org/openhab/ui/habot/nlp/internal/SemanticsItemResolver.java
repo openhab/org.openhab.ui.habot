@@ -78,7 +78,8 @@ public class SemanticsItemResolver implements ItemResolver {
                         : SemanticsPredicates.isA(semanticTagType);
                 items = items.filter(ItemPredicates.hasLabel(object).or(hasSynonym(object)).or(predicate));
             } else {
-                return items.filter(ItemPredicates.hasLabel(object).or(hasSynonym(object)));
+                return items.filter(ItemPredicates.hasLabel(object).or(hasSynonym(object))
+                        .and(SemanticsPredicates.isLocation().negate()));
             }
         }
 
