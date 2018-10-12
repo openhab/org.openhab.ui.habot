@@ -10,6 +10,7 @@ package org.openhab.ui.habot.nlp.internal;
 
 import java.io.InputStream;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -71,12 +72,18 @@ public class SemanticsItemResolver implements ItemResolver {
         }
 
         if (object != null) {
-            Class<? extends Tag> semanticTagType = SemanticTags.getByLabelOrSynonym(object, currentLocale);
-            if (semanticTagType != null && !Location.class.isAssignableFrom(semanticTagType)) {
-                Predicate<Item> predicate = Property.class.isAssignableFrom(semanticTagType)
-                        ? SemanticsPredicates.relatesTo((Class<? extends Property>) semanticTagType)
-                        : SemanticsPredicates.isA(semanticTagType);
-                items = items.filter(ItemPredicates.hasLabel(object).or(hasSynonym(object)).or(predicate));
+            List<Class<? extends Tag>> semanticTagTypes = SemanticTags.getByLabelOrSynonym(object, currentLocale);
+            if (!semanticTagTypes.isEmpty()
+                    && semanticTagTypes.stream().noneMatch(t -> !Location.class.isAssignableFrom(t))) {
+                Predicate<Item> tagsPredicate = null;
+                for (Class<? extends Tag> tag : semanticTagTypes) {
+                    Predicate<Item> tagPredicate = Property.class.isAssignableFrom(tag)
+                            ? SemanticsPredicates.relatesTo((Class<? extends Property>) tag)
+                            : SemanticsPredicates.isA(tag);
+
+                    tagsPredicate = (tagsPredicate == null) ? tagPredicate : tagsPredicate.or(tagPredicate);
+                }
+                items = items.filter(ItemPredicates.hasLabel(object).or(hasSynonym(object)).or(tagsPredicate));
             } else {
                 return items.filter(ItemPredicates.hasLabel(object).or(hasSynonym(object))
                         .and(SemanticsPredicates.isLocation().negate()));
