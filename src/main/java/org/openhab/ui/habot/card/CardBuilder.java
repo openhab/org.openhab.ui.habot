@@ -278,7 +278,7 @@ public class CardBuilder {
         if (matchingNonGroupItems.get().count() == 1) {
             Item item = matchingNonGroupItems.get().findFirst().get();
             card.setTitle(item.getLabel());
-            card.setSubtitle(item.getName());
+            card.setSubtitle(period + " - " + item.getName());
         } else {
             GroupItem commonGroup = getMatchingGroup(matchedItems);
             if (commonGroup != null) {
@@ -294,9 +294,10 @@ public class CardBuilder {
                     card.addComponent("right", singleItemComponent);
                 }
             } else {
-                card.setTitle(String.join(", ", intent.getEntities().values()));
+                card.setTitle(intent.getEntities().entrySet().stream().filter(e -> !e.getKey().equals("period"))
+                        .map(e -> e.getValue()).collect(Collectors.joining(", ")));
             }
-            card.setSubtitle(matchingNonGroupItems.get().count() + " items"); // TODO: i18n
+            card.setSubtitle(period + " - " + matchingNonGroupItems.get().count() + " items"); // TODO: i18n
         }
 
         Component chart = new Component("HbChartImage");
