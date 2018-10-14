@@ -12,6 +12,7 @@ import java.io.InputStream;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.eclipse.smarthome.core.items.GroupItem;
 import org.eclipse.smarthome.core.items.Item;
 import org.eclipse.smarthome.core.items.ItemRegistry;
 import org.openhab.ui.habot.nlp.internal.AnswerFormatter;
@@ -46,7 +47,17 @@ public abstract class AbstractItemIntentInterpreter implements Skill {
         String object = intent.getEntities().get("object");
         String location = intent.getEntities().get("location");
 
-        return this.itemResolver.getMatchingItems(object, location).collect(Collectors.toSet());
+        Set<Item> items = this.itemResolver.getMatchingItems(object, location).collect(Collectors.toSet());
+
+        // expand group items
+        for (Item item : items) {
+            if (item instanceof GroupItem) {
+                GroupItem gItem = (GroupItem) item;
+                items.addAll(gItem.getMembers());
+            }
+        }
+
+        return items;
     }
 
     @Override
