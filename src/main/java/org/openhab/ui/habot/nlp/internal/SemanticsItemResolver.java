@@ -74,7 +74,7 @@ public class SemanticsItemResolver implements ItemResolver {
         if (object != null) {
             List<Class<? extends Tag>> semanticTagTypes = SemanticTags.getByLabelOrSynonym(object, currentLocale);
             if (!semanticTagTypes.isEmpty()
-                    && semanticTagTypes.stream().noneMatch(t -> !Location.class.isAssignableFrom(t))) {
+                    && semanticTagTypes.stream().noneMatch(t -> Location.class.isAssignableFrom(t))) {
                 Predicate<Item> tagsPredicate = null;
                 for (Class<? extends Tag> tag : semanticTagTypes) {
                     Predicate<Item> tagPredicate = Property.class.isAssignableFrom(tag)
