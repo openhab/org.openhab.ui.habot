@@ -113,6 +113,7 @@
   .q-icon
     position absolute
     right 0
+    width auto
 </style>
 
 <script>

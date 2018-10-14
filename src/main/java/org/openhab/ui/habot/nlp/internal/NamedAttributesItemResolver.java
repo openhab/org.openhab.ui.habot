@@ -29,8 +29,8 @@ import org.eclipse.smarthome.core.items.MetadataKey;
 import org.eclipse.smarthome.core.items.MetadataRegistry;
 import org.openhab.ui.habot.nlp.ItemNamedAttribute;
 import org.openhab.ui.habot.nlp.ItemNamedAttribute.AttributeSource;
+import org.openhab.ui.habot.nlp.ItemResolver;
 import org.openhab.ui.habot.nlp.UnsupportedLanguageException;
-import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,10 +44,10 @@ import org.slf4j.LoggerFactory;
  *
  * @author Yannick Schaus
  */
-@Component(service = ItemNamedAttributesResolver.class, immediate = true)
-public class ItemNamedAttributesResolver {
+// @Component(service = ItemResolver.class, immediate = true)
+public class NamedAttributesItemResolver implements ItemResolver {
 
-    private final Logger logger = LoggerFactory.getLogger(ItemNamedAttributesResolver.class);
+    private final Logger logger = LoggerFactory.getLogger(NamedAttributesItemResolver.class);
 
     private static final Set<String> LOCATION_CATEGORIES = Collections
             .unmodifiableSet(new HashSet<>(Arrays.asList("cellar", "livingroom", "kitchen", "bedroom", "bath", "toilet",
@@ -60,13 +60,12 @@ public class ItemNamedAttributesResolver {
     private Locale currentLocale = null;
     ResourceBundle tagAttributes;
 
-    /**
-     * Sets the current locale.
-     * Attributes derived from semantic tags will use this locale.
-     * This will invalidate the attribute cache.
+    /*
+     * (non-Javadoc)
      *
-     * @param locale
+     * @see org.openhab.ui.habot.nlp.internal.ItemResolver#setLocale(java.util.Locale)
      */
+    @Override
     public void setLocale(Locale locale) {
         if (!locale.equals(currentLocale)) {
             this.currentLocale = locale;
@@ -78,12 +77,12 @@ public class ItemNamedAttributesResolver {
         }
     }
 
-    /**
-     * Returns a map of all named attributes by item.
+    /*
+     * (non-Javadoc)
      *
-     * @return attributes mapped by item
-     * @throws UnsupportedLanguageException
+     * @see org.openhab.ui.habot.nlp.internal.ItemResolver#getAllItemNamedAttributes()
      */
+    @Override
     public Map<Item, Set<ItemNamedAttribute>> getAllItemNamedAttributes() throws UnsupportedLanguageException {
         if (currentLocale == null) {
             throw new UnsupportedLanguageException(currentLocale);
@@ -115,14 +114,12 @@ public class ItemNamedAttributesResolver {
         return itemAttributes.get(item);
     }
 
-    /**
-     * Returns items having attributes matching the provided object and locations.
-     * Both have to match if provided.
+    /*
+     * (non-Javadoc)
      *
-     * @param object the object to find in the attributes
-     * @param location the location to find in the attribute
-     * @return a stream of matching items (groups included)
+     * @see org.openhab.ui.habot.nlp.internal.ItemResolver#getMatchingItems(java.lang.String, java.lang.String)
      */
+    @Override
     public Stream<Item> getMatchingItems(String object, String location) {
         return itemAttributes.entrySet().stream().filter(entry -> {
             boolean objectMatch = false;
@@ -170,12 +167,13 @@ public class ItemNamedAttributesResolver {
                     }
                 }
             } else {
-                if (item.getCategory() != null) {
+                String category = item.getCategory();
+                if (category != null) {
                     if (metadata != null && metadata.getConfiguration().containsKey("useCategory")
                             && metadata.getConfiguration().get("useCategory").equals(false)) {
                         logger.info("Ignoring category for item {}", item.getName());
                     } else {
-                        String category = item.getCategory().toLowerCase();
+                        category = category.toLowerCase();
                         String categoryNamedAttributes;
                         try {
                             categoryNamedAttributes = this.tagAttributes.getString(category);

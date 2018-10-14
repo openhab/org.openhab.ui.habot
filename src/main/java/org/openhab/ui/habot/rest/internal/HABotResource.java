@@ -41,8 +41,8 @@ import org.openhab.ui.habot.card.Card;
 import org.openhab.ui.habot.card.internal.CardRegistry;
 import org.openhab.ui.habot.nlp.ChatReply;
 import org.openhab.ui.habot.nlp.ItemNamedAttribute;
+import org.openhab.ui.habot.nlp.ItemResolver;
 import org.openhab.ui.habot.nlp.internal.AnswerFormatter;
-import org.openhab.ui.habot.nlp.internal.ItemNamedAttributesResolver;
 import org.openhab.ui.habot.nlp.internal.OpenNLPInterpreter;
 import org.openhab.ui.habot.notification.internal.NotificationService;
 import org.openhab.ui.habot.notification.internal.webpush.Subscription;
@@ -86,7 +86,7 @@ public class HABotResource implements RESTResource {
 
     private CardRegistry cardRegistry;
 
-    private ItemNamedAttributesResolver itemNamedAttributesResolver;
+    private ItemResolver itemResolver;
 
     @Reference(cardinality = ReferenceCardinality.OPTIONAL, policy = ReferencePolicy.DYNAMIC)
     public void setVoiceManager(VoiceManager voiceManager) {
@@ -125,12 +125,12 @@ public class HABotResource implements RESTResource {
     }
 
     @Reference(cardinality = ReferenceCardinality.OPTIONAL, policy = ReferencePolicy.DYNAMIC)
-    protected void setItemNamedAttributesResolver(ItemNamedAttributesResolver itemNamedAttributesResolver) {
-        this.itemNamedAttributesResolver = itemNamedAttributesResolver;
+    protected void setItemNamedAttributesResolver(ItemResolver itemResolver) {
+        this.itemResolver = itemResolver;
     }
 
-    protected void unsetItemNamedAttributesResolver(ItemNamedAttributesResolver itemNamedAttributesResolver) {
-        this.itemNamedAttributesResolver = null;
+    protected void unsetItemNamedAttributesResolver(ItemResolver itemResolver) {
+        this.itemResolver = null;
     }
 
     public static final String PATH_HABOT = "habot";
@@ -184,14 +184,14 @@ public class HABotResource implements RESTResource {
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Gets all item named attributes.")
     @ApiResponses(value = { @ApiResponse(code = 200, message = "OK", response = ChatReply.class),
-            @ApiResponse(code = 500, message = "An interpretation error occured") })
+            @ApiResponse(code = 500, message = "An error occurred") })
     public Response getAttributes(
             @HeaderParam(HttpHeaders.ACCEPT_LANGUAGE) @ApiParam(value = "language") String language) throws Exception {
         final Locale locale = this.localeService.getLocale(null);
 
-        this.itemNamedAttributesResolver.setLocale(locale);
+        this.itemResolver.setLocale(locale);
         Map<String, Set<ItemNamedAttribute>> attributesByItemName = new HashMap<String, Set<ItemNamedAttribute>>();
-        this.itemNamedAttributesResolver.getAllItemNamedAttributes().entrySet().stream()
+        this.itemResolver.getAllItemNamedAttributes().entrySet().stream()
                 .forEach(entry -> attributesByItemName.put(entry.getKey().getName(), entry.getValue()));
 
         return Response.ok(attributesByItemName).build();
@@ -420,7 +420,6 @@ public class HABotResource implements RESTResource {
 
     @Override
     public boolean isSatisfied() {
-        return localeService != null && voiceManager != null && notificationService != null && cardRegistry != null
-                && itemNamedAttributesResolver != null;
+        return localeService != null && voiceManager != null && notificationService != null && cardRegistry != null;
     }
 }

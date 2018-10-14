@@ -149,7 +149,7 @@ export default {
         return this.$store.getters['cards/locationSet'].map((location) => {
           return {
             value: location,
-            label: location.replace('location:', ''),
+            label: location,
             stamp: '(' + this.$store.getters['cards/location'](location).length + ')'
           }
         })

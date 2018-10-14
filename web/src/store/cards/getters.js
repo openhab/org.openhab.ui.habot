@@ -39,7 +39,7 @@ export const object = (state) => (object) => {
 
 export const location = (state) => (location) => {
   if (!state.cards.length) return []
-  return state.cards.filter((card) => card.objects.indexOf(location) >= 0)
+  return state.cards.filter((card) => card.locations.indexOf(location) >= 0)
 }
 
 export const filter = (state) => (objects, locations) => {
