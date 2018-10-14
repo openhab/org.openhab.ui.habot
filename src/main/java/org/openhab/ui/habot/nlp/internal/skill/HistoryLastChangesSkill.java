@@ -53,6 +53,10 @@ public class HistoryLastChangesSkill extends AbstractItemIntentInterpreter {
         IntentInterpretation interpretation = new IntentInterpretation();
 
         Set<Item> matchedItems = findItems(intent);
+        if (intent.getEntities().isEmpty()) {
+            interpretation.setAnswer(answerFormatter.getRandomAnswer("general_failure"));
+            return interpretation;
+        }
         if (matchedItems == null || matchedItems.isEmpty()) {
             interpretation.setAnswer(answerFormatter.getRandomAnswer("answer_nothing_found"));
             interpretation.setHint(answerFormatter.getStandardTagHint(intent.getEntities()));
