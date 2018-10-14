@@ -110,7 +110,7 @@ public class OpenNLPInterpreter implements HumanLanguageInterpreter {
     public ChatReply reply(Locale locale, String text) throws InterpretationException {
         if (!locale.equals(currentLocale) || intentTrainer == null) {
             try {
-                itemResolver.setLocale(currentLocale);
+                itemResolver.setLocale(locale);
                 intentTrainer = new IntentTrainer(locale.getLanguage(),
                         skills.values().stream().sorted(new Comparator<Skill>() {
 
