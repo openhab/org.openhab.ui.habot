@@ -10,7 +10,10 @@ package org.openhab.ui.habot.rest.internal;
 
 import java.security.InvalidParameterException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.Consumes;
@@ -37,6 +40,8 @@ import org.eclipse.smarthome.io.rest.RESTResource;
 import org.openhab.ui.habot.card.Card;
 import org.openhab.ui.habot.card.internal.CardRegistry;
 import org.openhab.ui.habot.nlp.ChatReply;
+import org.openhab.ui.habot.nlp.ItemNamedAttribute;
+import org.openhab.ui.habot.nlp.ItemResolver;
 import org.openhab.ui.habot.nlp.internal.AnswerFormatter;
 import org.openhab.ui.habot.nlp.internal.OpenNLPInterpreter;
 import org.openhab.ui.habot.notification.internal.NotificationService;
@@ -81,7 +86,7 @@ public class HABotResource implements RESTResource {
 
     private CardRegistry cardRegistry;
 
-    // private NamedAttributesItemResolver namedAttributesItemResolver;
+    private ItemResolver itemResolver;
 
     @Reference(cardinality = ReferenceCardinality.OPTIONAL, policy = ReferencePolicy.DYNAMIC)
     public void setVoiceManager(VoiceManager voiceManager) {
@@ -119,14 +124,14 @@ public class HABotResource implements RESTResource {
         this.cardRegistry = null;
     }
 
-    // @Reference(cardinality = ReferenceCardinality.OPTIONAL, policy = ReferencePolicy.DYNAMIC)
-    // protected void setItemNamedAttributesResolver(NamedAttributesItemResolver namedAttributesItemResolver) {
-    // this.namedAttributesItemResolver = namedAttributesItemResolver;
-    // }
-    //
-    // protected void unsetItemNamedAttributesResolver(ItemResolver itemNamedAttributesResolver) {
-    // this.namedAttributesItemResolver = null;
-    // }
+    @Reference(cardinality = ReferenceCardinality.OPTIONAL, policy = ReferencePolicy.DYNAMIC)
+    protected void setItemNamedAttributesResolver(ItemResolver itemResolver) {
+        this.itemResolver = itemResolver;
+    }
+
+    protected void unsetItemNamedAttributesResolver(ItemResolver itemResolver) {
+        this.itemResolver = null;
+    }
 
     public static final String PATH_HABOT = "habot";
 
@@ -172,25 +177,25 @@ public class HABotResource implements RESTResource {
         return Response.ok(reply).build();
     }
 
-    // @GET
-    // @RolesAllowed({ Role.USER, Role.ADMIN })
-    // @Path("/attributes")
-    // @Consumes(MediaType.TEXT_PLAIN)
-    // @Produces(MediaType.APPLICATION_JSON)
-    // @ApiOperation(value = "Gets all item named attributes.")
-    // @ApiResponses(value = { @ApiResponse(code = 200, message = "OK", response = ChatReply.class),
-    // @ApiResponse(code = 500, message = "An interpretation error occured") })
-    // public Response getAttributes(
-    // @HeaderParam(HttpHeaders.ACCEPT_LANGUAGE) @ApiParam(value = "language") String language) throws Exception {
-    // final Locale locale = this.localeService.getLocale(null);
-    //
-    // this.namedAttributesItemResolver.setLocale(locale);
-    // Map<String, Set<ItemNamedAttribute>> attributesByItemName = new HashMap<String, Set<ItemNamedAttribute>>();
-    // this.namedAttributesItemResolver.getAllItemNamedAttributes().entrySet().stream()
-    // .forEach(entry -> attributesByItemName.put(entry.getKey().getName(), entry.getValue()));
-    //
-    // return Response.ok(attributesByItemName).build();
-    // }
+    @GET
+    @RolesAllowed({ Role.USER, Role.ADMIN })
+    @Path("/attributes")
+    @Consumes(MediaType.TEXT_PLAIN)
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Gets all item named attributes.")
+    @ApiResponses(value = { @ApiResponse(code = 200, message = "OK", response = ChatReply.class),
+            @ApiResponse(code = 500, message = "An error occurred") })
+    public Response getAttributes(
+            @HeaderParam(HttpHeaders.ACCEPT_LANGUAGE) @ApiParam(value = "language") String language) throws Exception {
+        final Locale locale = this.localeService.getLocale(null);
+
+        this.itemResolver.setLocale(locale);
+        Map<String, Set<ItemNamedAttribute>> attributesByItemName = new HashMap<String, Set<ItemNamedAttribute>>();
+        this.itemResolver.getAllItemNamedAttributes().entrySet().stream()
+                .forEach(entry -> attributesByItemName.put(entry.getKey().getName(), entry.getValue()));
+
+        return Response.ok(attributesByItemName).build();
+    }
 
     @POST
     @Path("/notifications/subscribe")

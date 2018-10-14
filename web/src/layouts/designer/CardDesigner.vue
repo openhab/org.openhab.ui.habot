@@ -105,7 +105,7 @@
               <q-field label="attributes" class="config-field" orientation="vertical"
                       helper="The attributes of the card (objects & locations); used for filtering the Card deck and to override the default generated card during the chat">
                 <q-search class="q-body-1 search-tags" color="secondary" v-model="searchAttribute"
-                      placeholder="Search from items">
+                      placeholder="Search on items">
                     <q-autocomplete :static-data="attributesSuggestions" @selected="addAttribute" />
                 </q-search>
                 <q-chips-input v-model="selectedNode.component.objects" color="secondary"
@@ -470,9 +470,10 @@ export default {
       this.searchTag = null
       this.card.tags.push(tag.value)
     },
-    addAttribute (attribute) {
+    addAttribute (attribute, keyboard) {
+      if (keyboard) return
       this.searchAttribute = null
-      if (attribute.type === 'location') {
+      if (attribute.type === 'LOCATION') {
         this.card.locations.push(attribute.value)
       } else {
         this.card.objects.push(attribute.value)
@@ -684,7 +685,7 @@ export default {
             type: attr.type,
             label: attr.value,
             value: attr.value,
-            icon: attr.type === 'location' ? 'mdi-map-marker-outline' : 'mdi-cube-outline'
+            icon: attr.type === 'LOCATION' ? 'mdi-map-marker-outline' : 'mdi-cube-outline'
           }
           if (!vm.attributesSuggestions.list.some((a) => a.value === suggestion.value)) {
             vm.attributesSuggestions.list.push(suggestion)
