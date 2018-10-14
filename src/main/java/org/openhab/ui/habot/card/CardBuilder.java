@@ -338,6 +338,9 @@ public class CardBuilder {
                     String transformedState = TransformationHelper.transform(
                             FrameworkUtil.getBundle(CardBuilder.class).getBundleContext(),
                             stateDescription.getPattern(), state.toString());
+                    if (transformedState == null) {
+                        return state.toString();
+                    }
                     if (transformedState.equals(state.toString())) {
                         return state.format(stateDescription.getPattern());
                     } else {
