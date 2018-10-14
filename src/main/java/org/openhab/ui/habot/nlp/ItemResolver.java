@@ -8,8 +8,9 @@
  */
 package org.openhab.ui.habot.nlp;
 
-import java.io.InputStream;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import org.eclipse.smarthome.core.items.Item;
@@ -47,11 +48,9 @@ public interface ItemResolver {
     Stream<Item> getMatchingItems(String object, String location);
 
     /**
-     * Get an {@link InputStream} of additional name samples to feed to
-     * the {@link IntentTrainer} to improve the recognition.
+     * Gets all named attributes for all items
      *
-     * @return an OpenNLP compatible input stream with the tagged name samples on separate lines
+     * @return a map of the {@link ItemNamedAttribute}s by item
      */
-    InputStream getNameSamples() throws UnsupportedLanguageException;
-
+    Map<Item, Set<ItemNamedAttribute>> getAllItemNamedAttributes() throws UnsupportedLanguageException;
 }

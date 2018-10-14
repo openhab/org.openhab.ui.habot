@@ -16,13 +16,19 @@ package org.openhab.ui.habot.nlp;
  * @author Yannick Schaus
  */
 public class ItemNamedAttribute {
+    public enum AttributeType {
+        OBJECT,
+        LOCATION
+    }
+
     public enum AttributeSource {
+        LABEL,
         CATEGORY,
         TAG,
         METADATA
     }
 
-    public ItemNamedAttribute(String type, String value, boolean inherited, AttributeSource source) {
+    public ItemNamedAttribute(AttributeType type, String value, boolean inherited, AttributeSource source) {
         super();
         this.type = type;
         this.value = value;
@@ -30,7 +36,23 @@ public class ItemNamedAttribute {
         this.source = source;
     }
 
-    String type;
+    public ItemNamedAttribute(String type, String value, boolean inherited, AttributeSource source) {
+        super();
+        this.type = (type == "location") ? AttributeType.LOCATION : AttributeType.OBJECT;
+        this.value = value;
+        this.inherited = inherited;
+        this.source = source;
+    }
+
+    public ItemNamedAttribute(String type, String value, AttributeSource source) {
+        super();
+        this.type = (type == "location") ? AttributeType.LOCATION : AttributeType.OBJECT;
+        this.value = value;
+        this.inherited = false;
+        this.source = source;
+    }
+
+    AttributeType type;
     String value;
     boolean inherited;
     AttributeSource source;
@@ -40,7 +62,7 @@ public class ItemNamedAttribute {
      *
      * @return the type - "object" or "location"
      */
-    public String getType() {
+    public AttributeType getType() {
         return type;
     }
 
@@ -49,7 +71,7 @@ public class ItemNamedAttribute {
      *
      * @param type the type
      */
-    public void setType(String type) {
+    public void setType(AttributeType type) {
         this.type = type;
     }
 

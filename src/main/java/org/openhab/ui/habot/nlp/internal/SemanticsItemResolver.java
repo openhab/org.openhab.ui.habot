@@ -8,14 +8,15 @@
  */
 package org.openhab.ui.habot.nlp.internal;
 
-import java.io.InputStream;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import org.apache.commons.io.IOUtils;
 import org.eclipse.smarthome.core.items.Item;
 import org.eclipse.smarthome.core.items.ItemPredicates;
 import org.eclipse.smarthome.core.items.ItemRegistry;
@@ -28,6 +29,8 @@ import org.eclipse.smarthome.core.semantics.SemanticsService;
 import org.eclipse.smarthome.core.semantics.model.Location;
 import org.eclipse.smarthome.core.semantics.model.Property;
 import org.eclipse.smarthome.core.semantics.model.Tag;
+import org.openhab.ui.habot.nlp.ItemNamedAttribute;
+import org.openhab.ui.habot.nlp.ItemNamedAttribute.AttributeSource;
 import org.openhab.ui.habot.nlp.ItemResolver;
 import org.openhab.ui.habot.nlp.UnsupportedLanguageException;
 import org.osgi.service.component.annotations.Component;
@@ -94,27 +97,34 @@ public class SemanticsItemResolver implements ItemResolver {
     }
 
     @Override
-    public InputStream getNameSamples() throws UnsupportedLanguageException {
-        StringBuilder nameSamplesDoc = new StringBuilder();
+    public Map<Item, Set<ItemNamedAttribute>> getAllItemNamedAttributes() throws UnsupportedLanguageException {
+        if (currentLocale == null) {
+            throw new UnsupportedLanguageException(currentLocale);
+        }
+
+        Map<Item, Set<ItemNamedAttribute>> attributes = new HashMap<Item, Set<ItemNamedAttribute>>();
 
         for (Item item : itemRegistry.getAll()) {
             Class<? extends Tag> semanticType = SemanticTags.getSemanticType(item);
             if (semanticType != null) {
-                String nameSampleType = (Location.class.isAssignableFrom(semanticType)) ? "location" : "object";
+                Set<ItemNamedAttribute> itemAttributes = new HashSet<ItemNamedAttribute>();
+
+                attributes.put(item, new HashSet<ItemNamedAttribute>());
+                String attributeType = (Location.class.isAssignableFrom(semanticType)) ? "location" : "object";
 
                 // Add the item's label
-                appendNameSample(nameSamplesDoc, nameSampleType, item.getLabel());
+                itemAttributes.add(new ItemNamedAttribute(attributeType, item.getLabel(), AttributeSource.LABEL));
 
                 // Add the primary type's label and synonyms
-                for (String tagNameSample : SemanticTags.getLabelAndSynonyms(semanticType, currentLocale)) {
-                    appendNameSample(nameSamplesDoc, nameSampleType, tagNameSample);
+                for (String tagLabel : SemanticTags.getLabelAndSynonyms(semanticType, currentLocale)) {
+                    itemAttributes.add(new ItemNamedAttribute(attributeType, tagLabel, AttributeSource.TAG));
                 }
 
                 // Add the related property's label and synonyms
                 Class<? extends Property> relatedProperty = SemanticTags.getProperty(item);
                 if (relatedProperty != null) {
-                    for (String propertyNameSample : SemanticTags.getLabelAndSynonyms(relatedProperty, currentLocale)) {
-                        appendNameSample(nameSamplesDoc, "object", propertyNameSample);
+                    for (String propertyLabel : SemanticTags.getLabelAndSynonyms(relatedProperty, currentLocale)) {
+                        itemAttributes.add(new ItemNamedAttribute("object", propertyLabel, AttributeSource.TAG));
                     }
                 }
 
@@ -124,18 +134,15 @@ public class SemanticsItemResolver implements ItemResolver {
                 if (md != null) {
                     String[] synonyms = md.getValue().split(",");
                     for (String synonym : synonyms) {
-                        appendNameSample(nameSamplesDoc, nameSampleType, synonym);
+                        itemAttributes.add(new ItemNamedAttribute(attributeType, synonym, AttributeSource.METADATA));
                     }
                 }
+
+                attributes.put(item, itemAttributes);
             }
         }
 
-        // logger.debug("Additional name samples: {}", nameSamplesDoc.toString());
-        return IOUtils.toInputStream(nameSamplesDoc.toString());
-    }
-
-    private void appendNameSample(StringBuilder nameSamplesDoc, String type, String value) {
-        nameSamplesDoc.append(String.format("<START:%s> %s <END>%n", type, value));
+        return attributes;
     }
 
     private Predicate<? super Item> hasSynonym(String labelOrSynonym) {
@@ -185,7 +192,7 @@ public class SemanticsItemResolver implements ItemResolver {
         this.semanticsService = semanticsService;
     }
 
-    public void unsetSemanticsService(SemanticsService SemanticsService) {
+    public void unsetSemanticsService(SemanticsService semanticsService) {
         this.semanticsService = null;
     }
 

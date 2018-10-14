@@ -8,6 +8,7 @@
  */
 package org.openhab.ui.habot.nlp.internal;
 
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -17,7 +18,9 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import org.apache.commons.io.IOUtils;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.smarthome.core.common.registry.RegistryChangeListener;
 import org.eclipse.smarthome.core.events.EventPublisher;
@@ -28,8 +31,11 @@ import org.eclipse.smarthome.core.voice.text.InterpretationException;
 import org.openhab.ui.habot.nlp.ChatReply;
 import org.openhab.ui.habot.nlp.Intent;
 import org.openhab.ui.habot.nlp.IntentInterpretation;
+import org.openhab.ui.habot.nlp.ItemNamedAttribute;
+import org.openhab.ui.habot.nlp.ItemNamedAttribute.AttributeType;
 import org.openhab.ui.habot.nlp.ItemResolver;
 import org.openhab.ui.habot.nlp.Skill;
+import org.openhab.ui.habot.nlp.UnsupportedLanguageException;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -100,6 +106,29 @@ public class OpenNLPInterpreter implements HumanLanguageInterpreter {
     }
 
     /**
+     * Get an {@link InputStream} of additional name samples to feed to
+     * the {@link IntentTrainer} to improve the recognition.
+     *
+     * @return an OpenNLP compatible input stream with the tagged name samples on separate lines
+     */
+    protected InputStream getNameSamples() throws UnsupportedLanguageException {
+        StringBuilder nameSamplesDoc = new StringBuilder();
+        Map<Item, Set<ItemNamedAttribute>> itemAttributes = itemResolver.getAllItemNamedAttributes();
+
+        Stream<ItemNamedAttribute> attributes = itemAttributes.values().stream().flatMap(a -> a.stream());
+
+        attributes.forEach(attribute -> {
+            if (attribute.getType() == AttributeType.LOCATION) {
+                nameSamplesDoc.append(String.format("<START:location> %s <END>%n", attribute.getValue()));
+            } else {
+                nameSamplesDoc.append(String.format("<START:object> %s <END>%n", attribute.getValue()));
+            }
+        });
+
+        return IOUtils.toInputStream(nameSamplesDoc.toString());
+    }
+
+    /**
      * This variant of interpret() returns a more complete interpretation result.
      *
      * @param locale the locale of the query
@@ -125,7 +154,7 @@ public class OpenNLPInterpreter implements HumanLanguageInterpreter {
                                 return o1.getIntentId().compareTo(o2.getIntentId());
                             }
 
-                        }).collect(Collectors.toList()), itemResolver.getNameSamples(), this.tokenizerId);
+                        }).collect(Collectors.toList()), getNameSamples(), this.tokenizerId);
                 currentLocale = locale;
             } catch (Exception e) {
                 InterpretationException fe = new InterpretationException(

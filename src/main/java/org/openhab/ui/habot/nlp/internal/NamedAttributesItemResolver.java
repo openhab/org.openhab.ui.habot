@@ -8,7 +8,6 @@
  */
 package org.openhab.ui.habot.nlp.internal;
 
-import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -20,7 +19,6 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import org.apache.commons.io.IOUtils;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.smarthome.core.common.registry.RegistryChangeListener;
 import org.eclipse.smarthome.core.items.GroupItem;
@@ -79,12 +77,12 @@ public class NamedAttributesItemResolver implements ItemResolver {
         }
     }
 
-    /**
-     * Returns a map of all named attributes by item.
+    /*
+     * (non-Javadoc)
      *
-     * @return attributes mapped by item
-     * @throws UnsupportedLanguageException
+     * @see org.openhab.ui.habot.nlp.internal.ItemResolver#getAllItemNamedAttributes()
      */
+    @Override
     public Map<Item, Set<ItemNamedAttribute>> getAllItemNamedAttributes() throws UnsupportedLanguageException {
         if (currentLocale == null) {
             throw new UnsupportedLanguageException(currentLocale);
@@ -169,12 +167,13 @@ public class NamedAttributesItemResolver implements ItemResolver {
                     }
                 }
             } else {
-                if (item.getCategory() != null) {
+                String category = item.getCategory();
+                if (category != null) {
                     if (metadata != null && metadata.getConfiguration().containsKey("useCategory")
                             && metadata.getConfiguration().get("useCategory").equals(false)) {
                         logger.info("Ignoring category for item {}", item.getName());
                     } else {
-                        String category = item.getCategory().toLowerCase();
+                        category = category.toLowerCase();
                         String categoryNamedAttributes;
                         try {
                             categoryNamedAttributes = this.tagAttributes.getString(category);
@@ -301,22 +300,4 @@ public class NamedAttributesItemResolver implements ItemResolver {
             }
         }
     };
-
-    @Override
-    public InputStream getNameSamples() throws UnsupportedLanguageException {
-        StringBuilder nameSamplesDoc = new StringBuilder();
-        Map<Item, Set<ItemNamedAttribute>> itemAttributes = getAllItemNamedAttributes();
-
-        Stream<ItemNamedAttribute> attributes = itemAttributes.values().stream().flatMap(a -> a.stream());
-
-        attributes.forEach(attribute -> {
-            if (attribute.getType() == "location") {
-                nameSamplesDoc.append(String.format("<START:location> %s <END>%n", attribute.getValue()));
-            } else {
-                nameSamplesDoc.append(String.format("<START:object> %s <END>%n", attribute.getValue()));
-            }
-        });
-
-        return IOUtils.toInputStream(nameSamplesDoc.toString());
-    }
 }
