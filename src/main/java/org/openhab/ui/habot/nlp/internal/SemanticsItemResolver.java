@@ -57,8 +57,8 @@ public class SemanticsItemResolver implements ItemResolver {
 
     @Override
     public void setLocale(Locale locale) {
-        if (locale == null) {
-            this.currentLocale = Locale.ENGLISH;
+        if (locale == null || locale.getLanguage().equals(Locale.ENGLISH.getLanguage())) {
+            this.currentLocale = Locale.ROOT;
         } else {
             this.currentLocale = locale;
         }
