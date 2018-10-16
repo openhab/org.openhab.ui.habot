@@ -120,7 +120,7 @@ public class HistoryLastChangesSkill extends AbstractItemIntentInterpreter {
                     String transformedState = TransformationHelper.transform(
                             FrameworkUtil.getBundle(HistoryLastChangesSkill.class).getBundleContext(),
                             stateDescription.getPattern(), state.toString());
-                    if (transformedState.equals(state.toString())) {
+                    if (transformedState != null && transformedState.equals(state.toString())) {
                         return state.format(stateDescription.getPattern());
                     } else {
                         return transformedState;

@@ -134,7 +134,8 @@ public class SemanticsItemResolver implements ItemResolver {
                 if (md != null) {
                     String[] synonyms = md.getValue().split(",");
                     for (String synonym : synonyms) {
-                        itemAttributes.add(new ItemNamedAttribute(attributeType, synonym, AttributeSource.METADATA));
+                        itemAttributes
+                                .add(new ItemNamedAttribute(attributeType, synonym.trim(), AttributeSource.METADATA));
                     }
                 }
 
