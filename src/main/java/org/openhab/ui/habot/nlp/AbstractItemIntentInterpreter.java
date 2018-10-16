@@ -50,7 +50,7 @@ public abstract class AbstractItemIntentInterpreter implements Skill {
         Set<Item> items = this.itemResolver.getMatchingItems(object, location).collect(Collectors.toSet());
 
         // expand group items
-        for (Item item : items) {
+        for (Item item : items.toArray(new Item[0])) {
             if (item instanceof GroupItem) {
                 GroupItem gItem = (GroupItem) item;
                 items.addAll(gItem.getMembers());
