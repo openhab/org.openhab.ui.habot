@@ -65,6 +65,9 @@
         </q-item>
 
       </q-list>
+      <div class="q-ma-md" v-if="deferredPWAPrompt">
+        <q-btn icon="get_app" color="secondary" @click="installPWA()">Install App</q-btn>
+      </div>
     </q-layout-drawer>
 
     <q-page-container>
@@ -80,11 +83,25 @@ export default {
   name: 'LayoutDefault',
   data () {
     return {
-      leftDrawerOpen: true
+      leftDrawerOpen: true,
+      deferredPWAPrompt: null
     }
   },
   methods: {
-    openURL
+    openURL,
+    installPWA () {
+      if (!this.deferredPWAPrompt) return
+      this.deferredPWAPrompt.prompt()
+      this.deferredPWAPrompt = null
+    }
+  },
+  created () {
+    window.addEventListener('beforeinstallprompt', (e) => {
+      // Prevent Chrome 67 and earlier from automatically showing the prompt
+      // e.preventDefault()
+      // Stash the event so it can be triggered later.
+      this.deferredPWAPrompt = e
+    })
   }
 }
 </script>
