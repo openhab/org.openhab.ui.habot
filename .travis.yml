@@ -17,4 +17,4 @@ deploy:
   file: target/org.openhab.ui.habot-2.4.0-SNAPSHOT.jar
   skip_cleanup: true
   on:
-    repo: ghys/habot
+    repo: openhab/org.openhab.ui.habot
