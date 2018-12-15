@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: HABot Interactive Bot
 Bundle-SymbolicName: org.openhab.ui.habot
-Bundle-Version: 2.4.0.qualifier
+Bundle-Version: 2.4.0.RC1
 Bundle-RequiredExecutionEnvironment: JavaSE-1.8
 Bundle-ClassPath: .,
  lib/opennlp-tools-1.8.3.jar,
