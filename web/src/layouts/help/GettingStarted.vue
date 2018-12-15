@@ -156,12 +156,10 @@
       <q-icon class="q-ma-md" name="mdi-thought-bubble" />
     </div> -->
     <div class="q-display-1 text-center full-width"><q-icon class="q-display-3 full-width" name="mdi-thought-bubble" /><br />To be helpful, I need you to prepare your items first so I can figure out how they are related to your queries</div>
-    <div class="q-headline text-center full-width">In the next tutorial, I'll tell you all about it!</div>
+    <div class="q-headline text-center full-width">Read walkthrough series next to learn all about it and more!</div>
     <div class="full-width flex flex-center">
-      <q-btn push disabled size="xl" color="secondary" @click="$emit('go', 'tagging-items')">Go</q-btn>
-      <q-btn flat size="md" color="secondary" @click="$emit('done')">or Close</q-btn>
+      <q-btn push size="xl" color="secondary" @click="$emit('done')">Close</q-btn>
     </div>
-    <q-alert type="warning" message="The next tutorial is under (re)construction - sorry!" /><br /><br />
   </q-carousel-slide>
 
   <q-carousel-control
