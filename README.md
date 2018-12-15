@@ -1,7 +1,5 @@
 # HABot
 
-[![Build Status](https://travis-ci.org/openhab/org.openhab.ui.habot.svg?branch=master)](https://travis-ci.org/openhab/org.openhab.ui.habot)
-
 HABot is a chatbot for [openHAB](https://openhab.org), running inside the [Eclipse SmartHome](https://eclipse.org/smarthome/) runtime with no dependency; it can run offline and keep your data out of third-party clouds, but works very well remotely if served from an openHAB Cloud instance (like [myopenhab.org](https://www.myopenhab.org)). In that scenario it can even be added to the Android homescreen as a [Progressive Web App](https://developers.google.com/web/progressive-web-apps/), and adds features working only on "secure origins" like push notifications, speech recognition and resource caching.
 
 It consists in:
