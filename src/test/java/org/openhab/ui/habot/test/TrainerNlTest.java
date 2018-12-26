@@ -12,9 +12,9 @@ public class TrainerNlTest extends AbstractTrainerTest {
     @Test
     public void testGetStatus() throws Exception {
         
-    	this.trainer = new IntentTrainer("nl", skills);
+        this.trainer = new IntentTrainer("nl", skills, null, "alphanumeric");
  
-        assertIsGetStatus ("Wat is de temeratuur in de keuken?", "temeratuur", "keuken");
+        assertIsGetStatus ("Wat is de temperatuur in de keuken?", "temperatuur", "keuken");
         assertIsGetStatus ("Temperatuur in de keuken?", "temperatuur", "keuken");
         assertIsGetStatus ("toon me de temperatuur in de keuken", "temperatuur", "keuken");
         assertIsGetStatus ("wat is de temperatuur in de garage?", "temperatuur", "garage");
@@ -41,7 +41,7 @@ public class TrainerNlTest extends AbstractTrainerTest {
     @Test
     public void testActivateObjects() throws Exception {
         
-    	this.trainer = new IntentTrainer("nl", skills);
+        this.trainer = new IntentTrainer("nl", skills, null, "alphanumeric");
         
         assertIsActivate("zet de tv aan", "tv", null);
         assertIsActivate("doe het licht aan", "licht", null);
@@ -51,14 +51,14 @@ public class TrainerNlTest extends AbstractTrainerTest {
         assertIsActivate("zet het licht aan in de gang", "licht", "gang");
         assertIsActivate("zet het licht aan op de zolder", "licht", "zolder");
         assertIsActivate("zet het licht op de gang aan", "licht", "gang");
-        assertIsActivate("zet het verwarmng aan", "verwarmng", null);
+        assertIsActivate("zet de verwarmng aan", "verwarmng", null);
         
     }
     
     @Test
     public void testDeactivateObjects() throws Exception {
         
-    	this.trainer = new IntentTrainer("nl", skills);
+        this.trainer = new IntentTrainer("nl", skills, null, "alphanumeric");
 
         assertIsDeactivate("doe het licht uit", "licht", null);
         assertIsDeactivate("zet de tv uit", "tv", null);
@@ -70,7 +70,7 @@ public class TrainerNlTest extends AbstractTrainerTest {
         assertIsDeactivate("zet het licht uit in de gang", "licht", "gang");
         assertIsDeactivate("zet het licht uit op de zolder", "licht", "zolder");
         assertIsDeactivate("zet het licht op de gang uit", "licht", "gang");
-        assertIsDeactivate("zet het verwarmng uit", "verwarmng", null);
+        assertIsDeactivate("zet de verwarmng uit", "verwarmng", null);
     }
     
 
@@ -80,10 +80,10 @@ public class TrainerNlTest extends AbstractTrainerTest {
         Intent actual;
         this.trainer = new IntentTrainer("nl", skills, null, "alphanumeric");
 
-        actual = interpret("Hoe is het verloop van de temeratuur in het afgelopen uur?");
+        actual = interpret("Hoe is het verloop van de temperatuur in het afgelopen uur?");
         assertEquals(Skills.GET_HISTORY_HOURLY, actual.getName());
         assertEquals(1, actual.getEntities().size());
-        assertEquals("temeratuur", actual.getEntities().get("object"));
+        assertEquals("temperatuur", actual.getEntities().get("object"));
 
         actual = interpret("Verloop van de temperatuur van het laatste uur");
         assertEquals(Skills.GET_HISTORY_HOURLY, actual.getName());

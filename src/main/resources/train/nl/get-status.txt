@@ -61,7 +61,7 @@ staat het <START:object> raam <END> open
 <START:object> vochtigheid <END> van de <START:location> tuin <END>
 <START:object> waterverbruik <END> in de <START:location> keuken <END>
 <START:object> wifi <END> in de <START:location> pension <END>
-stroom <START:object> stroomverbruik <END>
+huidig <START:object> stroomverbruik <END>
 toon de <START:object> sensoren <END> op de <START:location> zolder <END>
 toon de <START:object> sensoren <END> op het <START:location> begane grond <END>
 toon de <START:object> temperatuur <END>
