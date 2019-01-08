@@ -20,10 +20,32 @@ module.exports = function (ctx) {
       vueRouterMode: 'history',
       publicPath: '/habot/',
       devtool: 'source-map',
-      gzip: { minRatio: 10 },
+      // gzip: true,
       // analyze: true,
       // extractCSS: false,
       // useNotifier: false,
+      chainWebpack (chain, { isServer, isClient }) {
+        if (!ctx.dev) {
+          chain.plugin('manifest-crossorigin').use(class ManifestCrossoriginPlugin {
+            apply (compiler) {
+              compiler.hooks.compilation.tap('webpack-plugin-manifest-crossorigin', compilation => {
+                compilation.hooks.htmlWebpackPluginAlterAssetTags.tapAsync('webpack-plugin-manifest-crossorigin', (data, callback) => {
+                  if (data.head) {
+                    for (let tag of data.head) {
+                      if (tag.tagName === 'link' && tag.attributes.rel === 'manifest') {
+                        tag.attributes.crossorigin = 'use-credentials'
+                        tag.attributes.href = '/habot/statics/manifest.json'
+                      }
+                    }
+                  }
+                  // finally, inform Webpack that we're ready
+                  callback(null, data)
+                })
+              })
+            }
+          }, [])
+        }
+      },
       extendWebpack (cfg) {
         cfg.module.rules.push({
           enforce: 'pre',
@@ -153,6 +175,7 @@ module.exports = function (ctx) {
         'CloseOverlay'
       ],
       plugins: [
+        'ActionSheet',
         'Notify',
         'Dialog',
         'Loading',
@@ -167,7 +190,7 @@ module.exports = function (ctx) {
     ],
     pwa: {
       workboxPluginMode: 'InjectManifest',
-      workboxOptions: {
+      workboxOptions: (ctx.dev) ? {} : {
         importWorkboxFrom: 'local'
       },
       manifest: {

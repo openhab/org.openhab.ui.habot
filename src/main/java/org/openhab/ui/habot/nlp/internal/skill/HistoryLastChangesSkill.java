@@ -27,8 +27,8 @@ import org.openhab.ui.habot.card.internal.CardRegistry;
 import org.openhab.ui.habot.nlp.AbstractItemIntentInterpreter;
 import org.openhab.ui.habot.nlp.Intent;
 import org.openhab.ui.habot.nlp.IntentInterpretation;
+import org.openhab.ui.habot.nlp.ItemResolver;
 import org.openhab.ui.habot.nlp.Skill;
-import org.openhab.ui.habot.nlp.internal.ItemNamedAttributesResolver;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.service.component.annotations.Reference;
 
@@ -53,6 +53,10 @@ public class HistoryLastChangesSkill extends AbstractItemIntentInterpreter {
         IntentInterpretation interpretation = new IntentInterpretation();
 
         Set<Item> matchedItems = findItems(intent);
+        if (intent.getEntities().isEmpty()) {
+            interpretation.setAnswer(answerFormatter.getRandomAnswer("general_failure"));
+            return interpretation;
+        }
         if (matchedItems == null || matchedItems.isEmpty()) {
             interpretation.setAnswer(answerFormatter.getRandomAnswer("answer_nothing_found"));
             interpretation.setHint(answerFormatter.getStandardTagHint(intent.getEntities()));
@@ -116,7 +120,7 @@ public class HistoryLastChangesSkill extends AbstractItemIntentInterpreter {
                     String transformedState = TransformationHelper.transform(
                             FrameworkUtil.getBundle(HistoryLastChangesSkill.class).getBundleContext(),
                             stateDescription.getPattern(), state.toString());
-                    if (transformedState.equals(state.toString())) {
+                    if (transformedState != null && transformedState.equals(state.toString())) {
                         return state.format(stateDescription.getPattern());
                     } else {
                         return transformedState;
@@ -135,12 +139,12 @@ public class HistoryLastChangesSkill extends AbstractItemIntentInterpreter {
     }
 
     @Reference
-    protected void setItemNamedAttributesResolver(ItemNamedAttributesResolver itemNamedAttributesResolver) {
-        this.itemNamedAttributesResolver = itemNamedAttributesResolver;
+    protected void setItemResolver(ItemResolver itemResolver) {
+        this.itemResolver = itemResolver;
     }
 
-    protected void unsetItemNamedAttributesResolver(ItemNamedAttributesResolver itemNamedAttributesResolver) {
-        this.itemNamedAttributesResolver = null;
+    protected void unsetItemResolver(ItemResolver itemResolver) {
+        this.itemResolver = null;
     }
 
     @Reference

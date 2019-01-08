@@ -1,5 +1,5 @@
 <template>
-<q-card inline v-if="model" class="hb-card" :class="{ bigger: model.config && model.config.bigger, 'highlight-and-fade': this.model.highlight }" :color="color" :text-color="textColor">
+<q-card inline v-if="model" class="hb-card" :class="{ bigger: model.config && model.config.bigger, 'highlight-and-fade': this.model.highlight }" :color="color" :text-color="textColor" :dark="color">
   <q-card-media v-if="model.slots && model.slots.media">
     <component v-for="(component, idx) in model.slots.media" :key="'card-media-' + idx" :is="component.component" :model="component"></component>
   </q-card-media>
@@ -69,15 +69,20 @@
 
 <style lang="stylus">
 @import '~variables'
-.hb-card .q-card-title-extra
-  align-self baseline
+.hb-card
+  .q-card-title
+    line-height 1.5rem
+  .q-card-title-extra
+    align-self baseline
 .corner-bookmark
   position absolute
   top: -20px
   opacity 0.2
 @media (min-width $breakpoint-sm-min)
-  .bigger
-    width 384px !important
+  .hb-card
+    width 300px !important
+    &.bigger
+      width 384px !important
 </style>
 
 <script>

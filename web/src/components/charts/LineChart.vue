@@ -64,16 +64,26 @@ export default {
             stack: 'a',
             data: this.data[idx]
           }
+          // use other y axis if the format is different than the previous series
+          if (idx > 0 && this.itemFormats[idx] && (this.itemFormats[idx] !== this.itemFormats[0])) {
+            seriesOptions.yAxisIndex = 1
+            seriesOptions.areaStyle = {
+              opacity: 0.2
+            }
+            seriesOptions.lineStyle = {
+              opacity: 0.2
+            }
+          }
           if (this.options.markers.averageLine || this.options.markers.minMaxLines) {
             seriesOptions.markLine = {
               data: []
             }
             if (this.options.markers.averageLine) {
-              seriesOptions.markLine.data.push({type: 'average', name: 'avg'})
+              seriesOptions.markLine.data.push({type: 'average', name: 'avg', label: { position: 'middle' }})
             }
             if (this.options.markers.minMaxLines) {
-              seriesOptions.markLine.data.push({type: 'min', name: 'min'})
-              seriesOptions.markLine.data.push({type: 'max', name: 'max'})
+              seriesOptions.markLine.data.push({type: 'min', name: 'min', label: { position: 'middle' }})
+              seriesOptions.markLine.data.push({type: 'max', name: 'max', label: { position: 'middle' }})
             }
           }
           if (this.options.markers.minMaxPoints) {
@@ -182,26 +192,43 @@ export default {
             show: true
           }
         },
-        yAxis: {
-          type: 'value',
-          scale: true,
-          axisTick: {
-            inside: false
+        yAxis: [
+          {
+            type: 'value',
+            scale: true,
+            axisTick: {
+              inside: false
+            },
+            splitLine: {
+              show: true
+            },
+            axisLabel: {
+              inside: false,
+              formatter: '{value}\n'
+            }
+            // z: 10
           },
-          splitLine: {
-            show: true
-          },
-          axisLabel: {
-            inside: false,
-            formatter: '{value}\n'
+          {
+            type: 'value',
+            scale: true,
+            axisTick: {
+              inside: false
+            },
+            splitLine: {
+              show: false
+            },
+            axisLabel: {
+              inside: false,
+              formatter: '{value}\n'
+            }
           }
-          // z: 10
-        },
+        ],
         grid: {
           top: 15,
-          left: 40,
-          right: 35,
-          bottom: 75
+          left: 0,
+          right: 0,
+          bottom: 75,
+          containLabel: true
           // height: 160
         },
         // dataZoom: [{

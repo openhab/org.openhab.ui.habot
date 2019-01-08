@@ -42,11 +42,11 @@
         />
       </template>
       <q-td slot="body-cell-attributes" slot-scope="props" :props="props">
-        <q-chip small dense :color="attribute.source === 'CATEGORY' ? 'primary' : attribute.source === 'TAG' ? 'secondary' : 'tertiary'"
+        <q-chip small dense :color="attribute.source === 'LABEL' ? 'primary' : attribute.source === 'TAG' ? 'secondary' : 'tertiary'"
           :style="{ opacity: attribute.inherited ? 0.4 : 1 }"
-          v-for="attribute in props.value"
+          v-for="attribute in (props.value || []).filter(a => a.source !== 'LABEL')"
           :key="attribute" class="q-mr-sm">
-            <q-icon :name="attribute.type === 'location' ? 'mdi-map-marker-outline' : 'mdi-cube-outline'" /> {{ attribute.value }}
+            <q-icon :name="attribute.type === 'LOCATION' ? 'mdi-map-marker-outline' : 'mdi-cube-outline'" /> {{ attribute.value }}
         </q-chip>
       </q-td>
     </q-table>
@@ -70,7 +70,7 @@ export default {
         { name: 'name', field: 'name', label: 'Name', align: 'left', sortable: true, required: true },
         { name: 'type', field: 'type', label: 'Type', align: 'center', sortable: true },
         { name: 'label', field: 'label', label: 'Label', align: 'left', sortable: true },
-        { name: 'attributes', field: 'attributes', label: 'Attributes', sortable: true }
+        { name: 'attributes', field: 'attributes', label: 'Attributes', align: 'left', sortable: true }
       ],
       items: [],
       filter: '',

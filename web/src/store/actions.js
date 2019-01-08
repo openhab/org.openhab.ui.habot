@@ -2,13 +2,13 @@ import axios from 'axios'
 
 export const initialLoad = (context, credential) => {
   let initialRequests = () => {
-    return context.dispatch('items/initialLoad')
+    return context.dispatch('cards/initialLoad')
       .then(() => {
-        return context.dispatch('cards/initialLoad')
+        context.dispatch('items/initialLoad')
           .then(() => {
             context.dispatch('items/watchEvents', credential)
-            return context.commit('setReady')
           })
+        return context.commit('setReady')
       })
   }
 

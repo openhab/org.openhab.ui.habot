@@ -51,7 +51,7 @@
 
         <div v-if="chat.greetingSuggestions" class="suggestion-chips">
           <q-btn rounded outline no-caps v-if="bookmarksCount" color="secondary" icon="bookmark" @click="$router.push('/cards/bookmarks')">Bookmarks</q-btn>
-          <q-btn rounded outline no-caps v-if="suggestionsCount" color="secondary" icon="star" @click="$router.push('/cards/suggestions')">Suggestions
+          <q-btn class="q-ml-sm" rounded outline no-caps v-if="suggestionsCount" color="secondary" icon="star" @click="$router.push('/cards/suggestions')">Suggestions
             <q-chip floating small dense color="red">{{suggestionsCount}}</q-chip>
           </q-btn>
         </div>
@@ -113,6 +113,7 @@
   .q-icon
     position absolute
     right 0
+    width auto
 </style>
 
 <script>
@@ -147,7 +148,7 @@ export default {
       showPWAPrompt: false,
       inputPlaceholder: 'Ask me about your home',
       stickToBottom: false,
-      suggestionsCount: 0,
+      // suggestionsCount: 0,
       bookmarksCount: 0
     }
   },
@@ -173,7 +174,7 @@ export default {
     this.$http.get('/rest/habot/greet').then((response) => {
       vm.$store.commit('setLang', response.data.language)
       if (!vm.language) {
-        vm.language = 'en'
+        vm.language = response.data.language || 'en'
       }
       vm.busy = false
       vm.chats[0].messages.push({
@@ -204,10 +205,14 @@ export default {
       this.showPWAPrompt = true
     }
 
-    this.$store.dispatch('cards/computeSuggestions').then((cards) => {
-      this.suggestionsCount = cards.length
-    })
     this.bookmarksCount = this.$store.getters['cards/bookmarked'].length
+  },
+  asyncComputed: {
+    suggestionsCount () {
+      return this.$store.dispatch('cards/computeSuggestions').then((cards) => {
+        return cards.length
+      })
+    }
   },
   mounted () {
     // if (this.$q.platform.is.iphone) {

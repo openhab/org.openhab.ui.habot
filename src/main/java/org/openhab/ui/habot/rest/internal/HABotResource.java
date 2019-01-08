@@ -33,22 +33,23 @@ import javax.ws.rs.core.Response.Status;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.smarthome.core.auth.Role;
-import org.eclipse.smarthome.core.i18n.LocaleProvider;
 import org.eclipse.smarthome.core.voice.VoiceManager;
 import org.eclipse.smarthome.core.voice.text.InterpretationException;
-import org.eclipse.smarthome.io.rest.LocaleUtil;
+import org.eclipse.smarthome.io.rest.LocaleService;
 import org.eclipse.smarthome.io.rest.RESTResource;
 import org.openhab.ui.habot.card.Card;
 import org.openhab.ui.habot.card.internal.CardRegistry;
 import org.openhab.ui.habot.nlp.ChatReply;
 import org.openhab.ui.habot.nlp.ItemNamedAttribute;
+import org.openhab.ui.habot.nlp.ItemResolver;
 import org.openhab.ui.habot.nlp.internal.AnswerFormatter;
-import org.openhab.ui.habot.nlp.internal.ItemNamedAttributesResolver;
 import org.openhab.ui.habot.nlp.internal.OpenNLPInterpreter;
 import org.openhab.ui.habot.notification.internal.NotificationService;
 import org.openhab.ui.habot.notification.internal.webpush.Subscription;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,9 +67,10 @@ import io.swagger.annotations.ApiResponses;
  * @author Yannick Schaus - Initial contribution
  *
  */
+@Component
+@RolesAllowed({ Role.USER, Role.ADMIN })
 @Path(HABotResource.PATH_HABOT)
 @Api(HABotResource.PATH_HABOT)
-@Component(service = RESTResource.class, immediate = true)
 public class HABotResource implements RESTResource {
 
     private final Logger logger = LoggerFactory.getLogger(HABotResource.class);
@@ -78,15 +80,15 @@ public class HABotResource implements RESTResource {
 
     private VoiceManager voiceManager;
 
-    private LocaleProvider localeProvider;
+    private LocaleService localeService;
 
     private NotificationService notificationService;
 
     private CardRegistry cardRegistry;
 
-    private ItemNamedAttributesResolver itemNamedAttributesResolver;
+    private ItemResolver itemResolver;
 
-    @Reference
+    @Reference(cardinality = ReferenceCardinality.OPTIONAL, policy = ReferencePolicy.DYNAMIC)
     public void setVoiceManager(VoiceManager voiceManager) {
         this.voiceManager = voiceManager;
     }
@@ -95,16 +97,16 @@ public class HABotResource implements RESTResource {
         this.voiceManager = null;
     }
 
-    @Reference
-    public void setLocaleProvider(LocaleProvider localeProvider) {
-        this.localeProvider = localeProvider;
+    @Reference(cardinality = ReferenceCardinality.OPTIONAL, policy = ReferencePolicy.DYNAMIC)
+    public void setLocaleService(LocaleService localeService) {
+        this.localeService = localeService;
     }
 
-    public void unsetLocaleProvider(LocaleProvider localeProvider) {
-        this.localeProvider = null;
+    public void unsetLocaleService(LocaleService localeService) {
+        this.localeService = null;
     }
 
-    @Reference
+    @Reference(cardinality = ReferenceCardinality.OPTIONAL, policy = ReferencePolicy.DYNAMIC)
     public void setNotificationService(NotificationService notificationService) {
         this.notificationService = notificationService;
     }
@@ -113,7 +115,7 @@ public class HABotResource implements RESTResource {
         this.notificationService = null;
     }
 
-    @Reference
+    @Reference(cardinality = ReferenceCardinality.OPTIONAL, policy = ReferencePolicy.DYNAMIC)
     public void setCardRegistry(CardRegistry cardRegistry) {
         this.cardRegistry = cardRegistry;
     }
@@ -122,13 +124,13 @@ public class HABotResource implements RESTResource {
         this.cardRegistry = null;
     }
 
-    @Reference
-    protected void setItemNamedAttributesResolver(ItemNamedAttributesResolver itemNamedAttributesResolver) {
-        this.itemNamedAttributesResolver = itemNamedAttributesResolver;
+    @Reference(cardinality = ReferenceCardinality.OPTIONAL, policy = ReferencePolicy.DYNAMIC)
+    protected void setItemNamedAttributesResolver(ItemResolver itemResolver) {
+        this.itemResolver = itemResolver;
     }
 
-    protected void unsetItemNamedAttributesResolver(ItemNamedAttributesResolver itemNamedAttributesResolver) {
-        this.itemNamedAttributesResolver = null;
+    protected void unsetItemNamedAttributesResolver(ItemResolver itemResolver) {
+        this.itemResolver = null;
     }
 
     public static final String PATH_HABOT = "habot";
@@ -142,8 +144,7 @@ public class HABotResource implements RESTResource {
             @ApiResponse(code = 500, message = "There is no support for the configured language") })
     public Response greet(
             @HeaderParam(HttpHeaders.ACCEPT_LANGUAGE) @ApiParam(value = "language (will use the default if omitted)") String language) {
-        final Locale locale = (this.localeProvider != null) ? this.localeProvider.getLocale()
-                : LocaleUtil.getLocale(language);
+        final Locale locale = this.localeService.getLocale(null);
 
         AnswerFormatter answerFormatter = new AnswerFormatter(locale);
 
@@ -164,8 +165,7 @@ public class HABotResource implements RESTResource {
             @ApiResponse(code = 500, message = "An interpretation error occured") })
     public Response chat(@HeaderParam(HttpHeaders.ACCEPT_LANGUAGE) @ApiParam(value = "language") String language,
             @ApiParam(value = "human language query", required = true) String query) throws Exception {
-        final Locale locale = (this.localeProvider != null) ? this.localeProvider.getLocale()
-                : LocaleUtil.getLocale(language);
+        final Locale locale = this.localeService.getLocale(null);
 
         // interpret
         OpenNLPInterpreter hli = (OpenNLPInterpreter) voiceManager.getHLI(OPENNLP_HLI);
@@ -184,15 +184,14 @@ public class HABotResource implements RESTResource {
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Gets all item named attributes.")
     @ApiResponses(value = { @ApiResponse(code = 200, message = "OK", response = ChatReply.class),
-            @ApiResponse(code = 500, message = "An interpretation error occured") })
+            @ApiResponse(code = 500, message = "An error occurred") })
     public Response getAttributes(
             @HeaderParam(HttpHeaders.ACCEPT_LANGUAGE) @ApiParam(value = "language") String language) throws Exception {
-        final Locale locale = (this.localeProvider != null) ? this.localeProvider.getLocale()
-                : LocaleUtil.getLocale(language);
+        final Locale locale = this.localeService.getLocale(null);
 
-        this.itemNamedAttributesResolver.setLocale(locale);
+        this.itemResolver.setLocale(locale);
         Map<String, Set<ItemNamedAttribute>> attributesByItemName = new HashMap<String, Set<ItemNamedAttribute>>();
-        this.itemNamedAttributesResolver.getAllItemNamedAttributes().entrySet().stream()
+        this.itemResolver.getAllItemNamedAttributes().entrySet().stream()
                 .forEach(entry -> attributesByItemName.put(entry.getKey().getName(), entry.getValue()));
 
         return Response.ok(attributesByItemName).build();
@@ -417,5 +416,10 @@ public class HABotResource implements RESTResource {
     public Response unsetCardBookmarkCompat(
             @PathParam("cardUID") @ApiParam(value = "cardUID", required = true) @NonNull String cardUID) {
         return this.unsetCardBookmark(cardUID);
+    }
+
+    @Override
+    public boolean isSatisfied() {
+        return localeService != null && voiceManager != null && notificationService != null && cardRegistry != null;
     }
 }
