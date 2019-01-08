@@ -1,3 +1,11 @@
+/**
+ * Copyright (c) 2010-2018 by the respective copyright holders.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ */
 package org.openhab.ui.habot.nlp.internal;
 
 import java.util.Locale;
@@ -7,6 +15,11 @@ import java.util.ResourceBundle;
 
 import com.google.common.collect.ImmutableMap;
 
+/**
+ * This class helps building natural language answers by selecting random answers from a resource bundle.
+ *
+ * @author Yannick Schaus
+ */
 public class AnswerFormatter {
 
     ResourceBundle answers;
@@ -47,8 +60,10 @@ public class AnswerFormatter {
 
     public String getStandardTagHint(Map<String, String> entities) {
         return getRandomAnswer("standard_hint",
-                ImmutableMap.of("tags", String.join(" & ", entities.entrySet().stream()
-                        .filter(e -> e.getKey().equals("object") || e.getKey().equals("location"))
-                        .map(e -> String.format("\"%s:%s\"", e.getKey(), e.getValue())).toArray(String[]::new))));
+                ImmutableMap.of("attributes",
+                        String.join(" & ",
+                                entities.entrySet().stream()
+                                        .filter(e -> e.getKey().equals("object") || e.getKey().equals("location"))
+                                        .map(e -> String.format("\"%s\"", e.getValue())).toArray(String[]::new))));
     }
 }

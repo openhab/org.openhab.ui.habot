@@ -1,15 +1,22 @@
+/**
+ * Copyright (c) 2010-2018 by the respective copyright holders.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ */
 package org.openhab.ui.habot.nlp.internal.skill;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.eclipse.smarthome.core.items.Item;
-import org.eclipse.smarthome.core.items.ItemRegistry;
 import org.eclipse.smarthome.core.persistence.HistoricItem;
+import org.eclipse.smarthome.core.transform.TransformationException;
 import org.eclipse.smarthome.core.transform.TransformationHelper;
 import org.eclipse.smarthome.core.types.State;
 import org.eclipse.smarthome.core.types.StateDescription;
@@ -20,10 +27,17 @@ import org.openhab.ui.habot.card.internal.CardRegistry;
 import org.openhab.ui.habot.nlp.AbstractItemIntentInterpreter;
 import org.openhab.ui.habot.nlp.Intent;
 import org.openhab.ui.habot.nlp.IntentInterpretation;
+import org.openhab.ui.habot.nlp.ItemResolver;
 import org.openhab.ui.habot.nlp.Skill;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.service.component.annotations.Reference;
 
+/**
+ * This {@link Skill} tries to retrieves when the matching item (only supports a single item for now) was changed and
+ * displays a card with an HbTimeline component.
+ *
+ * @author Yannick Schaus
+ */
 @org.osgi.service.component.annotations.Component(service = Skill.class)
 public class HistoryLastChangesSkill extends AbstractItemIntentInterpreter {
 
@@ -38,7 +52,11 @@ public class HistoryLastChangesSkill extends AbstractItemIntentInterpreter {
     public IntentInterpretation interpret(Intent intent, String language) {
         IntentInterpretation interpretation = new IntentInterpretation();
 
-        List<Item> matchedItems = findItems(intent);
+        Set<Item> matchedItems = findItems(intent);
+        if (intent.getEntities().isEmpty()) {
+            interpretation.setAnswer(answerFormatter.getRandomAnswer("general_failure"));
+            return interpretation;
+        }
         if (matchedItems == null || matchedItems.isEmpty()) {
             interpretation.setAnswer(answerFormatter.getRandomAnswer("answer_nothing_found"));
             interpretation.setHint(answerFormatter.getStandardTagHint(intent.getEntities()));
@@ -57,7 +75,7 @@ public class HistoryLastChangesSkill extends AbstractItemIntentInterpreter {
         Component timeline = new Component("HbTimeline");
 
         if (matchedItems.size() == 1) {
-            Item item = matchedItems.get(0);
+            Item item = matchedItems.stream().findFirst().get();
             HistoricItem historicItem = PersistenceExtensions.previousState(item, false); // TODO figure out a solution
                                                                                           // for rrd4j
 
@@ -102,12 +120,12 @@ public class HistoryLastChangesSkill extends AbstractItemIntentInterpreter {
                     String transformedState = TransformationHelper.transform(
                             FrameworkUtil.getBundle(HistoryLastChangesSkill.class).getBundleContext(),
                             stateDescription.getPattern(), state.toString());
-                    if (transformedState.equals(state.toString())) {
+                    if (transformedState != null && transformedState.equals(state.toString())) {
                         return state.format(stateDescription.getPattern());
                     } else {
                         return transformedState;
                     }
-                } catch (NoClassDefFoundError ex) {
+                } catch (NoClassDefFoundError | TransformationException ex) {
                     // TransformationHelper is optional dependency, so ignore if class not found
                     // return state as it is without transformation
                     return state.toString();
@@ -121,12 +139,12 @@ public class HistoryLastChangesSkill extends AbstractItemIntentInterpreter {
     }
 
     @Reference
-    public void setItemRegistry(ItemRegistry itemRegistry) {
-        this.itemRegistry = itemRegistry;
+    protected void setItemResolver(ItemResolver itemResolver) {
+        this.itemResolver = itemResolver;
     }
 
-    public void unsetItemRegistry(ItemRegistry itemRegistry) {
-        this.itemRegistry = null;
+    protected void unsetItemResolver(ItemResolver itemResolver) {
+        this.itemResolver = null;
     }
 
     @Reference

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2015-2017 by the respective copyright holders.
+ * Copyright (c) 2010-2018 by the respective copyright holders.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -10,7 +10,10 @@ package org.openhab.ui.habot.rest.internal;
 
 import java.security.InvalidParameterException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.Consumes;
@@ -28,20 +31,25 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.smarthome.core.auth.Role;
-import org.eclipse.smarthome.core.i18n.LocaleProvider;
 import org.eclipse.smarthome.core.voice.VoiceManager;
-import org.eclipse.smarthome.io.rest.LocaleUtil;
+import org.eclipse.smarthome.core.voice.text.InterpretationException;
+import org.eclipse.smarthome.io.rest.LocaleService;
 import org.eclipse.smarthome.io.rest.RESTResource;
 import org.openhab.ui.habot.card.Card;
 import org.openhab.ui.habot.card.internal.CardRegistry;
 import org.openhab.ui.habot.nlp.ChatReply;
+import org.openhab.ui.habot.nlp.ItemNamedAttribute;
+import org.openhab.ui.habot.nlp.ItemResolver;
 import org.openhab.ui.habot.nlp.internal.AnswerFormatter;
 import org.openhab.ui.habot.nlp.internal.OpenNLPInterpreter;
 import org.openhab.ui.habot.notification.internal.NotificationService;
 import org.openhab.ui.habot.notification.internal.webpush.Subscription;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,24 +67,28 @@ import io.swagger.annotations.ApiResponses;
  * @author Yannick Schaus - Initial contribution
  *
  */
+@Component
+@RolesAllowed({ Role.USER, Role.ADMIN })
 @Path(HABotResource.PATH_HABOT)
 @Api(HABotResource.PATH_HABOT)
-@Component(service = RESTResource.class, immediate = true)
 public class HABotResource implements RESTResource {
 
     private final Logger logger = LoggerFactory.getLogger(HABotResource.class);
 
+    @NonNull
     private final String OPENNLP_HLI = "opennlp";
 
     private VoiceManager voiceManager;
 
-    private LocaleProvider localeProvider;
+    private LocaleService localeService;
 
     private NotificationService notificationService;
 
     private CardRegistry cardRegistry;
 
-    @Reference
+    private ItemResolver itemResolver;
+
+    @Reference(cardinality = ReferenceCardinality.OPTIONAL, policy = ReferencePolicy.DYNAMIC)
     public void setVoiceManager(VoiceManager voiceManager) {
         this.voiceManager = voiceManager;
     }
@@ -85,16 +97,16 @@ public class HABotResource implements RESTResource {
         this.voiceManager = null;
     }
 
-    @Reference
-    public void setLocaleProvider(LocaleProvider localeProvider) {
-        this.localeProvider = localeProvider;
+    @Reference(cardinality = ReferenceCardinality.OPTIONAL, policy = ReferencePolicy.DYNAMIC)
+    public void setLocaleService(LocaleService localeService) {
+        this.localeService = localeService;
     }
 
-    public void unsetLocaleProvider(LocaleProvider localeProvider) {
-        this.localeProvider = null;
+    public void unsetLocaleService(LocaleService localeService) {
+        this.localeService = null;
     }
 
-    @Reference
+    @Reference(cardinality = ReferenceCardinality.OPTIONAL, policy = ReferencePolicy.DYNAMIC)
     public void setNotificationService(NotificationService notificationService) {
         this.notificationService = notificationService;
     }
@@ -103,13 +115,22 @@ public class HABotResource implements RESTResource {
         this.notificationService = null;
     }
 
-    @Reference
+    @Reference(cardinality = ReferenceCardinality.OPTIONAL, policy = ReferencePolicy.DYNAMIC)
     public void setCardRegistry(CardRegistry cardRegistry) {
         this.cardRegistry = cardRegistry;
     }
 
     public void unsetCardRegistry(CardRegistry cardRegistry) {
         this.cardRegistry = null;
+    }
+
+    @Reference(cardinality = ReferenceCardinality.OPTIONAL, policy = ReferencePolicy.DYNAMIC)
+    protected void setItemNamedAttributesResolver(ItemResolver itemResolver) {
+        this.itemResolver = itemResolver;
+    }
+
+    protected void unsetItemNamedAttributesResolver(ItemResolver itemResolver) {
+        this.itemResolver = null;
     }
 
     public static final String PATH_HABOT = "habot";
@@ -123,10 +144,7 @@ public class HABotResource implements RESTResource {
             @ApiResponse(code = 500, message = "There is no support for the configured language") })
     public Response greet(
             @HeaderParam(HttpHeaders.ACCEPT_LANGUAGE) @ApiParam(value = "language (will use the default if omitted)") String language) {
-
-        final Locale locale = (this.localeProvider != null && this.localeProvider.getLocale() != null)
-                ? this.localeProvider.getLocale()
-                : LocaleUtil.getLocale(language);
+        final Locale locale = this.localeService.getLocale(null);
 
         AnswerFormatter answerFormatter = new AnswerFormatter(locale);
 
@@ -147,16 +165,36 @@ public class HABotResource implements RESTResource {
             @ApiResponse(code = 500, message = "An interpretation error occured") })
     public Response chat(@HeaderParam(HttpHeaders.ACCEPT_LANGUAGE) @ApiParam(value = "language") String language,
             @ApiParam(value = "human language query", required = true) String query) throws Exception {
-
-        final Locale locale = (this.localeProvider != null && this.localeProvider.getLocale() != null)
-                ? this.localeProvider.getLocale()
-                : LocaleUtil.getLocale(language);
+        final Locale locale = this.localeService.getLocale(null);
 
         // interpret
         OpenNLPInterpreter hli = (OpenNLPInterpreter) voiceManager.getHLI(OPENNLP_HLI);
+        if (hli == null) {
+            throw new InterpretationException("The OpenNLP interpreter is not available");
+        }
         ChatReply reply = hli.reply(locale, query);
 
         return Response.ok(reply).build();
+    }
+
+    @GET
+    @RolesAllowed({ Role.USER, Role.ADMIN })
+    @Path("/attributes")
+    @Consumes(MediaType.TEXT_PLAIN)
+    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Gets all item named attributes.")
+    @ApiResponses(value = { @ApiResponse(code = 200, message = "OK", response = ChatReply.class),
+            @ApiResponse(code = 500, message = "An error occurred") })
+    public Response getAttributes(
+            @HeaderParam(HttpHeaders.ACCEPT_LANGUAGE) @ApiParam(value = "language") String language) throws Exception {
+        final Locale locale = this.localeService.getLocale(null);
+
+        this.itemResolver.setLocale(locale);
+        Map<String, Set<ItemNamedAttribute>> attributesByItemName = new HashMap<String, Set<ItemNamedAttribute>>();
+        this.itemResolver.getAllItemNamedAttributes().entrySet().stream()
+                .forEach(entry -> attributesByItemName.put(entry.getKey().getName(), entry.getValue()));
+
+        return Response.ok(attributesByItemName).build();
     }
 
     @POST
@@ -176,6 +214,7 @@ public class HABotResource implements RESTResource {
                 "{ \"body\": \"Congratulations, push notifications are working properly! 🎉👌\" }").get();
 
         logger.debug("Test notification response: {}", testNotificationResponse.toString());
+        logger.debug("Test notification response headers: {}", testNotificationResponse.getStringHeaders());
         logger.debug("Test notification response body: {}", testNotificationResponse.readEntity(String.class));
 
         return Response.ok(testNotificationResponse.getStatusInfo()).build();
@@ -259,7 +298,8 @@ public class HABotResource implements RESTResource {
     @Path("/cards/{cardUID}")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Deletes a card from the card deck.")
-    public Response deleteCard(@PathParam("cardUID") @ApiParam(value = "cardUID", required = true) String cardUID) {
+    public Response deleteCard(
+            @PathParam("cardUID") @ApiParam(value = "cardUID", required = true) @NonNull String cardUID) {
         this.cardRegistry.remove(cardUID);
 
         return Response.ok().build();
@@ -362,7 +402,8 @@ public class HABotResource implements RESTResource {
     @Path("/compat/cards/{cardUID}/delete")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Deletes a card from the card deck (compatibility endpoint).")
-    public Response deleteCardPost(@PathParam("cardUID") @ApiParam(value = "cardUID", required = true) String cardUID) {
+    public Response deleteCardPost(
+            @PathParam("cardUID") @ApiParam(value = "cardUID", required = true) @NonNull String cardUID) {
         return this.deleteCard(cardUID);
     }
 
@@ -373,7 +414,12 @@ public class HABotResource implements RESTResource {
             @ApiResponse(code = 404, message = "The card with the provided UID doesn't exist"),
             @ApiResponse(code = 500, message = "An error occured") })
     public Response unsetCardBookmarkCompat(
-            @PathParam("cardUID") @ApiParam(value = "cardUID", required = true) String cardUID) {
+            @PathParam("cardUID") @ApiParam(value = "cardUID", required = true) @NonNull String cardUID) {
         return this.unsetCardBookmark(cardUID);
+    }
+
+    @Override
+    public boolean isSatisfied() {
+        return localeService != null && voiceManager != null && notificationService != null && cardRegistry != null;
     }
 }

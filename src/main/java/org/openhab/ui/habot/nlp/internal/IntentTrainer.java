@@ -1,3 +1,11 @@
+/**
+ * Copyright (c) 2010-2018 by the respective copyright holders.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ */
 package org.openhab.ui.habot.nlp.internal;
 
 import java.io.InputStream;
@@ -7,7 +15,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedMap;
 
-import org.openhab.ui.habot.nlp.AlphaNumericTokenizer;
 import org.openhab.ui.habot.nlp.Intent;
 import org.openhab.ui.habot.nlp.Skill;
 import org.openhab.ui.habot.nlp.UnsupportedLanguageException;
@@ -30,6 +37,12 @@ import opennlp.tools.util.ObjectStreamUtils;
 import opennlp.tools.util.Span;
 import opennlp.tools.util.TrainingParameters;
 
+/**
+ * This class is used both for training the OpenNLP document categorizer and token extractor, and for doing the actual
+ * natural language understanding - it converts a natural query into an {@link Intent}.
+ *
+ * @author Yannick Schaus
+ */
 public class IntentTrainer {
 
     private final Logger logger = LoggerFactory.getLogger(IntentTrainer.class);
@@ -38,13 +51,29 @@ public class IntentTrainer {
     private NameFinderME nameFinder;
     private Tokenizer tokenizer;
 
+    /**
+     * Trains a new IntentTrainer instance with intents sourced from a collection of skills for the specified language
+     *
+     * @param language the ISO-639 language code
+     * @param skills the collection of skills providing training data
+     * @throws Exception
+     */
     public IntentTrainer(String language, Collection<Skill> skills) throws Exception {
         this(language, skills, null, null);
     }
 
+    /**
+     * Trains a new IntentTrainer instance with intents sourced from a collection of skills for the specified language,
+     * and additional name samples
+     *
+     * @param language the ISO-639 language code
+     * @param skills the collection of skills providing training data
+     * @param additionalNameSamples additional user-provided name samples to train the token name finder
+     * @param tokenizerId tokenizer to use ("alphanumeric" or "whitespace")
+     * @throws Exception
+     */
     public IntentTrainer(String language, Collection<Skill> skills, InputStream additionalNameSamples,
             String tokenizerId) throws Exception {
-
         this.tokenizer = (tokenizerId == "alphanumeric") ? AlphaNumericTokenizer.INSTANCE
                 : WhitespaceTokenizer.INSTANCE;
 
@@ -121,13 +150,19 @@ public class IntentTrainer {
         nameFinder = new NameFinderME(tokenNameFinderModel);
     }
 
+    /**
+     * Tries to understand the natural language query into an {@link Intent}
+     *
+     * @param query the natural language query
+     * @return the resulting @{link Intent}
+     */
     public Intent interpret(String query) {
         String[] tokens = this.tokenizer.tokenize(query.toLowerCase());
         // remove eventual trailing punctuation
         tokens[tokens.length - 1] = tokens[tokens.length - 1].replaceAll("\\s*[!?.]+$", "");
 
         double[] outcome = categorizer.categorize(tokens);
-        logger.debug(categorizer.getAllResults(outcome));
+        logger.debug("{}", categorizer.getAllResults(outcome));
 
         Intent intent = new Intent(categorizer.getBestCategory(outcome));
 
@@ -137,11 +172,18 @@ public class IntentTrainer {
             intent.getEntities().put(spans[i].getType(), names[i]);
         }
 
-        logger.debug(intent.toString());
+        logger.debug("{}", intent.toString());
 
         return intent;
     }
 
+    /**
+     * Retrieves a sorted score map of the categorisation results for a query.
+     * Mainly used for testing the categorizer.
+     *
+     * @param query the natural language query
+     * @return the score map
+     */
     public SortedMap<Double, Set<String>> getScoreMap(String query) {
         String[] tokens = this.tokenizer.tokenize(query.toLowerCase());
         return categorizer.sortedScoreMap(tokens);

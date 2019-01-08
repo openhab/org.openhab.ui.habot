@@ -1,3 +1,11 @@
+/**
+ * Copyright (c) 2010-2018 by the respective copyright holders.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ */
 package org.openhab.ui.habot.notification.internal.webpush;
 
 import java.io.IOException;
@@ -33,14 +41,19 @@ import org.jose4j.jws.AlgorithmIdentifiers;
 import org.jose4j.jws.JsonWebSignature;
 import org.jose4j.jwt.JwtClaims;
 import org.jose4j.lang.JoseException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.common.io.BaseEncoding;
 
+/**
+ * This code in this package is mostly borrowed from
+ * <a href=
+ * "https://github.com/web-push-libs/webpush-java/tree/master/src/main/java/nl/martijndwars/webpush">webpush-java</a>.
+ *
+ * @author Martijn Dwars
+ * @author Yannick Schaus - integration for HABot, replaced Apache HTTP client with JAX-RS
+ */
 public class PushService {
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
-    private final Logger logger = LoggerFactory.getLogger(PushService.class);
 
     /**
      * The Google Cloud Messaging API key (for pre-VAPID in Chrome)
@@ -143,8 +156,8 @@ public class PushService {
         if (notification.hasPayload()) {
             headers.add("Content-Type", "application/octet-stream");
             headers.add("Content-Encoding", "aesgcm");
-            headers.add("Encryption", "keyid=p256dh;salt=" + base64url.omitPadding().encode(salt));
-            headers.add("Crypto-Key", "keyid=p256dh;dh=" + base64url.encode(dh));
+            headers.add("Encryption", "salt=" + base64url.omitPadding().encode(salt));
+            headers.add("Crypto-Key", "dh=" + base64url.encode(dh));
         }
 
         if (notification.isGcm()) {
@@ -174,8 +187,8 @@ public class PushService {
             byte[] pk = Utils.savePublicKey((ECPublicKey) publicKey);
 
             if (headers.containsKey("Crypto-Key")) {
-                headers.add("Crypto-Key",
-                        headers.get("Crypto-Key") + ";p256ecdsa=" + base64url.omitPadding().encode(pk));
+                headers.putSingle("Crypto-Key",
+                        headers.getFirst("Crypto-Key") + ";p256ecdsa=" + base64url.omitPadding().encode(pk));
             } else {
                 headers.add("Crypto-Key", "p256ecdsa=" + base64url.encode(pk));
             }

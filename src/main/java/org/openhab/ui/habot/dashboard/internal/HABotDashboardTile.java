@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2015-2016 by the respective copyright holders.
+ * Copyright (c) 2010-2018 by the respective copyright holders.
  *
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
@@ -8,11 +8,15 @@
  */
 package org.openhab.ui.habot.dashboard.internal;
 
+import java.util.Map;
+
 import org.openhab.ui.dashboard.DashboardTile;
+import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.http.HttpContext;
 import org.osgi.service.http.HttpService;
 import org.osgi.service.http.NamespaceException;
 import org.slf4j.Logger;
@@ -35,7 +39,7 @@ public class HABotDashboardTile implements DashboardTile {
 
     @Override
     public String getUrl() {
-        return "../habot/index.html";
+        return "../habot/";
     }
 
     @Override
@@ -45,19 +49,24 @@ public class HABotDashboardTile implements DashboardTile {
 
     @Override
     public String getImageUrl() {
-        return "../habot/statics/tile.png";
+        return "../habot/statics/dashboardtile.png";
     }
 
     public static final String HABOT_ALIAS = "/habot";
+    public static final String RESOURCES_BASE = "web/dist/pwa-mat";
 
-    private static final Logger logger = LoggerFactory.getLogger(HABotDashboardTile.class);
+    private final Logger logger = LoggerFactory.getLogger(HABotDashboardTile.class);
 
     protected HttpService httpService;
 
     @Activate
-    protected void activate() {
+    protected void activate(Map<String, Object> configProps, BundleContext context) {
         try {
-            httpService.registerResources(HABOT_ALIAS, "web-new/dist/pwa-mat", null);
+            Object useGzipCompression = configProps.get("useGzipCompression");
+            HttpContext httpContext = new HABotHttpContext(httpService.createDefaultHttpContext(), RESOURCES_BASE,
+                    (useGzipCompression != null && Boolean.parseBoolean(useGzipCompression.toString())));
+
+            httpService.registerResources(HABOT_ALIAS, RESOURCES_BASE, httpContext);
             logger.info("Started HABot at " + HABOT_ALIAS);
         } catch (NamespaceException e) {
             logger.error("Error during HABot startup: {}", e.getMessage());

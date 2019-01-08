@@ -1,3 +1,11 @@
+/**
+ * Copyright (c) 2010-2018 by the respective copyright holders.
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ */
 package org.openhab.ui.habot.notification.internal;
 
 import static org.bouncycastle.jce.provider.BouncyCastleProvider.PROVIDER_NAME;
@@ -28,7 +36,6 @@ import org.bouncycastle.jce.interfaces.ECPublicKey;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.jce.spec.ECNamedCurveParameterSpec;
 import org.eclipse.smarthome.config.core.ConfigConstants;
-import org.eclipse.smarthome.model.script.engine.action.ActionDoc;
 import org.jose4j.lang.JoseException;
 import org.openhab.ui.habot.notification.internal.webpush.Notification;
 import org.openhab.ui.habot.notification.internal.webpush.PushService;
@@ -42,6 +49,11 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.io.BaseEncoding;
 
+/**
+ * Handles the web push notifications.
+ *
+ * @author Yannick Schaus
+ */
 @Component(service = NotificationService.class, immediate = true)
 public class NotificationService {
 
@@ -63,15 +75,20 @@ public class NotificationService {
         }
     }
 
+    /**
+     * Gets the public VAPID key
+     *
+     * @return the string representation of the public key
+     */
     public String getVAPIDPublicKey() {
         loadVAPIDKeys();
         return publicVAPIDKey;
     }
 
     /**
-     * Store the subscription
+     * Store a new subscription
      *
-     * @param subscription
+     * @param subscription the subscription to store
      */
     public void addSubscription(Subscription subscription) {
         if (this.subscriptionProvider.get(subscription.keys) == null) {
@@ -79,12 +96,26 @@ public class NotificationService {
         }
     }
 
+    /**
+     * Broadcast a web push notification to all subscriptions
+     *
+     * @param payload the payload to push
+     * @throws GeneralSecurityException
+     */
     public void broadcastNotification(String payload) throws GeneralSecurityException {
         for (Subscription subscription : this.subscriptionProvider.getAll()) {
             sendNotification(subscription, payload);
         }
     }
 
+    /**
+     * Sends a web push notification to a specified subscription
+     *
+     * @param subscription the subscription to send the notification to
+     * @param payload the payload to push
+     * @return the {@link Future} for the {@link Response} to the push server
+     * @throws GeneralSecurityException
+     */
     public Future<Response> sendNotification(Subscription subscription, String payload)
             throws GeneralSecurityException {
         getPushService();
@@ -111,7 +142,12 @@ public class NotificationService {
     /**
      * Generate an EC keypair on the prime256v1 curve and save them to a file for later usage.
      *
-     * @return
+     * Some code borrowed from
+     * <a href=
+     * "https://github.com/web-push-libs/webpush-java/blob/master/src/main/java/nl/martijndwars/webpush/cli/handlers/GenerateKeyHandler.java">webpush-java</a>.
+     *
+     * @author Martijn Dwars
+     *
      * @throws InvalidAlgorithmParameterException
      * @throws NoSuchProviderException
      * @throws NoSuchAlgorithmException
@@ -159,25 +195,6 @@ public class NotificationService {
                 RuntimeException ex = new RuntimeException("Cannot get the VAPID keypair for push notifications");
                 ex.initCause(e1);
                 throw ex;
-            }
-        }
-    }
-
-    @ActionDoc(text = "Sends a web push notification to all subscribed HABot clients")
-    public void sendHABotNotification(String title, String text) throws GeneralSecurityException {
-        if (this.pushService == null) {
-            loadVAPIDKeys();
-            this.pushService = new PushService(this.publicVAPIDKey, this.privateVAPIDKey, SUBJECT_NAME);
-        }
-
-        for (Subscription subscription : this.subscriptionProvider.getAll()) {
-            // TODO: add more arguments and build a payload
-            Notification notification = new Notification(subscription, text);
-            try {
-                this.pushService.send(notification);
-            } catch (IOException | JoseException | ExecutionException | InterruptedException e) {
-                logger.error("Unable to send the notification to {}: {}",
-                        this.subscriptionProvider.keyToString(subscription.keys));
             }
         }
     }
