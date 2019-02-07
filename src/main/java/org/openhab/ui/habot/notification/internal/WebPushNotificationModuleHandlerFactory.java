@@ -13,11 +13,11 @@ import java.util.Collections;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.smarthome.automation.Action;
-import org.eclipse.smarthome.automation.Module;
-import org.eclipse.smarthome.automation.handler.BaseModuleHandlerFactory;
-import org.eclipse.smarthome.automation.handler.ModuleHandler;
-import org.eclipse.smarthome.automation.handler.ModuleHandlerFactory;
+import org.openhab.core.automation.Action;
+import org.openhab.core.automation.Module;
+import org.openhab.core.automation.handler.BaseModuleHandlerFactory;
+import org.openhab.core.automation.handler.ModuleHandler;
+import org.openhab.core.automation.handler.ModuleHandlerFactory;
 import org.openhab.ui.habot.notification.WebPushNotificationActionHandler;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;

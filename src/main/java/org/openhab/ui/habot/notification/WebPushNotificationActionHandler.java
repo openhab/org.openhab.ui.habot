@@ -15,9 +15,9 @@ import java.util.Map;
 
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.jdt.annotation.Nullable;
-import org.eclipse.smarthome.automation.Action;
-import org.eclipse.smarthome.automation.handler.ActionHandler;
-import org.eclipse.smarthome.automation.handler.BaseModuleHandler;
+import org.openhab.core.automation.Action;
+import org.openhab.core.automation.handler.ActionHandler;
+import org.openhab.core.automation.handler.BaseModuleHandler;
 import org.openhab.ui.habot.notification.internal.NotificationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +49,7 @@ public class WebPushNotificationActionHandler extends BaseModuleHandler<Action> 
     /**
      * Constructs a WebPushNotificationActionHandler instance
      *
-     * @param module the {@link Action} module instance
+     * @param module              the {@link Action} module instance
      * @param notificationService the notification service to use to send the web push notifications
      */
     public WebPushNotificationActionHandler(Action module, NotificationService notificationService) {
