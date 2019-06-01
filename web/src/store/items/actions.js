@@ -4,7 +4,7 @@ export const someAction = (state) => {}
 import axios from 'axios'
 import 'event-source-polyfill'
 
-import { Notify } from 'quasar'
+import { Notify, Platform, LocalStorage } from 'quasar'
 
 let eventSource
 let authorizationHeader
@@ -28,14 +28,20 @@ export const initialLoad = (context) => {
 }
 
 export const watchEvents = async (context, credential) => {
+  let baseURL = ''
+  if (Platform.is.cordova) {
+    baseURL = LocalStorage.get.item('habot.baseURL') // context.rootState.baseURL
+  }
   if (credential || authorizationHeader) {
     if (!authorizationHeader) {
       authorizationHeader = 'Basic ' + btoa(credential.id + ':' + credential.password)
     }
-    eventSource = new EventSourcePolyfill('/rest/events', // eslint-disable-line no-undef
+    eventSource = new EventSourcePolyfill(baseURL + '/rest/events', // eslint-disable-line no-undef
       { headers: { 'Authorization': authorizationHeader } })
+  } else if (Platform.is.cordova) {
+    eventSource = new EventSourcePolyfill(baseURL + '/rest/events') // eslint-disable-line no-undef
   } else {
-    eventSource = new EventSource('/rest/events')
+    eventSource = new EventSource(baseURL + '/rest/events') // eslint-disable-line no-undef
   }
 
   eventSource.onopen = (event) => {
