@@ -140,6 +140,7 @@ export default {
           finished: false
         }
       ],
+      sentMessages: this.$q.localStorage.get.item('habot.sentMessages') || [],
       inputAfter: [{
         icon: 'arrow_send',
         content: true,
@@ -274,6 +275,8 @@ export default {
 
     send () {
       var currentChat = this.chats[this.chats.length - 1]
+      this.sentMessages.push(this.text)
+      this.$q.localStorage.set('habot.sentMessages', this.sentMessages)
       if (currentChat.greetingSuggestions) delete currentChat.greetingSuggestions
       currentChat.messages.push({
         id: new Date(),
@@ -356,13 +359,46 @@ export default {
       // }
     },
 
+    getCommand (sign) {
+      let messageIndex = this.sentMessages.lastIndexOf(this.text)
+      let index = this.sentMessages.length
+
+      if (!index) {
+        return
+      }
+
+      if (sign === -1) { // previous
+        if (messageIndex >= 0) {
+          index = messageIndex
+        }
+
+        this.text = this.sentMessages[index + sign]
+      }
+
+      if (sign === 1) { // next
+        if (messageIndex === index) {
+          this.text = this.sentMessages[0]
+        } else {
+          this.text = this.sentMessages[messageIndex + sign]
+        }
+      }
+    },
+
     keyUp (event) {
-      if (event.keyCode === 13) {
-        this.send()
-        // if (this.$q.platform.is.mobile) {
-        //   // force hide the virtual keyboard
-        //   setTimeout(event.currentTarget.blur()
-        // }
+      switch (event.keyCode) {
+        case 13: // enter
+          this.send()
+          // if (this.$q.platform.is.mobile) {
+          //   // force hide the virtual keyboard
+          //   setTimeout(event.currentTarget.blur()
+          // }
+          break
+        case 38: // up
+          this.getCommand(-1)
+          break
+        case 40: // down
+          this.getCommand(1)
+          break
       }
     },
 
